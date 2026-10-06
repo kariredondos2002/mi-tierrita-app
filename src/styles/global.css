@@ -17,33 +17,39 @@ body {
   background: var(--app-bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 650;
   margin: 0;
   color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
 h1 {
-  font-size: 21px;
-  line-height: 1.25;
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 48;
 }
 
 h2 {
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.35;
 }
 
 h3 {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 p {
@@ -66,9 +72,19 @@ textarea {
   color: inherit;
 }
 
+:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
+}
+
+::selection {
+  background: var(--sprout);
+  color: var(--forest-2);
 }
 
 .num {
@@ -95,4 +111,13 @@ table {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

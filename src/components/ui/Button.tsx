@@ -16,6 +16,13 @@ export const Button = ({ variant = "primary", size = "md", block = false, loadin
     disabled={disabled || loading}
     {...rest}
   >
-    {loading ? "Procesando…" : children}
+    {loading ? (
+      <>
+        <span className={styles.spinner} aria-hidden="true" />
+        Procesando…
+      </>
+    ) : (
+      children
+    )}
   </button>
 );

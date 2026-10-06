@@ -2,18 +2,20 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useScenario, useScenarios } from "@/hooks/financial";
 import type { ScenarioDetail } from "@/types/api";
-import { Button, EmptyState, ErrorState, Loading, QueryState, Tabs, type TabOption } from "@/components/ui";
+import { Button, Chips, EmptyState, ErrorState, Loading, QueryState, Tabs, type TabOption } from "@/components/ui";
 import { DecisionPanel } from "./DecisionPanel";
 import { AssumptionsPanel } from "./AssumptionsPanel";
 import { ScenariosPanel } from "./ScenariosPanel";
 import { CashFlowPanel } from "./CashFlowPanel";
+import { ProjectStudyPanel } from "./ProjectStudyPanel";
 import { ScenarioFormModal } from "./ScenarioFormModal";
 import styles from "./FinanceScreen.module.css";
 
-export type FinanceTab = "panel" | "supuestos" | "escenarios" | "flujo";
+export type FinanceTab = "panel" | "proyecto" | "supuestos" | "escenarios" | "flujo";
 
 const TAB_OPTIONS: TabOption<FinanceTab>[] = [
-  { value: "panel", label: "Panel" },
+  { value: "panel", label: "Panel de decisión" },
+  { value: "proyecto", label: "Estudio del proyecto" },
   { value: "supuestos", label: "Datos y supuestos" },
   { value: "escenarios", label: "Escenarios" },
   { value: "flujo", label: "Flujo y amortización" },
@@ -21,12 +23,13 @@ const TAB_OPTIONS: TabOption<FinanceTab>[] = [
 
 /** Título y subtítulo de cada vista del lienzo (el Panel usa el nombre del escenario). */
 const TAB_META: Record<Exclude<FinanceTab, "panel">, { title: string; subtitle: string }> = {
+  proyecto: { title: "Estudio del proyecto", subtitle: "Innovación, mercado, técnico y financiero articulados sobre el escenario seleccionado y los datos que registra el SIG." },
   supuestos: { title: "Datos del caso y supuestos", subtitle: "Cada campo indica su origen. Un cambio recalcula todos los indicadores y queda registrado con su usuario." },
   escenarios: { title: "Escenarios y sensibilidad", subtitle: "Qué alternativa conviene y cuánto margen de error tolera antes de dejar de convenir." },
   flujo: { title: "Flujo de caja y amortización", subtitle: "Detalle año por año de la ampliación y mes por mes del crédito." },
 };
 
-const isTab = (v: string | undefined): v is FinanceTab => v === "panel" || v === "supuestos" || v === "escenarios" || v === "flujo";
+const isTab = (v: string | undefined): v is FinanceTab => v === "panel" || v === "proyecto" || v === "supuestos" || v === "escenarios" || v === "flujo";
 
 /** CU-14 a CU-17: evaluación de la ampliación con crédito. Solo ADMIN (la ruta ya lo garantiza). */
 export const FinanceScreen = () => {
@@ -61,7 +64,7 @@ export const FinanceScreen = () => {
     const meta = tab === "panel" ? null : TAB_META[tab];
     const selector = (
       <div className={styles.presets}>
-        <Tabs options={presets} value={String(selectedId)} onChange={(v) => selectScenario(Number(v))} />
+        <Chips options={presets} value={String(selectedId)} onChange={(v) => selectScenario(Number(v))} />
       </div>
     );
     if (tab === "panel") {
@@ -121,6 +124,8 @@ export const FinanceScreen = () => {
             switch (tab) {
               case "panel":
                 return <DecisionPanel scenario={scenario} onOpenAssumptions={() => goTab("supuestos")} onNew={openNew} />;
+              case "proyecto":
+                return <ProjectStudyPanel scenario={scenario} />;
               case "supuestos":
                 return <AssumptionsPanel scenario={scenario} />;
               case "escenarios":

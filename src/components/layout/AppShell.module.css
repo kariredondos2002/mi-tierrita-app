@@ -1,7 +1,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: var(--app-bg);
+  background: radial-gradient(1200px 600px at -10% -10%, var(--app-bg-2), transparent 60%), var(--app-bg);
 }
 
 /* ---------- barra lateral ---------- */
@@ -15,7 +15,7 @@
   top: 0;
   height: 100vh;
   overflow: hidden;
-  transition: width 0.15s ease;
+  transition: width 0.18s ease;
 }
 .rail {
   width: var(--nav-rail);
@@ -23,40 +23,43 @@
 }
 .brand {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 2px 0 18px;
-  margin-bottom: 14px;
+  gap: 11px;
+  padding: 4px 8px 18px;
+  margin-bottom: 8px;
   border-bottom: 1px solid var(--nav-line);
   flex-shrink: 0;
 }
 .rail .brand {
+  justify-content: center;
   padding: 0 0 15px;
-  margin: 0 16px 13px;
+  margin: 0 16px 10px;
 }
-.brandText {
-  text-align: center;
+.rail .brandText {
+  display: none;
 }
 .brandName {
   font-family: var(--font-heading);
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 600;
   color: var(--nav-brand);
-  line-height: 1.1;
-  letter-spacing: -0.2px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 .brandSub {
-  font-size: 9.5px;
-  letter-spacing: 1.6px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--nav-muted);
-  margin-top: 5px;
+  margin-top: 4px;
+  font-weight: 600;
 }
 .list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 .rail .list {
   gap: 4px;
@@ -65,11 +68,11 @@
 .cat {
   padding: 16px 12px 7px;
   flex-shrink: 0;
-  font-size: 9.5px;
-  letter-spacing: 1.5px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--nav-muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 .rail .cat {
   height: 1px;
@@ -83,15 +86,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 40px;
+  height: 42px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: 11px;
   text-decoration: none;
   flex-shrink: 0;
   white-space: nowrap;
   position: relative;
   color: var(--nav-ink);
-  transition: background 0.13s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -100,7 +103,7 @@
 }
 .item:hover {
   background: var(--nav-hover);
-  color: var(--nav-ink);
+  color: #ffffff;
 }
 .item:focus-visible {
   outline: 2px solid var(--sprout);
@@ -108,30 +111,42 @@
 }
 .rail .item {
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
   padding: 0;
   align-self: center;
 }
-.active {
-  background: var(--nav-active);
-  box-shadow: inset 3px 0 0 var(--sprout);
-  color: #ffffff;
-}
+.active,
 .active:hover {
   background: var(--nav-active);
   color: #ffffff;
 }
+.active::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sprout);
+}
+.rail .active::before {
+  left: -15px;
+}
+.active .icon {
+  color: var(--sprout);
+}
 .rail .active {
   background: var(--nav-active-rail);
-  box-shadow: none;
 }
 .locked {
   color: var(--nav-muted);
 }
 .exit {
   color: var(--nav-exit);
+  height: 38px;
 }
 .icon {
   width: 20px;
@@ -144,36 +159,36 @@
   stroke-linejoin: round;
 }
 .label {
-  font-size: 13px;
-  letter-spacing: -0.1px;
+  font-size: 13.5px;
+  font-weight: 500;
   flex-grow: 1;
 }
 .active .label {
-  font-weight: 600;
+  font-weight: 650;
 }
 .rail .label {
   display: none;
 }
 .badge {
-  min-width: 20px;
-  height: 19px;
-  border-radius: 6px;
+  min-width: 22px;
+  height: 20px;
+  border-radius: 999px;
   background: var(--nav-badge-bg);
   color: var(--nav-badge-fg);
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6px;
+  padding: 0 7px;
   flex-shrink: 0;
 }
 .rail .badge {
   position: absolute;
-  top: 7px;
+  top: 8px;
   right: 8px;
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   min-width: 0;
   padding: 0;
   border-radius: 4px;
@@ -196,11 +211,55 @@
   padding-top: 12px;
   border-top: 1px solid var(--nav-line);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .rail .exitWrap {
   margin: auto 16px 0;
+  align-items: center;
+}
+.navUser {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.rail .navUser {
+  padding: 0;
+  background: none;
+}
+.rail .navUserText {
+  display: none;
+}
+.navAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--sprout), #6fbf8f);
+  color: #0d261c;
+  display: grid;
+  place-items: center;
+  font-size: 12.5px;
+  font-weight: 750;
+  flex-shrink: 0;
+}
+.navUserText {
+  min-width: 0;
+}
+.navUserName {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--nav-brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.navUserRole {
+  font-size: 11px;
+  color: var(--nav-muted);
 }
 
 /* ---------- panel de contenido ---------- */
@@ -209,31 +268,32 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  margin: 9px 9px 9px 0;
+  margin: 10px 10px 10px 0;
   border-radius: var(--radius-panel);
-  overflow: hidden;
+  overflow: clip;
   background: var(--ground);
   box-shadow: var(--shadow-panel);
 }
 .topbar {
-  height: 56px;
+  height: 62px;
   flex-shrink: 0;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
-  padding: 0 22px;
-  gap: 12px;
+  padding: 0 26px;
+  gap: 10px;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 .iconBtn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   background: transparent;
   cursor: pointer;
   display: flex;
@@ -241,12 +301,14 @@
   justify-content: center;
   position: relative;
   color: var(--ink-2);
+  transition: background 0.15s, border-color 0.15s;
 }
 .iconBtn:hover {
   background: var(--hover);
+  border-color: var(--line);
 }
 .toggle {
-  margin-left: -6px;
+  margin-left: -8px;
 }
 .crumbs {
   display: flex;
@@ -255,16 +317,23 @@
   flex-grow: 1;
   min-width: 0;
   font-size: 13px;
-  color: var(--ink-2);
+  color: var(--muted);
 }
 .crumbs a {
-  color: var(--ink-2);
+  color: var(--muted);
   text-decoration: none;
+  white-space: nowrap;
+  font-weight: 550;
+}
+.crumbs a:hover {
+  color: var(--ink);
+}
+.crumbGroup {
   white-space: nowrap;
 }
 .crumbs strong {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 650;
   white-space: nowrap;
 }
 .chevron {
@@ -274,77 +343,128 @@
 .saved {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
-  color: var(--muted);
+  font-weight: 550;
+  color: var(--ink-2);
   white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  margin-right: 4px;
+}
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 0 3px var(--good-soft);
+}
+.pulseBusy {
+  background: var(--harvest);
+  box-shadow: 0 0 0 3px var(--harvest-soft);
+  animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
 }
 .dot {
   position: absolute;
-  top: 7px;
-  right: 8px;
-  width: 7px;
-  height: 7px;
+  top: 8px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 1.5px solid var(--surface);
+  background: var(--clay);
+  border: 2px solid var(--surface);
 }
 .user {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding-left: 12px;
+  gap: 10px;
+  padding-left: 14px;
+  margin-left: 4px;
   border-left: 1px solid var(--line);
 }
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--leaf);
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--leaf), var(--forest));
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 700;
 }
 .userName {
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 650;
   line-height: 1.25;
 }
 .userRole {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--muted);
   line-height: 1.25;
 }
 .content {
   flex-grow: 1;
-  padding: 16px 22px 28px;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 24px 28px 36px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
+  animation: enter 0.25s ease-out;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 /* ---------- encabezado de página ---------- */
 .pageHead {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: flex-end;
+  gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 2px;
 }
 .pageHeadText {
   flex-grow: 1;
+  min-width: 0;
+}
+.eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--leaf);
+  margin-bottom: 4px;
 }
 .pageSub {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--ink-2);
-  margin-top: 3px;
+  margin-top: 5px;
 }
 .pageActions {
   display: flex;
-  gap: 9px;
+  gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+  .crumbGroup,
+  .crumbGroup + .chevron {
+    display: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -357,27 +477,33 @@
     width: var(--nav-width);
     padding: 18px 14px 14px;
     transform: translateX(-100%);
-    transition: transform 0.2s;
+    transition: transform 0.22s ease;
+    background: var(--app-bg);
+    box-shadow: var(--shadow-pop);
   }
   .navMobileOpen {
     transform: translateX(0);
   }
   .rail .label,
-  .rail .brandText {
+  .rail .brandText,
+  .rail .navUserText {
     display: block;
   }
   .panel {
     margin: 0;
     border-radius: 0;
   }
-  .topbar,
-  .content {
-    padding-left: 14px;
-    padding-right: 14px;
+  .topbar {
+    padding: 0 14px;
   }
-  .saved {
+  .content {
+    padding: 18px 14px 28px;
+  }
+  .crumbs > a,
+  .crumbs > a + .chevron {
     display: none;
   }
+  .saved,
   .userName,
   .userRole {
     display: none;
@@ -386,4 +512,12 @@
     padding-left: 0;
     border-left: none;
   }
+  h1 {
+    font-size: 22px;
+  }
+}
+
+/* Con el menú expandido el usuario ya aparece abajo a la izquierda: arriba solo queda el avatar. */
+.shell:not(:has(.rail)) .userText {
+  display: none;
 }

@@ -18,7 +18,10 @@ frontend) de la documentación técnica del TCC.
 | Estado global de cliente | Zustand (sesión, tema, notificaciones) |
 | Enrutamiento | React Router 7 |
 | Cliente HTTP | Axios con interceptores (token, 401 → cierre de sesión) |
-| Estilos | CSS modules por componente + variables de tema (claro y oscuro) |
+| Estilos | CSS modules por componente + sistema de diseño «Tierra viva» (variables de tema claro y oscuro) |
+| Tipografía | Plus Jakarta Sans (interfaz y cifras) y Fraunces (titulares), autoalojadas con @fontsource |
+| Gráficos | SVG propios dibujados al ancho real: tendencia, barras, dona, línea, tornado |
+| Pruebas | Vitest (`pnpm test`) |
 
 ## Puesta en marcha (local)
 
@@ -83,17 +86,48 @@ src/
 | Pantalla | Ruta | Administrador | Secretaria | Bodega |
 |---|---|---|---|---|
 | Iniciar sesión | `/iniciar-sesion` | todos sin sesión | | |
-| Inicio | `/` | ✓ | ✓ | ✓ |
+| Tablero gerencial (inicio por rol) | `/` | ✓ | ✓ | ✓ |
 | Inventario | `/inventario` | edición | consulta | edición |
 | Lotes y vencimientos | `/lotes` | ✓ | | ✓ |
 | Ventas (punto de venta e historial) | `/ventas`, `/ventas/:tab` | ✓ | ✓ | |
 | Clientes y cartera | `/clientes` | ✓ | ✓ | |
 | Proveedores | `/proveedores` | ✓ | | ✓ |
-| Finanzas (panel, supuestos, escenarios, flujo) | `/finanzas`, `/finanzas/:tab` | ✓ | | |
-| Reportes | `/reportes` | ✓ | solo ventas | |
+| Evaluación financiera (panel de decisión, estudio del proyecto, supuestos, escenarios, flujo) | `/finanzas`, `/finanzas/:tab` | ✓ | candado | |
+| Reportes gerenciales | `/reportes` | ✓ | solo ventas | |
 | Usuarios y roles | `/usuarios` | ✓ | | |
 | Auditoría | `/auditoria` | ✓ | | |
 | Acceso restringido | cualquier ruta sin permiso | ✓ | ✓ | ✓ |
+
+## Diseño (v2 · «Tierra viva»)
+
+Rediseño visual completo de 2026-2 sin cambiar la API ni las reglas de negocio:
+
+- **Tablero gerencial (SIG + BI + DSS):** indicadores con variación frente al mismo corte del mes anterior y
+  minigráfica, tendencia de ventas de 13 semanas, productos más vendidos, capital en bodega por línea (dona),
+  cartera por cliente con uso del cupo, pendientes y la decisión abierta de la ampliación.
+- **Evaluación financiera:** nueva pestaña *Estudio del proyecto* que articula innovación, mercado, técnico y
+  financiero (TCC de Ingeniería Económica) con los supuestos del escenario y los datos reales del SIG.
+- **Inicio de sesión** con panel de marca y cuentas de demostración (se ocultan con `VITE_SHOW_DEMO_ACCOUNTS=false`).
+- Menú agrupado por enfoque: *Operación · ERP*, *Análisis y decisión*, *Administración*; tema claro/oscuro;
+  punto de venta con carrito y total fijos a la derecha; tablas responsivas.
+- El mismo sistema está en Figma (sistema de diseño, prototipo de escritorio y móvil, manual de usuario).
+
+## Cuentas de demostración
+
+Con la base sembrada (`pnpm db:seed` en la API) existen `admin` (Administrador), `secretaria` (Secretaria) y
+`bodega` (Bodega), todas con la contraseña `MiTierrita2026`. Los datos son simulados.
+
+## Despliegue en Seenode (sitio estático)
+
+| Campo | Valor |
+|---|---|
+| Tipo de servicio | Static site, conectado al repositorio `mi-tierrita-app` |
+| Build command | `corepack enable && pnpm install --frozen-lockfile && pnpm build` |
+| Publish directory | `dist` |
+| Client-side routing | Activado (reescribe `/*` a `/index.html`) |
+| Variable de entorno | `VITE_API_URL=https://<url-de-la-api>/api/v1` |
+
+Guía completa (base de datos, API y orden de pasos) en `docs/DESPLIEGUE.md` del repositorio de la API.
 
 ## Producción
 

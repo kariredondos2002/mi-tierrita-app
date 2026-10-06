@@ -10,8 +10,8 @@
 /* Rejilla 1.6fr / 1fr del lienzo. */
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr);
+  gap: 18px;
   flex-grow: 1;
   min-height: 0;
   align-items: start;
@@ -19,7 +19,7 @@
 .column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   min-width: 0;
   min-height: 0;
 }
@@ -27,7 +27,23 @@
   flex-grow: 1;
 }
 .sideColumn {
-  align-self: stretch;
+  position: sticky;
+  top: 80px;
+}
+.results {
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+}
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sideColumn {
+    position: static;
+  }
+  .results {
+    max-height: none;
+  }
 }
 
 /* ---------- Punto de venta ---------- */
@@ -37,7 +53,8 @@
   gap: 10px;
   background: var(--surface);
   border: 1px solid var(--line-strong);
-  border-radius: 9px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
   height: 46px;
   padding: 0 14px;
 }
@@ -77,6 +94,12 @@
 }
 .mono {
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.searchInput:focus,
+.searchInput:focus-visible {
+  outline: none;
 }
 .stockCell {
   display: inline-flex;
@@ -154,10 +177,10 @@
 
 /* Panel verde oscuro de resumen (colores del lienzo sobre la marca, fijos como en Signin). */
 .summary {
-  background: var(--forest);
+  background: repeating-linear-gradient(-28deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px), linear-gradient(140deg, #1d4a37, #0d2a1e);
   border-radius: var(--radius);
-  padding: 16px 18px;
-  margin-top: auto;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
 }
 .summaryRow {
   display: flex;
@@ -183,9 +206,9 @@
   color: #e8f0ea;
 }
 .summaryTotal strong {
-  font-family: var(--font-heading);
-  font-size: 27px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
   color: #ffffff;
   font-variant-numeric: tabular-nums;
 }

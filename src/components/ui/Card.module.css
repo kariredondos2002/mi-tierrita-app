@@ -2,30 +2,39 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 15px 17px;
+  padding: 18px 20px;
   min-width: 0;
+  box-shadow: var(--shadow-card);
 }
 .header {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 11px;
+  gap: 12px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 .title {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
+.title h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .subtitle {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--muted);
+  font-weight: 400;
 }
 .flush {
   padding: 0;
+  overflow: hidden;
 }
 .soft {
   background: var(--surface-2);
+  box-shadow: none;
 }

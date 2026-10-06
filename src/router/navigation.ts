@@ -33,9 +33,9 @@ export const NAV_ICONS = ICONS;
 
 /** Mapa de pantallas por rol (documento 07, sección 2). La misma lista alimenta el menú y las guardas. */
 export const NAV_GROUPS: NavGroup[] = [
-  { items: [{ path: "/", label: "Inicio", icon: ICONS.home, roles: ALL }] },
+  { items: [{ path: "/", label: "Tablero gerencial", icon: ICONS.home, roles: ALL }] },
   {
-    title: "Operación",
+    title: "Operación · ERP",
     items: [
       { path: "/inventario", label: "Inventario", icon: ICONS.inventory, roles: ALL, badge: "inventory" },
       { path: "/lotes", label: "Lotes y vencimientos", icon: ICONS.batches, roles: ["ADMIN", "WAREHOUSE"], badge: "batches" },
@@ -45,14 +45,14 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Gestión",
+    title: "Análisis y decisión",
     items: [
-      { path: "/finanzas", label: "Finanzas y crédito", icon: ICONS.finance, roles: ["ADMIN"], lockedFor: ["SALES"] },
-      { path: "/reportes", label: "Reportes", icon: ICONS.reports, roles: ["ADMIN", "SALES"] },
+      { path: "/reportes", label: "Reportes gerenciales", icon: ICONS.reports, roles: ["ADMIN", "SALES"] },
+      { path: "/finanzas", label: "Evaluación financiera", icon: ICONS.finance, roles: ["ADMIN"], lockedFor: ["SALES"] },
     ],
   },
   {
-    title: "Sistema",
+    title: "Administración",
     items: [
       { path: "/usuarios", label: "Usuarios y roles", icon: ICONS.users, roles: ["ADMIN"] },
       { path: "/auditoria", label: "Auditoría", icon: ICONS.audits, roles: ["ADMIN"] },

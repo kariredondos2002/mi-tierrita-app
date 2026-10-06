@@ -1,20 +1,97 @@
 /* Inicio: rejillas, listas de pendientes y tarjeta de decisión, con las medidas del lienzo. */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+@media (max-width: 1280px) {
+  .grid3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.trendFoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.trendFoot strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.cardLink {
+  font-size: 12.5px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.debtors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.debtorTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.debtorName {
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.debtorBar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  margin: 6px 0 4px;
+  overflow: hidden;
+}
+.debtorBar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chart-1);
+}
+.debtorBar .debtorWarn {
+  background: var(--harvest);
+}
+.debtorBar .debtorBad {
+  background: var(--bad);
+}
+.debtorMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--muted);
 }
 .gridEven {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 18px;
   align-items: start;
 }
 .column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
   min-width: 0;
 }
 .strong {
@@ -92,57 +169,86 @@
   color: var(--bad-tag-fg);
   margin-top: 8px;
 }
-/* Tarjeta verde "Decisión abierta": los tonos claros derivan del blanco sobre el verde bosque del lienzo. */
+/* Tarjeta «Decisión abierta» (DSS): degradado verde bosque con textura de surcos. */
 .decision {
+  position: relative;
   display: block;
   text-decoration: none;
   color: inherit;
-  background: var(--forest);
+  background:
+    repeating-linear-gradient(-28deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px),
+    linear-gradient(140deg, #1d4a37 0%, #0f3324 70%, #0b291d 100%);
   border-radius: var(--radius);
-  padding: 15px 17px;
-  --decision-label: color-mix(in srgb, var(--on-forest) 60%, var(--forest));
-  --decision-text: color-mix(in srgb, var(--on-forest) 76%, var(--forest));
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  --decision-label: rgba(255, 255, 255, 0.62);
+  --decision-text: rgba(255, 255, 255, 0.8);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 .decision:hover {
   color: inherit;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-pop);
+}
+.decision::after {
+  content: "";
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(159, 212, 180, 0.35), transparent 70%);
 }
 .decisionLabel {
-  font-size: 11.5px;
-  color: var(--decision-label);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9fd4b4;
 }
 .decisionTitle {
   font-family: var(--font-heading);
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
-  color: var(--on-forest);
-  margin-top: 3px;
+  line-height: 1.25;
+  color: #ffffff;
+  margin-top: 6px;
 }
 .decisionText {
   font-size: 12.5px;
   color: var(--decision-text);
-  margin-top: 7px;
-  line-height: 1.5;
+  margin-top: 8px;
+  line-height: 1.55;
 }
 .decisionMetrics {
   display: flex;
-  gap: 16px;
-  margin-top: 11px;
+  gap: 22px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 .metricLabel {
   display: block;
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--decision-label);
 }
 .metricValue {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--on-forest);
+  font-size: 18px;
+  font-weight: 750;
+  color: #ffffff;
 }
 .metricGood {
-  color: var(--sprout);
+  color: #9fd4b4;
 }
-@media (max-width: 1000px) {
+
+@media (max-width: 980px) {
   .grid,
+  .grid3,
   .gridEven {
     grid-template-columns: 1fr;
   }

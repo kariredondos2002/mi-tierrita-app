@@ -78,9 +78,18 @@ export const InventoryScreen = () => {
   };
 
   const columns: Column<Product>[] = [
-    { key: "sku", header: "Código", render: (p) => <span className={styles.code}>{p.sku}</span> },
-    { key: "name", header: "Producto", align: "left", render: (p) => <span className={styles.productName}>{p.name}</span> },
-    { key: "category", header: "Línea", align: "left", render: (p) => p.categoryName },
+    { key: "sku", header: "Código", mobile: false, render: (p) => <span className={styles.code}>{p.sku}</span> },
+    {
+      key: "name",
+      header: "Producto",
+      align: "left",
+      render: (p) => (
+        <span className={styles.productCell}>
+          <span className={styles.productName}>{p.name}</span>
+          <span className={styles.productLine}>{p.categoryName}</span>
+        </span>
+      ),
+    },
     { key: "stock", header: "Stock", align: "right", render: (p) => int(p.stock) },
     { key: "price", header: "Precio", align: "right", render: (p) => money(p.salePrice) },
     {

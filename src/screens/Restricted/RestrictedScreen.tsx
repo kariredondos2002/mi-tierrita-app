@@ -34,7 +34,7 @@ export const RestrictedScreen = ({ roles }: { roles: Role[] }) => {
         </div>
         <h1>{module} no está disponible para su cuenta</h1>
         <p>
-          {module === "Finanzas y crédito"
+          {module === "Evaluación financiera"
             ? "Este módulo contiene la evaluación de inversiones y las proyecciones financieras del negocio."
             : "Este módulo no forma parte de las tareas de su rol."}{" "}
           Está reservado para {describe(roles)}.

@@ -43,7 +43,7 @@ const expiryLabel = (batch: ProductBatch): string => (batch.expired ? "Vencido" 
 const batchColumns: Column<ProductBatch>[] = [
   { key: "product", header: "Producto", render: (b) => <span className={styles.name}>{b.productName}</span> },
   { key: "supplier", header: "Proveedor", align: "left", render: (b) => <span className={styles.secondary}>{b.supplierName ?? "Sin proveedor"}</span> },
-  { key: "units", header: "Unidades", render: (b) => int(b.quantityRemaining) },
+  { key: "units", header: "Unidades", align: "right", render: (b) => int(b.quantityRemaining) },
   { key: "expires", header: "Vence", render: (b) => <Badge tone={expiryTone(b)}>{expiryLabel(b)}</Badge> },
 ];
 

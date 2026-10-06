@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSalesReport } from "@/hooks/reports";
 import { ROLE_LABELS, useSessionStore } from "@/stores/session";
-import { addDaysIso, dateOnly, int, money, moneyCompact, todayIso } from "@/lib/format";
+import { addDaysIso, dateOnly, int, money, moneyAxis, moneyCompact, todayIso } from "@/lib/format";
 import { Button, DataTable, EmptyState, Field, Input, QueryState, Tabs, type Column, type TabOption } from "@/components/ui";
 import { HBarChart, VBarChart } from "@/components/charts";
 import type { SalesGroupBy, SalesReport, SalesReportDayRow, SalesReportProductRow } from "@/types/api";
@@ -158,7 +158,7 @@ export const SalesReportPanel = () => {
                     hint={report.groupBy === "day" ? (dayRows.length > MAX_DAY_BARS ? `últimos ${MAX_DAY_BARS} días con ventas del rango` : rangeLabel) : `top ${int(topProducts.length)} por total vendido`}
                   >
                     {report.groupBy === "day" ? (
-                      <VBarChart data={chartDays.map((r) => ({ label: shortDay(r.date), value: r.total }))} format={chartDays.length <= 8 ? moneyCompact : () => ""} />
+                      <VBarChart data={chartDays.map((r) => ({ label: shortDay(r.date), value: r.total }))} format={moneyAxis} />
                     ) : (
                       <HBarChart data={topProducts.map((r) => ({ label: truncate(r.productName, 22), value: r.total }))} format={moneyCompact} />
                     )}

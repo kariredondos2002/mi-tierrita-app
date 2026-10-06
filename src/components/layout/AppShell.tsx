@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useIsFetching } from "@tanstack/react-query";
 import { useSessionStore, ROLE_LABELS } from "@/stores/session";
 import { useUiStore } from "@/stores/ui";
+import { useThemeStore } from "@/stores/theme";
 import { useSignout } from "@/hooks/session";
 import { NAV_GROUPS, NAV_ICONS, findRoute, isLockedFor, isVisibleFor } from "@/router/navigation";
 import { initials } from "@/lib/format";
@@ -13,10 +14,17 @@ import styles from "./AppShell.module.css";
 /** Marca del lienzo: hoja sobre cuadrado verde claro. */
 export const BrandMark = ({ size = 38 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 44 44" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <rect x="1.5" y="1.5" width="41" height="41" rx="13.5" fill="#95D5B2" />
-    <path d="M22 35 L22 18.5" stroke="#132E24" strokeWidth="2.6" strokeLinecap="round" />
-    <path d="M22 26.5 C 16 26.5 12.5 22.5 12.5 16.5 C 18.5 16.5 22 20.5 22 26.5 Z" fill="#132E24" />
-    <path d="M22 22.5 C 28 22.5 31.5 18.5 31.5 12.5 C 25.5 12.5 22 16.5 22 22.5 Z" fill="#2D6A4F" />
+    <defs>
+      <linearGradient id="bm-bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#B8E3C8" />
+        <stop offset="1" stopColor="#7CC59B" />
+      </linearGradient>
+    </defs>
+    <rect x="1.5" y="1.5" width="41" height="41" rx="13.5" fill="url(#bm-bg)" />
+    <path d="M9 33.5 C 15 30.5 29 30.5 35 33.5" stroke="#0D261C" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
+    <path d="M22 32 L22 18.5" stroke="#0D261C" strokeWidth="2.6" strokeLinecap="round" />
+    <path d="M22 26 C 16 26 12.5 22 12.5 16 C 18.5 16 22 20 22 26 Z" fill="#0D261C" />
+    <path d="M22 22 C 28 22 31.5 18 31.5 12 C 25.5 12 22 16 22 22 Z" fill="#1D4A37" />
   </svg>
 );
 
@@ -24,8 +32,8 @@ const NavIcon = ({ paths }: { paths: string }) => <svg className={styles.icon} v
 
 const Lock = () => (
   <svg className={styles.lock} width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-    <rect x="2.4" y="5.2" width="7.2" height="5.4" rx="1.2" fill="#132E24" stroke="#5C7D6B" strokeWidth="1" />
-    <path d="M4.2 5.2 V3.8 a1.8 1.8 0 0 1 3.6 0 V5.2" stroke="#5C7D6B" strokeWidth="1.1" />
+    <rect x="2.4" y="5.2" width="7.2" height="5.4" rx="1.2" fill="none" stroke="currentColor" strokeWidth="1" />
+    <path d="M4.2 5.2 V3.8 a1.8 1.8 0 0 1 3.6 0 V5.2" stroke="currentColor" strokeWidth="1.1" />
   </svg>
 );
 
@@ -34,6 +42,8 @@ const Chevron = () => (
     <path d="M6 3.5 L10.5 8 L6 12.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+const groupOf = (pathname: string) => NAV_GROUPS.find((g) => g.items.some((i) => (i.path === "/" ? pathname === "/" : pathname.startsWith(i.path))))?.title ?? "Inicio";
 
 const timeNow = () => new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
 
@@ -49,6 +59,9 @@ export const AppShell = () => {
   const fetching = useIsFetching();
   const [savedAt, setSavedAt] = useState(timeNow);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const themeMode = useThemeStore((s) => s.mode);
+  const setThemeMode = useThemeStore((s) => s.setMode);
+  const isDark = themeMode === "dark" || (themeMode === "system" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
   const current = findRoute(location.pathname);
 
   useEffect(() => {
@@ -66,7 +79,7 @@ export const AppShell = () => {
           <BrandMark />
           <div className={styles.brandText}>
             <div className={styles.brandName}>Mi Tierrita</div>
-            <div className={styles.brandSub}>AGROPECUARIA</div>
+            <div className={styles.brandSub}>SIG · Agropecuaria</div>
           </div>
         </div>
         <div className={styles.list}>
@@ -99,6 +112,15 @@ export const AppShell = () => {
           })}
         </div>
         <div className={styles.exitWrap}>
+          <div className={styles.navUser}>
+            <div className={styles.navAvatar}>{initials(user.firstName, user.lastName)}</div>
+            <div className={styles.navUserText}>
+              <div className={styles.navUserName}>
+                {user.firstName} {user.lastName}
+              </div>
+              <div className={styles.navUserRole}>{ROLE_LABELS[user.role]}</div>
+            </div>
+          </div>
           <button type="button" className={[styles.item, styles.exit].join(" ")} onClick={() => signout.mutate(undefined)} aria-label="Cerrar sesión" title="Cerrar sesión">
             <NavIcon paths={NAV_ICONS.signout} />
             <span className={styles.label}>Cerrar sesión</span>
@@ -121,17 +143,38 @@ export const AppShell = () => {
           </button>
           <nav className={styles.crumbs} aria-label="Ruta de navegación">
             <a href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }}>Mi Tierrita</a>
+            {location.pathname !== "/" ? (
+              <>
+                <Chevron />
+                <span className={styles.crumbGroup}>{groupOf(location.pathname)}</span>
+              </>
+            ) : null}
             <Chevron />
-            <strong aria-current="page">{current?.label ?? "Inicio"}</strong>
+            <strong aria-current="page">{current?.label ?? "Tablero gerencial"}</strong>
             <span id="crumb-slot" style={{ display: "contents" }} />
           </nav>
           <span className={styles.saved}>
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="8" cy="8" r="6.4" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M8 4.6 V8.2 L10.4 9.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {fetching > 0 ? "Actualizando…" : `Actualizado ${savedAt}`}
+            <span className={[styles.pulse, fetching > 0 ? styles.pulseBusy : ""].join(" ")} aria-hidden="true" />
+            {fetching > 0 ? "Sincronizando…" : `En línea · ${savedAt}`}
           </span>
+          <button
+            type="button"
+            className={styles.iconBtn}
+            aria-label={isDark ? "Usar tema claro" : "Usar tema oscuro"}
+            title={isDark ? "Tema claro" : "Tema oscuro"}
+            onClick={() => setThemeMode(isDark ? "light" : "dark")}
+          >
+            {isDark ? (
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="10" cy="10" r="3.6" stroke="currentColor" strokeWidth="1.6" />
+                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a7 7 0 1 0 8.8 8.8z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
           <button type="button" className={styles.iconBtn} aria-label="Notificaciones" onClick={() => navigate("/")}>
             <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M10 2.5 a4.8 4.8 0 0 1 4.8 4.8 v3.2 l1.4 2.4 h-12.4 l1.4 -2.4 v-3.2 A4.8 4.8 0 0 1 10 2.5 z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -141,7 +184,7 @@ export const AppShell = () => {
           </button>
           <div className={styles.user}>
             <div className={styles.avatar}>{initials(user.firstName, user.lastName)}</div>
-            <div>
+            <div className={styles.userText}>
               <div className={styles.userName}>
                 {user.firstName} {user.lastName}
               </div>
@@ -158,10 +201,11 @@ export const AppShell = () => {
   );
 };
 
-/** Encabezado de página del lienzo: título serif 21px, subtítulo 13px y acciones a la derecha. */
-export const PageHeader = ({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) => (
+/** Encabezado de página: antetítulo opcional (módulo), título Fraunces 26px, subtítulo y acciones a la derecha. */
+export const PageHeader = ({ title, subtitle, actions, eyebrow }: { title: string; subtitle?: string; actions?: ReactNode; eyebrow?: string }) => (
   <div className={styles.pageHead}>
     <div className={styles.pageHeadText}>
+      {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
       <h1>{title}</h1>
       {subtitle ? <div className={styles.pageSub}>{subtitle}</div> : null}
     </div>

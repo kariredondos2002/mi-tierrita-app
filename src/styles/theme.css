@@ -1,105 +1,147 @@
 /*
- * Variables de diseño compartidas: valores exactos del lienzo "Vistas del módulo de evaluación"
- * (documento 02, sección 6). Ningún componente usa un color suelto.
+ * Sistema de diseño «Tierra viva» (v2, 2026-2). Fuente única de colores, tipografía, radios y sombras;
+ * los mismos tokens están publicados como variables en el archivo de Figma (página 01 · Sistema de diseño).
+ * Ningún componente usa un color suelto.
  */
 :root {
   /* marca */
-  --forest: #1b4332;
-  --leaf: #2d6a4f;
-  --sprout: #95d5b2;
-  --sprout-soft: #e0efe5;
-  --forest-fg: #1b4332;
+  --forest: #1d4a37;
+  --forest-2: #163b2c;
+  --leaf: #2c6a4e;
+  --sprout: #9fd4b4;
+  --sprout-soft: #e5f2ea;
+  --forest-fg: #1d4a37;
   --on-forest: #ffffff;
+  --harvest: #e3a33b;
+  --harvest-soft: #fbf0db;
+  --clay: #c0612b;
+  --sky: #3a7ca5;
+  --sky-soft: #e4eff6;
+
   /* fondos y bordes */
-  --app-bg: #132e24;
-  --ground: #f4f3ed;
+  --app-bg: #0d261c;
+  --app-bg-2: #12352a;
+  --ground: #f5f4ef;
   --surface: #ffffff;
   --surface-2: #fafaf6;
-  --surface-3: #efede4;
-  --segment-bg: #e7e8e0;
-  --line: #dedddc;
-  --line-soft: #efede4;
-  --line-strong: #c9ccc2;
-  --hover: #f1f2ee;
+  --surface-3: #f0efe8;
+  --segment-bg: #eceae2;
+  --line: #e6e4db;
+  --line-soft: #efeee8;
+  --line-strong: #d2d0c5;
+  --hover: #f3f2ec;
+
   /* texto */
-  --ink: #17201b;
-  --ink-2: #4a554e;
-  --muted: #78837b;
-  --muted-2: #9aa49c;
-  --link: #2d6a4f;
+  --ink: #13201a;
+  --ink-2: #47534c;
+  --muted: #7a857e;
+  --muted-2: #a2aba5;
+  --link: #2c6a4e;
+
   /* semánticos */
-  --good: #12795a;
-  --good-soft: #edf6f0;
-  --good-line: #a8d5bc;
-  --warn: #a16207;
-  --warn-soft: #fff8e8;
-  --warn-line: #e3c88a;
-  --warn-tag-bg: #f7ecd6;
-  --warn-tag-fg: #8a5a12;
-  --bad: #b02a2e;
-  --bad-soft: #fbeded;
-  --bad-line: #e3b4b6;
-  --bad-tag-bg: #f6e1e1;
-  --bad-tag-fg: #8a2226;
-  --accent: #c2410c;
+  --good: #14805e;
+  --good-soft: #eaf6ef;
+  --good-line: #b3dcc5;
+  --warn: #b26a00;
+  --warn-soft: #fff7e6;
+  --warn-line: #ecd29b;
+  --warn-tag-bg: #fbeed4;
+  --warn-tag-fg: #8a5300;
+  --bad: #c23b2e;
+  --bad-soft: #fdf0ee;
+  --bad-line: #efc0ba;
+  --bad-tag-bg: #fbe3df;
+  --bad-tag-fg: #9a2b20;
+  --accent: #c0612b;
+
+  /* gráficos: categorías en orden fijo (validado para daltonismo) */
+  --chart-1: #1d6b4c;
+  --chart-2: #e3a33b;
+  --chart-3: #3a7ca5;
+  --chart-4: #c0612b;
+  --chart-5: #7b6bb0;
+  --chart-6: #8aa65a;
+  --chart-grid: #ecebe4;
+  --chart-area: rgba(29, 107, 76, 0.14);
+
   /* barra lateral */
-  --nav-ink: #93ad9d;
-  --nav-muted: #5c7d6b;
-  --nav-exit: #7e9b8a;
-  --nav-line: rgba(255, 255, 255, 0.09);
-  --nav-hover: rgba(255, 255, 255, 0.065);
-  --nav-active: rgba(255, 255, 255, 0.1);
-  --nav-active-rail: rgba(255, 255, 255, 0.13);
-  --nav-badge-bg: rgba(226, 124, 70, 0.18);
-  --nav-badge-fg: #efa985;
-  --nav-badge-dot: #e27c46;
+  --nav-ink: #a9c2b3;
+  --nav-muted: #6c8c7b;
+  --nav-exit: #8fa99a;
+  --nav-line: rgba(255, 255, 255, 0.08);
+  --nav-hover: rgba(255, 255, 255, 0.06);
+  --nav-active: rgba(159, 212, 180, 0.14);
+  --nav-active-rail: rgba(159, 212, 180, 0.18);
+  --nav-badge-bg: rgba(227, 163, 59, 0.2);
+  --nav-badge-fg: #f2c477;
+  --nav-badge-dot: #e3a33b;
   --nav-brand: #f4faf6;
-  /* geometría y tipografía */
-  --radius: 11px;
-  --radius-sm: 7px;
-  --radius-panel: 15px;
-  --shadow: 0 1px 3px rgba(20, 40, 30, 0.14);
-  --shadow-panel: 0 2px 14px rgba(0, 0, 0, 0.14);
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-heading: "IBM Plex Serif", Georgia, serif;
-  --nav-width: 236px;
+
+  /* geometría, sombras y tipografía */
+  --radius: 14px;
+  --radius-sm: 9px;
+  --radius-panel: 22px;
+  --shadow: 0 1px 2px rgba(16, 40, 28, 0.06);
+  --shadow-card: 0 1px 2px rgba(16, 40, 28, 0.05), 0 6px 18px -8px rgba(16, 40, 28, 0.1);
+  --shadow-pop: 0 10px 30px -10px rgba(16, 40, 28, 0.28);
+  --shadow-panel: 0 2px 24px rgba(0, 0, 0, 0.18);
+  --font-body: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-heading: "Fraunces Variable", "Fraunces", Georgia, serif;
+  --nav-width: 252px;
   --nav-rail: 76px;
+  --content-max: 1440px;
   color-scheme: light;
 }
 
-/* Tema oscuro (documento 02): mismas variables, activado con data-theme="dark". */
+/* Tema oscuro: mismas variables, activado con data-theme="dark" (selector en la barra superior). */
 :root[data-theme="dark"] {
-  --sprout-soft: #1f3a2c;
+  --sprout-soft: #1d3a2c;
   --forest-fg: #b7e4c7;
-  --app-bg: #0b1a13;
-  --ground: #111815;
-  --surface: #182019;
-  --surface-2: #1c2620;
-  --surface-3: #22302a;
-  --segment-bg: #22302a;
-  --line: #2e3b33;
-  --line-soft: #26332c;
-  --line-strong: #3a4a40;
-  --hover: #1f2a23;
-  --ink: #e6ede8;
-  --ink-2: #b9c6be;
-  --muted: #84948a;
-  --muted-2: #6f7f75;
-  --link: #95d5b2;
+  --forest: #2f7a58;
+  --leaf: #3d8d68;
+  --harvest-soft: #3a2e14;
+  --sky-soft: #172b38;
+  --app-bg: #08150f;
+  --app-bg-2: #0d2219;
+  --ground: #0f1613;
+  --surface: #161f1a;
+  --surface-2: #1a241f;
+  --surface-3: #212d27;
+  --segment-bg: #212d27;
+  --line: #27332d;
+  --line-soft: #212c26;
+  --line-strong: #364640;
+  --hover: #1d2823;
+  --ink: #e7eee9;
+  --ink-2: #b8c5bd;
+  --muted: #86968c;
+  --muted-2: #6c7c72;
+  --link: #9fd4b4;
   --good: #6fcf9a;
-  --good-soft: #163526;
+  --good-soft: #15301f;
   --good-line: #2f6a4c;
-  --warn: #e6b35a;
-  --warn-soft: #3a2e14;
+  --warn: #e9b764;
+  --warn-soft: #33290f;
   --warn-line: #6e5a25;
   --warn-tag-bg: #3a2e14;
-  --warn-tag-fg: #e6b35a;
-  --bad: #f09a9c;
-  --bad-soft: #3c1f20;
-  --bad-line: #6e3a3c;
-  --bad-tag-bg: #3c1f20;
-  --bad-tag-fg: #f09a9c;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-panel: 0 2px 14px rgba(0, 0, 0, 0.6);
+  --warn-tag-fg: #e9b764;
+  --bad: #f19a90;
+  --bad-soft: #36201d;
+  --bad-line: #6e3a34;
+  --bad-tag-bg: #3c211e;
+  --bad-tag-fg: #f19a90;
+  --accent: #e8925e;
+  --chart-1: #5cc493;
+  --chart-2: #ebb85c;
+  --chart-3: #6aaed6;
+  --chart-4: #e8925e;
+  --chart-5: #a497d6;
+  --chart-6: #a9c47b;
+  --chart-grid: #222e28;
+  --chart-area: rgba(92, 196, 147, 0.16);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --shadow-panel: 0 2px 24px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
 }

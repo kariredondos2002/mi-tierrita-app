@@ -115,7 +115,7 @@ export const ScenariosPanel = ({ scenario, scenarios }: Props) => {
                 <th>Indicador</th>
                 {list.map((s, i) => (
                   <th key={s.id} className={s.id === scenario.id ? styles.current : undefined}>
-                    {letterOf(i)} · {s.name}
+                    {letterOf(i)} · {s.name.replace(/^[A-Z]\. /, "")}
                   </th>
                 ))}
                 {other ? (

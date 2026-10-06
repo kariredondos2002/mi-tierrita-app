@@ -29,7 +29,11 @@ export const dateOnly = (iso: string | null | undefined): string => {
   if (y === undefined || m === undefined || d === undefined) return iso;
   return new Date(y, m - 1, d).toLocaleDateString("es-CO", { dateStyle: "medium" });
 };
-export const todayIso = (): string => new Date().toISOString().slice(0, 10);
+/** Fecha local (no UTC) en AAAA-MM-DD: en Colombia, después de las 7 p. m. la fecha UTC ya es mañana. */
+export const todayIso = (): string => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 export const addDaysIso = (iso: string, days: number): string => {
   const d = new Date(`${iso}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
@@ -40,5 +44,18 @@ export const longToday = (): string =>
 export const greeting = (): string => {
   const h = new Date().getHours();
   return h < 12 ? "Buenos días" : h < 18 ? "Buenas tardes" : "Buenas noches";
+};
+/** "12 sep" para ejes de gráficas. */
+export const shortDate = (iso: string): string => {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  if (y === undefined || m === undefined || d === undefined) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", { day: "numeric", month: "short" }).replace(".", "");
+};
+/** Abreviado para ejes: 2,5 M · 850 mil. */
+export const moneyAxis = (value: number): string => {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 }).format(value / 1_000_000)} M`;
+  if (abs >= 1_000) return `${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(value / 1_000)} mil`;
+  return integer.format(value);
 };
 export const initials = (first: string, last: string): string => `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();

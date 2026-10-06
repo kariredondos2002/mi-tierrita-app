@@ -1,21 +1,22 @@
 .callout {
   border-radius: var(--radius);
-  padding: 16px 20px;
+  padding: 18px 22px;
   border: 1px solid var(--line);
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 .good {
-  background: var(--good-soft);
+  background: linear-gradient(120deg, var(--good-soft), var(--surface) 140%);
   border-color: var(--good-line);
 }
 .warn {
-  background: var(--warn-soft);
+  background: linear-gradient(120deg, var(--warn-soft), var(--surface) 140%);
   border-color: var(--warn-line);
 }
 .bad {
-  background: var(--bad-soft);
+  background: linear-gradient(120deg, var(--bad-soft), var(--surface) 140%);
   border-color: var(--bad-line);
 }
 .neutral {
@@ -24,8 +25,9 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: 1;
+  min-width: 220px;
   font-size: 13.5px;
   color: var(--ink-2);
 }
@@ -34,6 +36,7 @@
   font-size: 26px;
   font-weight: 600;
   line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .mark {

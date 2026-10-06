@@ -92,7 +92,7 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
   };
 
   const resultColumns: Column<Product>[] = [
-    { key: "sku", header: "Código", render: (p) => <span className={styles.mono}>{p.sku}</span> },
+    { key: "sku", header: "Código", mobile: false, render: (p) => <span className={styles.mono}>{p.sku}</span> },
     { key: "name", header: "Producto", render: (p) => p.name },
     {
       key: "stock",
@@ -151,7 +151,7 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
   ];
 
   const lineColumns: Column<SaleLine>[] = [
-    { key: "sku", header: "Código", render: (l) => <span className={styles.mono}>{l.sku}</span> },
+    { key: "sku", header: "Código", mobile: false, render: (l) => <span className={styles.mono}>{l.sku}</span> },
     { key: "name", header: "Producto", render: (l) => l.productName },
     { key: "qty", header: "Cant.", align: "right", render: (l) => int(l.quantity) },
     { key: "price", header: "Precio", align: "right", render: (l) => money(l.unitPrice) },
@@ -176,7 +176,7 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
             {resultsCount ? <span className={styles.searchCount}>{resultsCount}</span> : null}
           </div>
 
-          <Card title="Resultados" subtitle="Toque un producto para agregarlo">
+          <Card title="Catálogo" subtitle="Toque «Agregar» para sumar el producto al carrito" className={styles.results}>
             <QueryState
               query={products}
               isEmpty={(page) => page.items.length === 0}
@@ -186,13 +186,6 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
             </QueryState>
           </Card>
 
-          <Card title="Carrito" subtitle={cart.length === 0 ? "Sin productos" : `${int(cart.length)} ${cart.length === 1 ? "producto" : "productos"}`} className={styles.grow}>
-            {cart.length === 0 ? (
-              <EmptyState title="El carrito está vacío" text="Busque un producto arriba y agréguelo para empezar la venta." />
-            ) : (
-              <DataTable columns={cartColumns} rows={cart} rowKey={(l) => l.product.id} />
-            )}
-          </Card>
         </div>
 
         <div className={[styles.column, styles.sideColumn].join(" ")}>
@@ -254,6 +247,14 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
                 </Select>
               </Field>
             </div>
+          </Card>
+
+          <Card title="Carrito" subtitle={cart.length === 0 ? "Sin productos" : `${int(cart.length)} ${cart.length === 1 ? "producto" : "productos"}`} className={styles.grow}>
+            {cart.length === 0 ? (
+              <EmptyState title="El carrito está vacío" text="Busque un producto a la izquierda y agréguelo para empezar la venta." />
+            ) : (
+              <DataTable columns={cartColumns} rows={cart} rowKey={(l) => l.product.id} />
+            )}
           </Card>
 
           <div className={styles.summary}>

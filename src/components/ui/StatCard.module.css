@@ -1,54 +1,167 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 11px;
+  gap: 14px;
 }
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 560px) {
   .grid {
-    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .card {
+    padding: 13px 14px;
+  }
+  .value {
+    font-size: 21px;
+  }
+  .spark {
+    display: none;
   }
 }
 .card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 13px 15px;
+  padding: 16px 18px 15px;
   min-width: 0;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--line-strong);
+}
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--sprout-soft);
+  color: var(--forest-fg);
+  flex-shrink: 0;
+}
+.icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  flex: 1;
+  min-width: 0;
+}
+.delta {
   font-size: 11.5px;
+  font-weight: 650;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.up {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.down {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.flat {
+  background: var(--surface-3);
   color: var(--ink-2);
 }
+.valueRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
 .value {
-  font-family: var(--font-heading);
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.15;
-  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+}
+.spark {
+  width: 86px;
+  height: 30px;
+  flex-shrink: 0;
+}
+.spark path.line {
+  fill: none;
+  stroke: var(--chart-1);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.spark path.area {
+  fill: var(--chart-area);
 }
 .hint {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
-  margin-top: 3px;
+  margin-top: 4px;
+}
+.good::before {
+  background: var(--good);
 }
 .good .value {
   color: var(--good);
+}
+.warn::before {
+  background: var(--harvest);
+}
+.warn .icon {
+  background: var(--warn-soft);
+  color: var(--warn);
 }
 .warn .value {
   color: var(--warn);
 }
 .bad {
-  border-color: var(--bad);
+  border-color: var(--bad-line);
+}
+.bad::before {
+  background: var(--bad);
+}
+.bad .icon {
+  background: var(--bad-soft);
+  color: var(--bad);
 }
 .bad .value {
   color: var(--bad);
+}
+.neutral::before {
+  background: var(--chart-1);
 }

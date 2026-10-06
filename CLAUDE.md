@@ -7,7 +7,7 @@ CSS modules con variables de tema). Consume la API de `../mi-tierrita-api` (`VIT
 
 ## Comandos
 
-`pnpm dev` (puerto 5173) · `pnpm typecheck` · `pnpm build` · `pnpm preview`.
+`pnpm dev` (puerto 5173) · `pnpm typecheck` · `pnpm test` (Vitest) · `pnpm build` · `pnpm preview`.
 
 ## Cadena de datos en un solo sentido
 
@@ -19,16 +19,15 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 
 1. **Toda pantalla contempla sus tres estados**: cargando, vacío (con llamada a la acción) y con datos.
    Usar `QueryState` / `Loading` / `EmptyState` / `ErrorState` de `@/components/ui`.
-2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, que son los valores exactos del
-   lienzo de diseño "Vistas del módulo de evaluación — Mi Tierrita" (https://claude.ai/artifact/Vui7YHNx51ThJHF1U3GHZV,
-   una vista `.dc.html` por captura). Fondo de la app `--app-bg` #132E24; panel `--ground` #F4F3ED; tarjetas
-   `--surface` #FFF con borde `--line` #DEDDD3 y radio `--radius` 11px; fondo suave `--surface-2` #FAFAF6;
-   gris de chips/círculos `--surface-3` #EFEDE4; segmentado `--segment-bg` #E7E8E0; bordes de inputs
-   `--line-strong` #C9CCC2; texto `--ink` #17201B, `--ink-2` #4A554E, `--muted` #78837B; semánticos `--good`
-   #12795A, `--warn` #A16207, `--bad` #B02A2E con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; naranja de
-   acento `--accent` #C2410C; marca `--forest`, `--leaf`, `--sprout`, `--sprout-soft`. Tipografía: `--font-heading`
-   IBM Plex Serif (títulos y cifras grandes), `--font-body` IBM Plex Sans 13px. Cuando el lienzo usa un hex,
-   usar la variable equivalente; los SVG de iconos pueden llevar `currentColor`.
+2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, el sistema de diseño «Tierra viva» (v2,
+   2026-2), publicado también como variables en Figma (página 01 · Sistema de diseño). Marca `--forest` #1D4A37,
+   `--leaf` #2C6A4E, `--sprout` #9FD4B4, `--harvest` #E3A33B, `--clay` #C0612B, `--sky` #3A7CA5; fondo del menú
+   `--app-bg` #0D261C; panel `--ground` #F5F4EF; tarjetas `--surface` #FFF con borde `--line` #E6E4DB, radio
+   `--radius` 14px y `--shadow-card`; texto `--ink` #13201A, `--ink-2` #47534C, `--muted` #7A857E; semánticos
+   `--good` #14805E, `--warn` #B26A00, `--bad` #C23B2E con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; serie de
+   gráficos `--chart-1` a `--chart-6`. Tipografía (autoalojada con @fontsource): `--font-body` Plus Jakarta Sans
+   13,5px para interfaz y cifras; `--font-heading` Fraunces solo para h1, marca y titulares. Tema oscuro con
+   `data-theme="dark"` (botón luna/sol de la barra superior). Los SVG de iconos usan `currentColor`.
 3. **Estilos encapsulados**: cada pantalla/componente tiene su `X.module.css`; nada de CSS global nuevo.
 4. **El frontend no calcula**: totales, saldos e indicadores se muestran tal como los devuelve la API.
    Lo único que suma el cliente es una vista previa del carrito, marcada como estimada.
@@ -53,10 +52,15 @@ hint, tone neutral|good|warn|bad) y `StatGrid` · `Badge` (tone) · `DataTable<T
 align, render, width}], rows, rowKey, onRowClick, footer) · `Loading`, `EmptyState`, `ErrorState`,
 `QueryState` · `Pagination` (page, onPage) · `Modal` (open, title, description, onClose, footer, wide) ·
 `Tabs` (segmentado gris #E7E8E0 con pestaña activa blanca) y `Chips` (píldoras; activa verde bosque) ·
-`Callout` (veredicto: tone good|warn|bad con ícono circular, title serif 26px, aside a la derecha) · `Toasts`. Gráficos SVG en `@/components/charts`:
-`HBarChart`, `VBarChart` ({label, value, alt}[], format), `LineChart` (points, formatX, formatY, marker,
-highlightX), `TornadoChart` (data[{label, low, high}], base, format). Encabezado de página: `PageHeader` (h1 serif 21px + subtítulo 13px + acciones) y `BrandMark` de
-`@/components/layout/AppShell`. Botones: `primary` 38px verde bosque, `secondary` blanco con borde #C9CCC2.
+`Callout` (veredicto: tone good|warn|bad con ícono circular, title serif 26px, aside a la derecha) · `Toasts`.
+`StatCard` acepta además `icon` (trazos SVG 22×22), `delta` (variación en fracción) y `spark` (serie corta).
+`DataTable`: texto a la izquierda por defecto, `align: "right"` para cifras, `mobile: false` oculta la columna en celular.
+Gráficos en `@/components/charts`, dibujados al ancho real del contenedor (`useWidth`) para que el texto no se escale:
+`HBarChart` (HTML; `stacked` para tarjetas angostas), `VBarChart` ({label, value, alt}[], format), `TrendChart`
+(área suavizada con lectura al pasar el cursor), `DonutChart` (participación con leyenda), `LineChart` (points,
+formatX, formatY, marker, highlightX), `TornadoChart` (data[{label, low, high}], base, format). Encabezado de página:
+`PageHeader` (eyebrow opcional + h1 Fraunces 26px + subtítulo + acciones) y `BrandMark` de `@/components/layout/AppShell`.
+Botones: `primary` 40px verde bosque, `secondary` blanco con borde, `accent` dorado cosecha.
 
 ## Hooks disponibles (`@/hooks/<entidad>`)
 

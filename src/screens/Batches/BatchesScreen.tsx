@@ -10,6 +10,7 @@ import { AdminBatchStats } from "./AdminBatchStats";
 import { WindowBatchStats } from "./WindowBatchStats";
 import { DistributionCard } from "./DistributionCard";
 import { RegisterBatchModal } from "./RegisterBatchModal";
+import { FefoShelf } from "./FefoShelf";
 import styles from "./BatchesScreen.module.css";
 
 const WINDOWS = [7, 15, 30, 60, 90].map((d) => ({ value: d, label: `${d} días` }));
@@ -79,6 +80,8 @@ export const BatchesScreen = () => {
         <span className={styles.filtersLabel}>Ventana</span>
         <Chips options={WINDOWS} value={days} onChange={setDays} />
       </div>
+
+      {items.length > 0 ? <FefoShelf items={items} days={days} /> : null}
 
       <div className={styles.grid}>
         <Card title="Lotes por orden de vencimiento" subtitle={isAdmin ? "El más próximo a vencer sale primero" : "El más próximo sale primero"}>

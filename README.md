@@ -21,6 +21,8 @@ frontend) de la documentación técnica del TCC.
 | Estilos | CSS modules por componente + sistema de diseño «Tierra viva» (variables de tema claro y oscuro) |
 | Tipografía | Plus Jakarta Sans (interfaz y cifras) y Fraunces (titulares), autoalojadas con @fontsource |
 | Gráficos | SVG propios dibujados al ancho real: tendencia, barras, dona, línea, tornado |
+| 3D | three.js + React Three Fiber + drei (escenas cargadas bajo demanda) |
+| Movimiento | Motion (`LazyMotion`): transiciones de pantalla, aparición al desplazarse, microanimaciones |
 | Pruebas | Vitest (`pnpm test`) |
 
 ## Puesta en marcha (local)
@@ -111,6 +113,26 @@ Rediseño visual completo de 2026-2 sin cambiar la API ni las reglas de negocio:
 - Menú agrupado por enfoque: *Operación · ERP*, *Análisis y decisión*, *Administración*; tema claro/oscuro;
   punto de venta con carrito y total fijos a la derecha; tablas responsivas.
 - El mismo sistema está en Figma (sistema de diseño, prototipo de escritorio y móvil, manual de usuario).
+
+## Experiencia inmersiva (v3)
+
+El 3D comunica el sistema, no lo decora. Cada escena usa los datos reales de la API y tiene una vista en **Lista**
+equivalente (teclado y lector de pantalla):
+
+| Escena | Dónde | Qué representa | Interacción |
+|---|---|---|---|
+| Mapa vivo del negocio | Tablero del administrador | Proveedores → bodega → mostrador → clientes → caja → ampliación, con el SIG al centro; partículas = flujos de mercancía, dinero e información; balizas = puntos críticos | Clic: el objeto se ilumina, la cámara vuela y aparece el detalle · doble clic abre el módulo · recorrido guiado con progreso y logro |
+| Estante FEFO | Lotes y vencimientos | Filas del frente (vencidos, ≤ 7 días…) al fondo; altura = lo que queda del lote | Clic en una caja · «Simular una venta» muestra qué lote sale primero |
+| Torres de escenarios | Panel de decisión | Altura = cuántas veces la ampliación paga su cuota; plano de vidrio = 1,0 ×; cristal = crea valor | Clic en una torre elige el escenario |
+| Escena de bienvenida | Inicio de sesión | El núcleo del SIG con ERP, BI y DSS sobre el terreno | Paralaje con el puntero |
+
+- **Misiones de revisión** (tablero): recorrer el mapa, revisar lotes, simular una venta FEFO, revisar la cartera y
+  comparar escenarios. El progreso es por usuario y por navegador (no se envía a la API).
+- **Accesibilidad:** vista en Lista, barra de puntos navegable con flechas, Esc para volver, anuncios `aria-live`,
+  «reducir movimiento» del sistema (sin vuelos de cámara ni partículas en movimiento), contraste AA en el escenario nocturno.
+- **Rendimiento:** escenas y pantallas en fragmentos aparte (carga inicial ≈ 174 kB gzip), la escena deja de dibujar
+  fuera de pantalla, resolución adaptable si caen los cuadros, menos partículas y sin sombras en celulares, sin
+  WebGL se muestra la Lista. La rueda del mouse solo acerca con Ctrl/⌘ (no secuestra el desplazamiento).
 
 ## Cuentas de demostración
 

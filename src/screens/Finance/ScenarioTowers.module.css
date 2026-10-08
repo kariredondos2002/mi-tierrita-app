@@ -1,0 +1,117 @@
+.legend {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  z-index: 4;
+}
+.current {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 14px;
+  background: rgba(8, 21, 15, 0.72);
+  border: 1px solid rgba(159, 212, 180, 0.3);
+  backdrop-filter: blur(10px);
+  color: #f4faf6;
+  z-index: 4;
+  max-width: calc(100% - 90px);
+}
+.current strong {
+  display: block;
+  font-size: 13px;
+}
+.current span {
+  font-size: 12px;
+  color: #c9ddd1;
+}
+.letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #9fd4b4;
+  color: #0d261c;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1.4fr) minmax(80px, 1fr) 64px 80px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f4faf6;
+  text-align: left;
+  cursor: pointer;
+}
+.row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.row:focus-visible {
+  outline: 2px solid #9fd4b4;
+  outline-offset: 2px;
+}
+.rowOn {
+  border-color: #9fd4b4;
+  background: rgba(159, 212, 180, 0.1);
+}
+.rowName {
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rowVal {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+}
+.bar b {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: #6aaed6;
+}
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 32px minmax(0, 1fr) 60px;
+  }
+  .bar,
+  .row .rowVal:last-child {
+    display: none;
+  }
+  .legend {
+    display: none;
+  }
+}

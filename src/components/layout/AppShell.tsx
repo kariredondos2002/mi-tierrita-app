@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useIsFetching } from "@tanstack/react-query";
 import { useSessionStore, ROLE_LABELS } from "@/stores/session";
 import { useUiStore } from "@/stores/ui";
@@ -9,6 +9,8 @@ import { NAV_GROUPS, NAV_ICONS, findRoute, isLockedFor, isVisibleFor } from "@/r
 import { initials } from "@/lib/format";
 import { Toasts } from "@/components/ui";
 import { useNavBadges } from "./useNavBadges";
+import { AnimatedOutlet } from "./AnimatedOutlet";
+import { useExperienceStore } from "@/stores/experience";
 import styles from "./AppShell.module.css";
 
 /** Marca del lienzo: hoja sobre cuadrado verde claro. */
@@ -58,6 +60,11 @@ export const AppShell = () => {
   const badges = useNavBadges();
   const fetching = useIsFetching();
   const [savedAt, setSavedAt] = useState(timeNow);
+  const markVisited = useExperienceStore((s) => s.markVisited);
+  // misiones: registrar qué módulos revisó cada usuario
+  useEffect(() => {
+    if (user) markVisited(user.username, `/${location.pathname.split("/")[1] ?? ""}`);
+  }, [location.pathname, user, markVisited]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const themeMode = useThemeStore((s) => s.mode);
   const setThemeMode = useThemeStore((s) => s.setMode);
@@ -192,9 +199,7 @@ export const AppShell = () => {
             </div>
           </div>
         </header>
-        <main className={styles.content}>
-          <Outlet />
-        </main>
+        <AnimatedOutlet className={styles.content} />
       </div>
       <Toasts />
     </div>

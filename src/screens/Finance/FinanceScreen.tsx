@@ -9,6 +9,7 @@ import { ScenariosPanel } from "./ScenariosPanel";
 import { CashFlowPanel } from "./CashFlowPanel";
 import { ProjectStudyPanel } from "./ProjectStudyPanel";
 import { ScenarioFormModal } from "./ScenarioFormModal";
+import { ScenarioTowers } from "./ScenarioTowers";
 import styles from "./FinanceScreen.module.css";
 
 export type FinanceTab = "panel" | "proyecto" | "supuestos" | "escenarios" | "flujo";
@@ -123,7 +124,12 @@ export const FinanceScreen = () => {
           {(scenario) => {
             switch (tab) {
               case "panel":
-                return <DecisionPanel scenario={scenario} onOpenAssumptions={() => goTab("supuestos")} onNew={openNew} />;
+                return (
+                  <>
+                    {items.length > 1 ? <ScenarioTowers items={items} selectedId={selectedId} onSelect={selectScenario} /> : null}
+                    <DecisionPanel scenario={scenario} onOpenAssumptions={() => goTab("supuestos")} onNew={openNew} />
+                  </>
+                );
               case "proyecto":
                 return <ProjectStudyPanel scenario={scenario} />;
               case "supuestos":

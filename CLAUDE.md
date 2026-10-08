@@ -62,6 +62,16 @@ formatX, formatY, marker, highlightX), `TornadoChart` (data[{label, low, high}],
 `PageHeader` (eyebrow opcional + h1 Fraunces 26px + subtítulo + acciones) y `BrandMark` de `@/components/layout/AppShell`.
 Botones: `primary` 40px verde bosque, `secondary` blanco con borde, `accent` dorado cosecha.
 
+## Experiencia 3D (`@/components/immersive`)
+
+- `Stage` es el contenedor de toda escena: cabecera, interruptor 3D/Lista, botones de cámara, capa de etiquetas y
+  pausa fuera de pantalla. **Toda escena necesita su `list` equivalente** (misma información y acciones).
+- Las escenas viven en `immersive/scenes/*Scene.tsx`, se importan con `lazy()` y usan el kit (`StageCanvas`,
+  `SceneCamera`, `Hoverable`, `Label`/`StageHtml`, `Flow`, `Beacon`, `Platform`). Nunca importar `three` ni `kit`
+  desde código que no sea perezoso.
+- Los datos llegan ya calculados por la API; la escena solo los dibuja. Colores 3D en `immersive/palette.ts`.
+- Respetar `reducedMotion` y `tier` de `useImmersive()`; animaciones con `m.*` de `motion/react` (hay `LazyMotion` estricto).
+
 ## Hooks disponibles (`@/hooks/<entidad>`)
 
 - session: `useSignin`, `useSignout`, `useMe`

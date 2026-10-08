@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnimatePresence, m } from "motion/react";
 import styles from "./StatCard.module.css";
 
 type Tone = "neutral" | "good" | "warn" | "bad";
@@ -47,7 +48,14 @@ export const StatCard = ({ label, value, hint, tone = "neutral", icon, delta, sp
       ) : null}
     </div>
     <div className={styles.valueRow}>
-      <div className={styles.value}>{value}</div>
+      <div className={styles.value}>
+        {/* microanimación de cambio de estado: la cifra nueva entra desde abajo */}
+        <AnimatePresence mode="popLayout" initial={false}>
+          <m.span key={typeof value === "string" || typeof value === "number" ? String(value) : "v"} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} style={{ display: "inline-block" }}>
+            {value}
+          </m.span>
+        </AnimatePresence>
+      </div>
       {spark ? <Spark values={spark} /> : null}
     </div>
     {hint !== undefined ? <div className={styles.hint}>{hint}</div> : null}

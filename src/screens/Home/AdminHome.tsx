@@ -4,6 +4,11 @@ import { Button, Card, EmptyState, QueryState, StatCard, StatGrid } from "@/comp
 import { DonutChart, HBarChart, TrendChart } from "@/components/charts";
 import { useInventoryReport, useReceivablesReport, useSalesReport } from "@/hooks/reports";
 import { useScenarios } from "@/hooks/financial";
+import { useSuppliers } from "@/hooks/suppliers";
+import { useMemo } from "react";
+import { LiveSystemMap } from "./LiveSystemMap";
+import { MissionsCard } from "./MissionsCard";
+import { buildSystemModel } from "./systemModel";
 import { NAV_ICONS } from "@/router/navigation";
 import { addDaysIso, dateOnly, int, money, moneyAxis, moneyCompact, shortDate, todayIso } from "@/lib/format";
 import type { SalesReportDayRow, SalesReportProductRow, User } from "@/types/api";
@@ -50,6 +55,19 @@ export const AdminHome = ({ user }: { user: User }) => {
   const receivables = useReceivablesReport();
   const inventory = useInventoryReport();
   const scenarios = useScenarios({ limit: 1 });
+  const allScenarios = useScenarios();
+  const suppliers = useSuppliers({ limit: 1, active: true });
+  const model = useMemo(
+    () =>
+      buildSystemModel({
+        sales: sales.data,
+        inventory: inventory.data,
+        receivables: receivables.data,
+        scenarios: allScenarios.data?.items,
+        suppliers: suppliers.data?.count,
+      }),
+    [sales.data, inventory.data, receivables.data, allScenarios.data, suppliers.data],
+  );
 
   const days = (trend.data?.rows ?? []) as SalesReportDayRow[];
   const weeks = weekly(days);
@@ -75,6 +93,9 @@ export const AdminHome = ({ user }: { user: User }) => {
           </>
         }
       />
+
+      <LiveSystemMap nodes={model.nodes} flows={model.flows} username={user.username} />
+      <MissionsCard username={user.username} />
 
       <StatGrid>
         <StatCard

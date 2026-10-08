@@ -1,9 +1,12 @@
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
+import { useImmersive } from "@/components/immersive/useImmersive";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSignin } from "@/hooks/session";
 import { Button, Field, Input } from "@/components/ui";
 import { BrandMark } from "@/components/layout/AppShell";
 import styles from "./SigninScreen.module.css";
+
+const HeroScene = lazy(() => import("@/components/immersive/scenes/HeroScene"));
 
 const Eye = ({ off }: { off: boolean }) => (
   <svg width="21" height="21" viewBox="0 0 24 20" fill="none" aria-hidden="true">
@@ -19,6 +22,7 @@ export const SigninScreen = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const signin = useSignin();
+  const { webgl, tier, reducedMotion } = useImmersive();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,7 +44,14 @@ export const SigninScreen = () => {
   return (
     <div className={styles.page}>
       <aside className={styles.hero}>
-        <Landscape />
+        {webgl ? null : <Landscape />}
+        {webgl ? (
+          <div className={styles.hero3d}>
+            <Suspense fallback={null}>
+              <HeroScene tier={tier} reducedMotion={reducedMotion} />
+            </Suspense>
+          </div>
+        ) : null}
         <div className={styles.brand}>
           <BrandMark size={52} />
           <div>

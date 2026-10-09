@@ -16,7 +16,7 @@ const MAX_PER_ROW = 10;
 /** Ventanas de vencimiento: cada una es una fila del estante, del frente (urgente) al fondo. */
 const BANDS = [
   { key: "vencidos", label: "Vencidos · retirar", color: STAGE.badSolid, test: (b: ProductBatch) => b.expired },
-  { key: "7", label: "≤ 7 días · al frente", color: STAGE.clay, test: (b: ProductBatch) => !b.expired && b.daysToExpire <= 7 },
+  { key: "7", label: "≤ 7 días · urgente", color: STAGE.clay, test: (b: ProductBatch) => !b.expired && b.daysToExpire <= 7 },
   { key: "15", label: "8 a 15 días", color: STAGE.harvest, test: (b: ProductBatch) => !b.expired && b.daysToExpire > 7 && b.daysToExpire <= 15 },
   { key: "30", label: "16 a 30 días", color: STAGE.sprout, test: (b: ProductBatch) => !b.expired && b.daysToExpire > 15 && b.daysToExpire <= 30 },
   { key: "mas", label: "Más de 30 días", color: STAGE.sky, test: (b: ProductBatch) => !b.expired && b.daysToExpire > 30 },

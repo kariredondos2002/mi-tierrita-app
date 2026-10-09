@@ -269,7 +269,10 @@
   }
   .hero {
     width: auto;
-    padding: 28px 24px 120px;
+    padding: 28px 24px 200px;
+  }
+  .hero3d {
+    height: 190px;
   }
   .heroBody {
     margin-top: 24px;

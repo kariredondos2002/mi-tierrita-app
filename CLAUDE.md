@@ -67,9 +67,15 @@ Botones: `primary` 40px verde bosque, `secondary` blanco con borde, `accent` dor
 - `Stage` es el contenedor de toda escena: cabecera, interruptor 3D/Lista, botones de cámara, capa de etiquetas y
   pausa fuera de pantalla. **Toda escena necesita su `list` equivalente** (misma información y acciones).
 - Las escenas viven en `immersive/scenes/*Scene.tsx`, se importan con `lazy()` y usan el kit (`StageCanvas`,
-  `SceneCamera`, `Hoverable`, `Label`/`StageHtml`, `Flow`, `Beacon`, `Platform`). Nunca importar `three` ni `kit`
+  `SceneCamera`, `Hoverable`, `Label`/`StageHtml`, `Flow`, `Ground`, `SelectionDisc`). Nunca importar `three` ni `kit`
   desde código que no sea perezoso.
 - Los datos llegan ya calculados por la API; la escena solo los dibuja. Colores 3D en `immersive/palette.ts`.
+- **Realismo**: solo escaneos reales (Poly Haven, CC0) en `public/assets/3d` — modelos con `Model`/`ModelInstances`
+  de `scenes/assets.tsx` (vienen a escala 1/1,6: pasar `scale={1.6}` para 1:1), materiales con `Pbr name=…` de
+  `scenes/materials.tsx` (mapa nombre → escaneo) y cielos HDR con `env` de `StageCanvas` (`morning`, `studio`,
+  `warehouse`). Nada de figuras abstractas ni colores planos inventados. Optimizar modelos nuevos con
+  `gltf-transform optimize in.gltf out.glb --compress meshopt --texture-compress webp --texture-size 512` y anotarlos en
+  `public/assets/3d/CREDITOS.md`. `localStorage["mi-tierrita-calidad"] = "high" | "low"` fuerza la calidad.
 - Respetar `reducedMotion` y `tier` de `useImmersive()`; animaciones con `m.*` de `motion/react` (hay `LazyMotion` estricto).
 
 ## Hooks disponibles (`@/hooks/<entidad>`)

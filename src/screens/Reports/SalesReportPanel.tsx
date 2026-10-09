@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useSalesReport } from "@/hooks/reports";
+import { useExportReport, useSalesReport } from "@/hooks/reports";
 import { ROLE_LABELS, useSessionStore } from "@/stores/session";
 import { addDaysIso, dateOnly, int, money, moneyAxis, moneyCompact, todayIso } from "@/lib/format";
 import { Button, DataTable, EmptyState, Field, Input, QueryState, Tabs, type Column, type TabOption } from "@/components/ui";
 import { HBarChart, VBarChart } from "@/components/charts";
-import type { SalesGroupBy, SalesReport, SalesReportDayRow, SalesReportProductRow } from "@/types/api";
-import { downloadCsv } from "./csv";
+import type { SalesGroupBy, SalesReportDayRow, SalesReportProductRow } from "@/types/api";
+import { ExportButtons } from "@/components/exports";
 import { ReportPreview } from "./ReportPreview";
 import { ReportPaper } from "./ReportPaper";
 import { PaperBlock } from "./PaperBlock";
@@ -38,24 +38,6 @@ const productColumns: Column<SalesReportProductRow>[] = [
   { key: "total", header: "Total", align: "right", render: (r) => money(r.total) },
 ];
 
-const exportCsv = (report: SalesReport) => {
-  const name = `ventas_${report.from.slice(0, 10)}_${report.to.slice(0, 10)}_${report.groupBy === "day" ? "por-dia" : "por-producto"}.csv`;
-  if (report.groupBy === "day") {
-    const rows = report.rows as SalesReportDayRow[];
-    downloadCsv(
-      name,
-      ["Fecha", "Ventas", "Unidades", "Total"],
-      rows.map((r) => [r.date.slice(0, 10), r.salesCount, r.units, r.total]),
-    );
-  } else {
-    const rows = report.rows as SalesReportProductRow[];
-    downloadCsv(
-      name,
-      ["Producto", "SKU", "Ventas", "Unidades", "Total"],
-      rows.map((r) => [r.productName, r.sku, r.salesCount, r.units, r.total]),
-    );
-  }
-};
 
 /** CU-19 Reporte de ventas (ADMIN y SALES). */
 export const SalesReportPanel = () => {
@@ -64,6 +46,7 @@ export const SalesReportPanel = () => {
   const [to, setTo] = useState(() => todayIso());
   const [groupBy, setGroupBy] = useState<SalesGroupBy>("day");
   const query = useSalesReport({ from, to, groupBy });
+  const exporter = useExportReport();
   const rangeError = from && to && from > to ? "La fecha inicial no puede ser posterior a la final." : undefined;
   const groupLabel = groupBy === "day" ? "por día" : "por producto";
 
@@ -99,18 +82,7 @@ export const SalesReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de ventas · ${dateOnly(from)} – ${dateOnly(to)} · ${groupLabel} · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={
-        query.data && query.data.rows.length > 0 ? (
-          <>
-            <Button variant="secondary" size="sm" onClick={() => exportCsv(query.data)}>
-              Excel (CSV)
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => window.print()} title="Abre el diálogo de impresión: elija «Guardar como PDF»">
-              PDF
-            </Button>
-          </>
-        ) : undefined
-      }
+      actions={<ExportButtons disabled={!query.data || query.data.rows.length === 0 || Boolean(rangeError)} onExport={(format) => exporter.mutateAsync({ report: "sales", format, from, to, groupBy })} />}
     >
       <QueryState query={query} empty={null}>
         {(report) => {

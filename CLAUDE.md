@@ -97,7 +97,17 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
 - reports: `useSalesReport({from, to, groupBy})`, `useInventoryReport(days)`, `useReceivablesReport(overdueDays)`
 - chat: `useConversations`, `usePeople`, `useUnreadMessages`, `useConversation(target)`, `useUnreadInTitle(n)`
 - notifications: `useNotifications`, `useMarkNotificationsRead` · search: `useGlobalSearch(q)` · contact: `useSendContact`, `useContactMessages`, `useMarkContactHandled` · users: `useUpdateProfile`
+- reports (v4.2): `useExportReport` ({report, format, filtros}), `useExportHistory(query)` · financial: `useExportScenario` · users: `useMyActivity`
 - financial: `useScenarios()`, `useScenario(id)`, `useCreateScenario`, `useCompareScenarios(ids)`, `useAmortization(id)`, `useSensitivity(id, variable, range?)`, `useBivariate(id, varX, varY)`, `useTornado(id)`
 
 Las consultas son `useQuery` de TanStack (data, isPending, isError, error, refetch); las mutaciones son
 `useMutation` (mutate, mutateAsync, isPending, error: ApiError | null, reset).
+
+## Reportes y perfil (v4.2)
+
+- Los PDF y Excel los genera la API (`/reports/*/export`, `/financial/scenarios/:id/export`); el navegador solo
+  descarga con `downloadFile` de `@/lib/download` (token incluido, nombre desde Content-Disposition). Nunca
+  `window.print()` ni CSV armado en el cliente. Botones: `ExportButtons` de `@/components/exports`.
+- Toda descarga queda auditada como `EXPORT`; los hooks de exportación invalidan el historial, la auditoría y la
+  actividad propia. El inicio de sesión no muestra cuentas de demostración.
+- `ProfileScreen` tiene pestañas (datos, seguridad, actividad, rol, preferencias); textos de actividad y permisos en `@/lib/activity`.

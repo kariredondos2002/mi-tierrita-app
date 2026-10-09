@@ -35,3 +35,14 @@
 .pager {
   padding-top: 8px;
 }
+
+/* v4.2: detalle legible de reportes e inicios de sesión */
+.resourceCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail {
+  color: var(--muted);
+  font-size: 12px;
+}

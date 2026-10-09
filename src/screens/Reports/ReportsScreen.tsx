@@ -5,6 +5,7 @@ import { Button, Card } from "@/components/ui";
 import { SalesReportPanel } from "./SalesReportPanel";
 import { InventoryReportPanel } from "./InventoryReportPanel";
 import { ReceivablesReportPanel } from "./ReceivablesReportPanel";
+import { ExportHistory } from "./ExportHistory";
 import styles from "./ReportsScreen.module.css";
 
 type ReportKind = "sales" | "inventory" | "receivables";
@@ -79,7 +80,7 @@ export const ReportsScreen = () => {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="Reportes" subtitle={isAdmin ? "Documentos para la propietaria: ventas, inventario y cartera tal como los registra el sistema." : "Documento de ventas del periodo tal como las registra el sistema."} />
+      <PageHeader title="Reportes" subtitle={isAdmin ? "Ventas, inventario y cartera tal como los registra el sistema, para descargar en PDF con gráficos o en Excel." : "Ventas del periodo tal como las registra el sistema, en PDF con gráficos o en Excel."} />
 
       <div className={styles.cards}>
         {reports.map((r) => {
@@ -106,6 +107,8 @@ export const ReportsScreen = () => {
       {current === "sales" ? <SalesReportPanel /> : null}
       {isAdmin && current === "inventory" ? <InventoryReportPanel /> : null}
       {isAdmin && current === "receivables" ? <ReceivablesReportPanel /> : null}
+
+      <ExportHistory isAdmin={isAdmin} />
     </div>
   );
 };

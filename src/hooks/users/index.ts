@@ -3,3 +3,4 @@ export * from "./useUser";
 export * from "./useCreateUser";
 export * from "./useChangePassword";
 export * from "./useUpdateProfile";
+export * from "./useMyActivity";

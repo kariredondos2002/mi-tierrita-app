@@ -1,7 +1,7 @@
 # Manual de usuario · Mi Tierrita SIG (guía rápida)
 
 > Versión completa por rol, con más capturas: `entregables/Compartidos/Manual_de_usuario_MiTierrita.pdf` en la carpeta
-> del proyecto. Cuentas de demostración: `admin`, `secretaria` y `bodega` · contraseña `MiTierrita2026`.
+> del proyecto. Las cuentas las entrega el administrador; la pantalla de ingreso ya no muestra atajos de demostración.
 
 ## 1. La página pública
 
@@ -89,9 +89,17 @@ propio aviso.
 ## 8. Administración y decisión
 
 - **Evaluación financiera:** panel de decisión con el veredicto, estudio del proyecto, supuestos, escenarios y flujo.
-- **Reportes:** **Excel (CSV)** o **PDF** («Guardar como PDF» en la impresión).
+- **Reportes:** elija el reporte, ajuste los filtros y pulse **PDF** (indicadores, gráficos y detalle) o **Excel**
+  (hojas formateadas). El documento dice quién lo generó y a qué hora. Abajo, **Historial de reportes generados**
+  muestra cada descarga; la secretaria ve solo las suyas. En **Evaluación financiera** los mismos botones descargan
+  el escenario elegido (VPN, TIR, flujo y tornado).
 - **Contactos del sitio:** responda por correo y pulse **Marcar atendido**.
-- **Usuarios y roles · Auditoría:** alta de usuarios y bitácora de cada escritura.
+- **Usuarios y roles · Auditoría:** alta de usuarios y bitácora. El filtro **Acción** separa altas, cambios,
+  borrados, **reportes generados** e **inicios de sesión**; la columna de detalle dice qué reporte y con qué filtros.
+
+![Reportes](capturas/09-reportes.png)
+
+![Auditoría de reportes](capturas/20-auditoria-reportes.png)
 
 ![Evaluación financiera](capturas/08-evaluacion-financiera.png)
 
@@ -99,10 +107,20 @@ propio aviso.
 
 ## 9. Perfil y tema
 
-Sus iniciales abren **Mi perfil**: nombre y apellido, cambio de contraseña (mínimo 8 caracteres) y apariencia
-(claro, oscuro o según el sistema).
+Sus iniciales abren **Mi perfil**. A la izquierda, su tarjeta: nombre, rol, correo, teléfono, último ingreso y lo
+que ha hecho en 30 días. A la derecha, cinco pestañas:
+
+| Pestaña | Qué hace |
+|---|---|
+| Datos personales | Nombre, apellido, correo (único en el equipo) y teléfono. Usuario y rol solo los cambia el administrador |
+| Seguridad | Cambio de contraseña con requisitos a la vista y **Cerrar sesión en todos los dispositivos** |
+| Mi actividad | Ventas, abonos, lotes y reportes de los últimos 30 días y la lista de sus últimas acciones |
+| Mi rol | Lo que puede hacer y a qué no tiene acceso |
+| Preferencias | Claro, oscuro o según el sistema |
 
 ![Perfil](capturas/17-perfil.png)
+
+![Mi actividad](capturas/17b-perfil-actividad.png)
 
 ![Oscuro](capturas/11-oscuro.png)
 

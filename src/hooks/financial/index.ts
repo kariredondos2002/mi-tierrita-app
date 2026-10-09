@@ -6,3 +6,4 @@ export * from "./useAmortization";
 export * from "./useSensitivity";
 export * from "./useBivariate";
 export * from "./useTornado";
+export * from "./useExportScenario";

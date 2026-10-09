@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useReceivablesReport } from "@/hooks/reports";
+import { useExportReport, useReceivablesReport } from "@/hooks/reports";
 import { ROLE_LABELS, useSessionStore } from "@/stores/session";
 import { dateOnly, dateTime, int, money, todayIso } from "@/lib/format";
-import { Badge, Button, Chips, DataTable, EmptyState, QueryState, type Column } from "@/components/ui";
-import type { ReceivableRow, ReceivablesReport } from "@/types/api";
-import { downloadCsv } from "./csv";
+import { Badge, Chips, DataTable, EmptyState, QueryState, type Column } from "@/components/ui";
+import type { ReceivableRow } from "@/types/api";
+import { ExportButtons } from "@/components/exports";
 import { ReportPreview } from "./ReportPreview";
 import { ReportPaper } from "./ReportPaper";
 import { PaperBlock } from "./PaperBlock";
@@ -21,18 +21,13 @@ const columns: Column<ReceivableRow>[] = [
   { key: "overdue", header: "Estado", align: "left", render: (r) => <Badge tone={r.overdue ? "bad" : "good"}>{r.overdue ? "Vencida" : "Al día"}</Badge> },
 ];
 
-const exportCsv = (report: ReceivablesReport) =>
-  downloadCsv(
-    `cartera_${report.overdueDays}-dias.csv`,
-    ["Cliente", "Cupo", "Saldo", "Última venta a crédito", "Último abono", "Estado"],
-    report.items.map((r) => [r.name, r.creditLimit, r.balance, r.lastCreditSaleAt ?? "", r.lastPaymentAt ?? "", r.overdue ? "Vencida" : "Al día"]),
-  );
 
 /** CU-20 Reporte de cartera (solo ADMIN). */
 export const ReceivablesReportPanel = () => {
   const user = useSessionStore((s) => s.user);
   const [overdueDays, setOverdueDays] = useState(30);
   const query = useReceivablesReport(overdueDays);
+  const exporter = useExportReport();
 
   const filters = (
     <div className={styles.chipsRow}>
@@ -46,18 +41,7 @@ export const ReceivablesReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de cartera · vencida a ${int(overdueDays)} días · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={
-        query.data && query.data.items.length > 0 ? (
-          <>
-            <Button variant="secondary" size="sm" onClick={() => exportCsv(query.data)}>
-              Excel (CSV)
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => window.print()} title="Abre el diálogo de impresión: elija «Guardar como PDF»">
-              PDF
-            </Button>
-          </>
-        ) : undefined
-      }
+      actions={<ExportButtons disabled={!query.data || query.data.items.length === 0} onExport={(format) => exporter.mutateAsync({ report: "receivables", format, overdueDays })} />}
     >
       <QueryState query={query} empty={null}>
         {(report) => (

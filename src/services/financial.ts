@@ -1,5 +1,6 @@
 import { http } from "@/lib/http";
-import type { Amortization, Bivariate, CreateScenarioInput, Page, PageQuery, Range, ScenarioDetail, ScenarioSummary, Sensitivity, SensitivityVariable, Tornado } from "@/types/api";
+import { downloadFile } from "@/lib/download";
+import type { ExportFormat, Amortization, Bivariate, CreateScenarioInput, Page, PageQuery, Range, ScenarioDetail, ScenarioSummary, Sensitivity, SensitivityVariable, Tornado } from "@/types/api";
 
 export const financialService = {
   list: async (query: PageQuery): Promise<Page<ScenarioSummary>> => (await http.get<Page<ScenarioSummary>>("/financial/scenarios", { params: query })).data,
@@ -13,4 +14,6 @@ export const financialService = {
   bivariate: async (id: number, varX: SensitivityVariable, varY: SensitivityVariable): Promise<Bivariate> =>
     (await http.get<Bivariate>(`/financial/scenarios/${id}/sensitivity/bivariate`, { params: { varX, varY } })).data,
   tornado: async (id: number): Promise<Tornado> => (await http.get<Tornado>(`/financial/scenarios/${id}/tornado`)).data,
+  /** v4.2: evaluación del escenario en PDF (indicadores, flujo y tornado) o Excel. */
+  exportScenario: (id: number, format: ExportFormat): Promise<string> => downloadFile(`/financial/scenarios/${id}/export`, { format }, `escenario-${id}.${format}`),
 };

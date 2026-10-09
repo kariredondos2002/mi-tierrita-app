@@ -30,13 +30,6 @@ export const SigninScreen = () => {
     );
   };
 
-  const demo = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== "false";
-  const fill = (user: string) => {
-    setUsername(user);
-    setPassword("MiTierrita2026");
-    signin.reset();
-  };
-
   return (
     <div className={styles.page}>
       <aside className={styles.hero} style={{ backgroundImage: `url(${photoUrl("hero-tractor")})` }}>
@@ -96,23 +89,6 @@ export const SigninScreen = () => {
             Entrar al sistema
           </Button>
           <p className={styles.help}>¿Olvidó su contraseña? Pídale al administrador que la restablezca desde Usuarios y roles.</p>
-          {demo ? (
-            <div className={styles.demo}>
-              <span className={styles.demoTitle}>Cuentas de demostración (datos simulados)</span>
-              <div className={styles.demoList}>
-                {[
-                  ["admin", "Administrador"],
-                  ["secretaria", "Secretaria"],
-                  ["bodega", "Bodega"],
-                ].map(([u, r]) => (
-                  <button key={u} type="button" className={styles.demoBtn} onClick={() => fill(u ?? "")}>
-                    <strong>{r}</strong>
-                    <span>{u}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
         </form>
       </section>
     </div>

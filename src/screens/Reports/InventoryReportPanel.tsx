@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useInventoryReport } from "@/hooks/reports";
+import { useExportReport, useInventoryReport } from "@/hooks/reports";
 import { ROLE_LABELS, useSessionStore } from "@/stores/session";
 import { dateOnly, dateTime, int, money, moneyCompact, todayIso } from "@/lib/format";
-import { Button, Chips, DataTable, EmptyState, QueryState, type Column } from "@/components/ui";
+import { Chips, DataTable, EmptyState, QueryState, type Column } from "@/components/ui";
 import { VBarChart } from "@/components/charts";
 import type { BatchAggregate, InventoryReport } from "@/types/api";
-import { downloadCsv } from "./csv";
+import { ExportButtons } from "@/components/exports";
 import { ReportPreview } from "./ReportPreview";
 import { ReportPaper } from "./ReportPaper";
 import { PaperBlock } from "./PaperBlock";
@@ -31,18 +31,13 @@ const aggregateColumns: Column<AggregateRow>[] = [
   { key: "costValue", header: "Valor al costo", align: "right", render: (r) => money(r.data.costValue) },
 ];
 
-const exportCsv = (report: InventoryReport) =>
-  downloadCsv(
-    `inventario_${report.asOf.slice(0, 10)}.csv`,
-    ["Categoría", "Productos", "Unidades", "Valor al costo", "Valor a precio de venta"],
-    report.byCategory.map((r) => [r.categoryName, r.products, r.units, r.costValue, r.saleValue]),
-  );
 
 /** CU-20 Reporte de inventario (solo ADMIN). */
 export const InventoryReportPanel = () => {
   const user = useSessionStore((s) => s.user);
   const [days, setDays] = useState(30);
   const query = useInventoryReport(days);
+  const exporter = useExportReport();
 
   const filters = (
     <div className={styles.chipsRow}>
@@ -55,18 +50,7 @@ export const InventoryReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de inventario · lotes por vencer a ${int(days)} días · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={
-        query.data && query.data.byCategory.length > 0 ? (
-          <>
-            <Button variant="secondary" size="sm" onClick={() => exportCsv(query.data)}>
-              Excel (CSV)
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => window.print()} title="Abre el diálogo de impresión: elija «Guardar como PDF»">
-              PDF
-            </Button>
-          </>
-        ) : undefined
-      }
+      actions={<ExportButtons disabled={!query.data || query.data.byCategory.length === 0} onExport={(format) => exporter.mutateAsync({ report: "inventory", format, days })} />}
     >
       <QueryState query={query} isEmpty={(r) => r.products === 0} empty={<EmptyState title="Sin productos registrados" text="Registre productos y compras en Inventario para ver el valor del stock." />}>
         {(report) => {

@@ -4,7 +4,20 @@ export type Role = "ADMIN" | "SALES" | "WAREHOUSE";
 export type Page<T> = { count: number; page: number; pages: number; items: T[] };
 export type PageQuery = { page?: number; limit?: number };
 
-export type User = { id: number; firstName: string; lastName: string; username: string; role: Role; active: boolean; createdAt: string };
+export type User = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  role: Role;
+  active: boolean;
+  createdAt: string;
+  /** v4.2: datos de contacto editables en Mi perfil. */
+  email?: string | null;
+  phone?: string | null;
+  lastSeenAt?: string | null;
+  updatedAt?: string | null;
+};
 export type SigninResponse = { token: string; user: User };
 export type CreateUserInput = { firstName: string; lastName: string; username: string; password: string; role: Role };
 export type ChangePasswordInput = { currentPassword: string; newPassword: string };
@@ -98,8 +111,9 @@ export type SaleLine = { id: number; productId: number; productName: string; sku
 export type SaleDetail = Sale & { lines: SaleLine[] };
 export type SaleQuery = PageQuery & { from?: string; to?: string; customerId?: number; userId?: number; status?: SaleStatus };
 
-export type Audit = { id: number; userId: number; username: string; method: string; resource: string; createdAt: string };
-export type AuditQuery = PageQuery & { userId?: number; resource?: string; from?: string; to?: string };
+/** method: POST/PUT/PATCH/DELETE para escrituras; EXPORT = reporte generado; SIGNIN = inicio de sesión (v4.2). */
+export type Audit = { id: number; userId: number; username: string; method: string; resource: string; detail?: string | null; createdAt: string };
+export type AuditQuery = PageQuery & { userId?: number; resource?: string; method?: string; from?: string; to?: string };
 
 export type SalesGroupBy = "day" | "product";
 export type SalesReportDayRow = { date: string; salesCount: number; units: number; total: number };
@@ -258,6 +272,17 @@ export type SearchResults = {
   people: Person[];
 };
 
-export type UpdateProfileInput = { firstName: string; lastName: string };
+export type UpdateProfileInput = { firstName: string; lastName: string; email?: string | null; phone?: string | null };
+
+/** Mi actividad (v4.2): últimas acciones propias y conteos de 30 días, desde la auditoría. */
+export type ActivityItem = { id: number; method: string; resource: string; detail: string | null; createdAt: string };
+export type MyActivity = {
+  items: ActivityItem[];
+  last30Days: { writes: number; exports: number; signins: number; sales: number; payments: number; batches: number };
+  lastSigninAt: string | null;
+};
+
+/** Reportes descargables (v4.2): PDF con gráficos o Excel, generados y auditados por la API. */
+export type ExportFormat = "pdf" | "xlsx";
 export type ContactInput = { name: string; email: string; phone?: string; message: string };
 export type ContactMessage = ContactInput & { id: number; handled: boolean; createdAt: string };

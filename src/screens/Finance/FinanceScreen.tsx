@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useScenario, useScenarios } from "@/hooks/financial";
+import { useExportScenario, useScenario, useScenarios } from "@/hooks/financial";
+import { ExportButtons } from "@/components/exports";
 import type { ScenarioDetail } from "@/types/api";
 import { Button, Chips, EmptyState, ErrorState, Loading, QueryState, Tabs, type TabOption } from "@/components/ui";
 import { DecisionPanel } from "./DecisionPanel";
@@ -45,6 +46,7 @@ export const FinanceScreen = () => {
   const selectedId = items.some((s) => s.id === paramId) ? paramId : (items[0]?.id ?? null);
   const selected = items.find((s) => s.id === selectedId);
   const detail = useScenario(selectedId);
+  const exportScenario = useExportScenario();
 
   const [modal, setModal] = useState<{ open: boolean; prefill: ScenarioDetail | null }>({ open: false, prefill: null });
   const openNew = () => setModal({ open: true, prefill: null });
@@ -150,7 +152,12 @@ export const FinanceScreen = () => {
         eyebrow="Análisis y decisión"
         title="Evaluación financiera"
         subtitle="¿Conviene ampliar el local? VPN, TIR, cobertura de la cuota y sensibilidad de cada escenario del crédito."
-        actions={<Button onClick={openNew}>Nuevo escenario</Button>}
+        actions={
+          <>
+            {selectedId !== null ? <ExportButtons onExport={(format) => exportScenario.mutateAsync({ id: selectedId, format })} /> : null}
+            <Button onClick={openNew}>Nuevo escenario</Button>
+          </>
+        }
       />
       <div className={[styles.page, tab === "panel" ? "" : styles.pageWide].join(" ")}>
         <Tabs options={TAB_OPTIONS} value={tab} onChange={goTab} />

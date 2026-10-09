@@ -252,3 +252,34 @@
   font-weight: 600;
   background: var(--surface-3);
 }
+
+/* v4.2: descarga en PDF o Excel y su historial */
+.history {
+  margin-top: 20px;
+}
+.historyFormat {
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.fmtPdf {
+  background: var(--bad-tag-bg);
+  color: var(--bad-tag-fg);
+}
+.fmtXlsx {
+  background: var(--good-tag-bg);
+  color: var(--good-tag-fg);
+}
+.historyWho {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.historyWho small {
+  color: var(--muted);
+}

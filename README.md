@@ -123,7 +123,7 @@ ilustraciones planas. Las imágenes son livianas (WebP, ≈ 150 kB) y se cargan 
 
 | Módulo | Qué hace | RF |
 |---|---|---|
-| Inicio de sesión | Usuario y contraseña, límite de intentos, cuentas de demostración opcionales, portada fotográfica | RF-01 |
+| Inicio de sesión | Usuario y contraseña, límite de intentos, portada fotográfica (sin atajos de demostración en pantalla desde la v4.2) | RF-01 |
 | Tablero gerencial | Inicio distinto por rol; indicadores con variación y minigráfica, **tres frentes del negocio** (mercancía, dinero y decisión) con su estado, tendencia de 13 semanas, productos más vendidos, capital en bodega, cartera con uso del cupo | RF-08 |
 | Inventario | Productos por línea, precio, stock mínimo, búsqueda y filtros; edición según el rol | RF-02 |
 | Lotes y vencimientos | Lotes vencidos y por vencer ordenados FEFO, ventanas de 7 a 90 días, registro de lotes | RF-02.6 |
@@ -131,17 +131,17 @@ ilustraciones planas. Las imágenes son livianas (WebP, ≈ 150 kB) y se cargan 
 | Clientes y cartera | Cupo, saldo, abonos, cartera vencida | RF-04 |
 | Proveedores | Ficha, compras con lote y vencimiento | RF-05 |
 | Evaluación financiera | Panel de decisión, estudio del proyecto, supuestos, escenarios, flujo de caja, amortización, sensibilidad y tornado | RF-06 |
-| Reportes gerenciales | Ventas por día, semana o mes; inventario por vencer; cartera; exportación CSV | RF-08 |
+| Reportes gerenciales | Ventas por día o producto, inventario por vencer y cartera; **descarga en PDF con gráficos o en Excel** generada por la API, con historial de quién generó cada reporte (v4.2) | RF-08 |
 | Usuarios y roles | Alta de usuarios, rol, activación, cambio de contraseña | RF-01 |
-| Auditoría | Toda escritura con usuario, fecha y recurso | RF-09 |
+| Auditoría | Escrituras, reportes generados e inicios de sesión, filtrables por usuario, acción, recurso y fecha, con el detalle legible | RF-09 |
 | Página pública (v4) | Inicio para visitantes con formulario de contacto, boletín y avisos legales | — |
 | Chat del equipo (v4) | Canal #general y privados, historial con «cargar anteriores», «está escribiendo…», ✓✓ leído, presencia y última conexión, panel del equipo | Socket.io |
 | Notificaciones (v4) | Campana con contador: ventas, anulaciones, abonos, compras, stock bajo, escenarios y contactos; avisos emergentes | Socket.io |
 | Actualización en vivo (v4) | Indicador «En vivo / Reconectando…»; las pantallas se refrescan cuando otro usuario cambia datos; `(n)` en el título de la pestaña | Socket.io |
 | Búsqueda global (v4) | `Ctrl + K` o `/`: productos, clientes, proveedores, ventas y personas, con teclado | — |
-| Mi perfil (v4) | Nombre, contraseña y tema | RF-01 |
+| Mi perfil (v4.2) | Como en SoftUnity: tarjeta de identidad, datos personales con correo y teléfono, seguridad (contraseña con requisitos y cerrar sesión en todos los dispositivos), mi actividad de 30 días, qué puede hacer mi rol y apariencia | RF-01 |
 | Contactos del sitio (v4) | Bandeja del administrador con los mensajes del formulario público | — |
-| Sistema | Acceso restringido por rol, 404 ilustrado, red de seguridad ante errores (`ErrorBoundary`), estados de carga, vacío y error en cada vista, tema oscuro, exportación Excel (CSV) y PDF | RNF |
+| Sistema | Acceso restringido por rol, 404 ilustrado, red de seguridad ante errores (`ErrorBoundary`), estados de carga, vacío y error en cada vista, tema oscuro, descarga de reportes en PDF y Excel | RNF |
 
 ---
 
@@ -305,12 +305,12 @@ mi-tierrita-app/
 │   │   └── system/                  ErrorBoundary
 │   ├── lib/                         cliente HTTP, errores, formato de números y fechas
 │   ├── styles/                      tema claro/oscuro y base
-│   └── __tests__/                   22 pruebas
+│   └── __tests__/                   26 pruebas
 ├── public/img/                      fotografías de las portadas (.webp) y CREDITOS.txt
 ├── src/assets/ill/                  ilustraciones planas (.svg)
 ├── docs/capturas/                   capturas de escritorio, celular y modo oscuro
 ├── Dockerfile · nginx.conf          imagen alternativa con Nginx
-└── .env.example                     VITE_API_URL · VITE_SHOW_DEMO_ACCOUNTS
+└── .env.example                     VITE_API_URL
 ```
 
 ---
@@ -395,14 +395,13 @@ Con la carpeta completa del proyecto (la que trae los `.bat`):
 | `pnpm typecheck` | Verificación de tipos |
 | `pnpm build` | Compilación optimizada en `dist/` |
 | `pnpm preview` | Sirve la compilación para revisarla |
-| `pnpm test` | Ejecuta las 14 pruebas |
+| `pnpm test` | Ejecuta las 26 pruebas |
 
 ### Variables de entorno
 
 | Variable | Ejemplo | Descripción |
 |---|---|---|
 | `VITE_API_URL` | `https://<api>.seenode.app/api/v1` | URL base de la API (se compila dentro del build) |
-| `VITE_SHOW_DEMO_ACCOUNTS` | `true` | Muestra las cuentas de demostración en el inicio de sesión |
 
 ---
 
@@ -414,7 +413,7 @@ Con la carpeta completa del proyecto (la que trae los `.bat`):
 2. Desde *Bodega y lotes* abra **Lotes y vencimientos**: retire los vencidos y revise lo que vence esta semana.
 3. En **Clientes y cartera** revise quién está en mora antes de autorizar más crédito.
 4. En **Evaluación financiera** compare los escenarios y lea el veredicto del panel de decisión.
-5. Exporte los **Reportes** a Excel (CSV) o PDF para la propietaria o el banco.
+5. Descargue los **Reportes** en PDF (con gráficos) o Excel para la propietaria o el banco; cada descarga queda en la auditoría.
 6. Atienda la **campana**: cada venta, abono, compra o contacto del sitio llega en vivo; los mensajes del formulario
    público quedan en **Contactos del sitio**.
 7. Use el **Chat del equipo** para coordinar con caja y bodega; `Ctrl + K` busca cualquier cosa.
@@ -464,7 +463,8 @@ pnpm test
 | `navigation.test.ts` | 3 | Pantallas permitidas por rol |
 | `charts.test.ts` | 2 | Escalas y series de los gráficos SVG |
 | `realtime.test.ts` | 8 | Agrupación de mensajes, «Hoy / Ayer», última conexión, nombres de quien escribe, origen del socket, qué se refresca tras una venta, chat y contactos por rol |
-| **Total** | **22** | ✔ todas pasan |
+| `reports-profile.test.ts` | 4 | Nombre del archivo descargado, detalle del historial de reportes, actividad en palabras y permisos por rol (v4.2) |
+| **Total** | **26** | ✔ todas pasan |
 
 Además `pnpm typecheck` y `pnpm build` terminan sin errores, y las pantallas se revisaron en escritorio, celular y
 tema oscuro sin errores de consola.
@@ -479,7 +479,7 @@ tema oscuro sin errores de consola.
 | Build command | `corepack enable && pnpm install --frozen-lockfile && pnpm build` |
 | Publish directory | `dist` |
 | Client-side routing | Activado (reescribe `/*` a `/index.html`) |
-| Variables | `VITE_API_URL=https://<api>/api/v1` · `VITE_SHOW_DEMO_ACCOUNTS=true` |
+| Variables | `VITE_API_URL=https://<api>/api/v1` |
 
 Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (base de datos, API y orden):
 [`mi-tierrita-api/docs/DESPLIEGUE.md`](https://github.com/kariredondos2002/mi-tierrita-api/blob/main/docs/DESPLIEGUE.md).
@@ -520,6 +520,8 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | ![Clientes](docs/capturas/07-clientes-cartera.png) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png) |
 | **Reportes gerenciales** | **Mi perfil** |
 | ![Reportes](docs/capturas/09-reportes.png) | ![Perfil](docs/capturas/17-perfil.png) |
+| **Mi actividad** | **Auditoría de reportes** |
+| ![Actividad](docs/capturas/17b-perfil-actividad.png) | ![Auditoría](docs/capturas/20-auditoria-reportes.png) |
 
 **Modo oscuro**
 
@@ -539,6 +541,7 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | v2 · «Tierra viva» | Rediseño visual completo, tablero gerencial SIG + BI + DSS, estudio del proyecto, tema oscuro, móvil | Completado |
 | v3 · Experiencia inmersiva | Escenas 3D del negocio (retiradas en v4 a pedido de la autora) | Reemplazado |
 | v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima, tres frentes ilustrados, pie negro | Completado |
+| v4.2 · Reportes y perfil | Reportes en PDF con gráficos y Excel generados por la API, historial de reportes y auditoría por acción, Mi perfil completo, inicio de sesión sin atajos de demostración | Completado |
 | v4.1 · Sitio y tiempo real | Página pública completa con contacto y boletín; chat con Socket.io, presencia, notificaciones, datos en vivo, búsqueda global, Mi perfil, contactos del sitio, ErrorBoundary, 404 ilustrado, exportación PDF | Completado · falta publicar en Seenode y validar con usuarios reales |
 
 ---

@@ -433,7 +433,7 @@ Con la carpeta completa del proyecto (la que trae los `.bat`):
    producto con 5 unidades o menos.
 4. **Chat:** avise en #general la llegada de mercancía o escriba en privado al administrador.
 
-Manual completo con capturas: `entregables/Compartidos/Manual_de_usuario_MiTierrita.pdf` en la carpeta del proyecto.
+Guía rápida: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md). Manual completo por rol: `entregables/Compartidos/Manual_de_usuario_MiTierrita.pdf` en la carpeta del proyecto.
 
 ---
 

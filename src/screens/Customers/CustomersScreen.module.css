@@ -91,8 +91,8 @@
 }
 .balanceValue {
   font-family: var(--font-heading);
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 31px;
+  font-weight: 400;
   line-height: 1.15;
   color: var(--ink);
   font-variant-numeric: tabular-nums;

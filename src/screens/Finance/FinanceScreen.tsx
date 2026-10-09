@@ -9,7 +9,7 @@ import { ScenariosPanel } from "./ScenariosPanel";
 import { CashFlowPanel } from "./CashFlowPanel";
 import { ProjectStudyPanel } from "./ProjectStudyPanel";
 import { ScenarioFormModal } from "./ScenarioFormModal";
-import { ScenarioTowers } from "./ScenarioTowers";
+import { PageHeader } from "@/components/layout/AppShell";
 import styles from "./FinanceScreen.module.css";
 
 export type FinanceTab = "panel" | "proyecto" | "supuestos" | "escenarios" | "flujo";
@@ -126,7 +126,6 @@ export const FinanceScreen = () => {
               case "panel":
                 return (
                   <>
-                    {items.length > 1 ? <ScenarioTowers items={items} selectedId={selectedId} onSelect={selectScenario} /> : null}
                     <DecisionPanel scenario={scenario} onOpenAssumptions={() => goTab("supuestos")} onNew={openNew} />
                   </>
                 );
@@ -146,10 +145,18 @@ export const FinanceScreen = () => {
   };
 
   return (
-    <div className={[styles.page, tab === "panel" ? "" : styles.pageWide].join(" ")}>
-      <Tabs options={TAB_OPTIONS} value={tab} onChange={goTab} />
-      {body()}
-      {modal.open ? <ScenarioFormModal prefill={modal.prefill} onClose={closeModal} onCreated={onCreated} /> : null}
-    </div>
+    <>
+      <PageHeader
+        eyebrow="Análisis y decisión"
+        title="Evaluación financiera"
+        subtitle="¿Conviene ampliar el local? VPN, TIR, cobertura de la cuota y sensibilidad de cada escenario del crédito."
+        actions={<Button onClick={openNew}>Nuevo escenario</Button>}
+      />
+      <div className={[styles.page, tab === "panel" ? "" : styles.pageWide].join(" ")}>
+        <Tabs options={TAB_OPTIONS} value={tab} onChange={goTab} />
+        {body()}
+        {modal.open ? <ScenarioFormModal prefill={modal.prefill} onClose={closeModal} onCreated={onCreated} /> : null}
+      </div>
+    </>
   );
 };

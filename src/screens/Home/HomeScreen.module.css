@@ -176,8 +176,7 @@
   text-decoration: none;
   color: inherit;
   background:
-    repeating-linear-gradient(-28deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px),
-    linear-gradient(140deg, #1d4a37 0%, #0f3324 70%, #0b291d 100%);
+    linear-gradient(140deg, rgba(18, 19, 21, 0.9), rgba(18, 19, 21, 0.7)), url("/img/amanecer-pradera.webp") center / cover;
   border-radius: var(--radius);
   padding: 20px 22px;
   box-shadow: var(--shadow-card);
@@ -209,12 +208,12 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9fd4b4;
+  color: var(--lime);
 }
 .decisionTitle {
   font-family: var(--font-heading);
-  font-size: 19px;
-  font-weight: 600;
+  font-size: 25px;
+  font-weight: 400;
   line-height: 1.25;
   color: #ffffff;
   margin-top: 6px;
@@ -243,7 +242,7 @@
   color: #ffffff;
 }
 .metricGood {
-  color: #9fd4b4;
+  color: var(--lime);
 }
 
 @media (max-width: 980px) {

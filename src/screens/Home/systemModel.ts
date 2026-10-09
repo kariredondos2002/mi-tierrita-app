@@ -1,4 +1,4 @@
-import type { NodeKey, SystemFlow, SystemNode, Tone } from "@/components/immersive/systemTypes";
+import type { NodeKey, SystemFlow, SystemNode, Tone } from "./systemTypes";
 import { int, moneyCompact, pct, times } from "@/lib/format";
 import type { InventoryReport, ReceivablesReport, SalesReport, ScenarioSummary } from "@/types/api";
 

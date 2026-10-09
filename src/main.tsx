@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
-import "@fontsource-variable/plus-jakarta-sans";
-import "@fontsource-variable/fraunces";
+import "@fontsource-variable/inter";
+import "@fontsource/bebas-neue";
+import "@fontsource/lobster";
 import "./styles/global.css";
 import "./stores/theme";
 

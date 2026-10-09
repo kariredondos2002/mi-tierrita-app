@@ -10,7 +10,7 @@
   align-items: center;
   padding: 26px 28px;
   border-radius: var(--radius);
-  background: repeating-linear-gradient(-28deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px), linear-gradient(140deg, #1d4a37, #0d2a1e);
+  background: linear-gradient(140deg, rgba(18, 19, 21, 0.9), rgba(18, 19, 21, 0.7)), url("/img/amanecer-pradera.webp") center / cover;
   color: #e6f1ea;
   box-shadow: var(--shadow-card);
 }
@@ -19,12 +19,12 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9fd4b4;
+  color: var(--lime);
 }
 .heroTitle {
   font-family: var(--font-heading);
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 34px;
+  font-weight: 400;
   color: #ffffff;
   margin-top: 8px;
   line-height: 1.2;
@@ -65,8 +65,8 @@
   border-radius: 11px;
   display: grid;
   place-items: center;
-  background: #9fd4b4;
-  color: #0d261c;
+  background: var(--lime);
+  color: #121315;
 }
 .flowIcon svg {
   width: 20px;

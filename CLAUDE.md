@@ -19,15 +19,15 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 
 1. **Toda pantalla contempla sus tres estados**: cargando, vacío (con llamada a la acción) y con datos.
    Usar `QueryState` / `Loading` / `EmptyState` / `ErrorState` de `@/components/ui`.
-2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, el sistema de diseño «Tierra viva» (v2,
-   2026-2), publicado también como variables en Figma (página 01 · Sistema de diseño). Marca `--forest` #1D4A37,
-   `--leaf` #2C6A4E, `--sprout` #9FD4B4, `--harvest` #E3A33B, `--clay` #C0612B, `--sky` #3A7CA5; fondo del menú
-   `--app-bg` #0D261C; panel `--ground` #F5F4EF; tarjetas `--surface` #FFF con borde `--line` #E6E4DB, radio
-   `--radius` 14px y `--shadow-card`; texto `--ink` #13201A, `--ink-2` #47534C, `--muted` #7A857E; semánticos
-   `--good` #14805E, `--warn` #B26A00, `--bad` #C23B2E con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; serie de
-   gráficos `--chart-1` a `--chart-6`. Tipografía (autoalojada con @fontsource): `--font-body` Plus Jakarta Sans
-   13,5px para interfaz y cifras; `--font-heading` Fraunces solo para h1, marca y titulares. Tema oscuro con
-   `data-theme="dark"` (botón luna/sol de la barra superior). Los SVG de iconos usan `currentColor`.
+2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, sistema de diseño «Campo abierto» (v4, 2026-2,
+   línea editorial agrotecnológica). Carbón `--forest` #1D1E20 (acciones; texto `--on-forest`), negro `--app-bg`
+   #121315 (menú y pie), oliva `--leaf`/`--olive` #2F3A13, acento `--lime` #14F77B (solo sobre fondos oscuros o como
+   franja; nunca texto lima sobre blanco), `--harvest` #E3A33B; fondo `--ground` #F4F5F7, tarjetas `--surface` #FFF
+   con borde `--line` #E3E6EC y radio `--radius` 10px; texto `--ink` #1D1E20, `--ink-2`, `--muted`; semánticos
+   `--good`, `--warn`, `--bad` con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; gráficos `--chart-1` a `--chart-6`.
+   Tipografía (autoalojada con @fontsource): `--font-body` Inter para interfaz y cifras; `--font-heading` Bebas Neue
+   (siempre `font-weight: 400`, es mayúscula y condensada) para h1, marca y titulares; `--font-script` Lobster solo
+   para antetítulos y frases cortas. Tema oscuro con `data-theme="dark"`. Los SVG de iconos usan `currentColor`.
 3. **Estilos encapsulados**: cada pantalla/componente tiene su `X.module.css`; nada de CSS global nuevo.
 4. **El frontend no calcula**: totales, saldos e indicadores se muestran tal como los devuelve la API.
    Lo único que suma el cliente es una vista previa del carrito, marcada como estimada.
@@ -51,32 +51,24 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 hint, tone neutral|good|warn|bad) y `StatGrid` · `Badge` (tone) · `DataTable<T>` (columns[{key, header,
 align, render, width}], rows, rowKey, onRowClick, footer) · `Loading`, `EmptyState`, `ErrorState`,
 `QueryState` · `Pagination` (page, onPage) · `Modal` (open, title, description, onClose, footer, wide) ·
-`Tabs` (segmentado gris #E7E8E0 con pestaña activa blanca) y `Chips` (píldoras; activa verde bosque) ·
-`Callout` (veredicto: tone good|warn|bad con ícono circular, title serif 26px, aside a la derecha) · `Toasts`.
+`Tabs` (segmentado gris #E7E8E0 con pestaña activa blanca) y `Chips` (píldoras; activa carbón) ·
+`Callout` (veredicto: tone good|warn|bad con ícono circular, title Bebas, aside a la derecha) · `Toasts`.
 `StatCard` acepta además `icon` (trazos SVG 22×22), `delta` (variación en fracción) y `spark` (serie corta).
 `DataTable`: texto a la izquierda por defecto, `align: "right"` para cifras, `mobile: false` oculta la columna en celular.
 Gráficos en `@/components/charts`, dibujados al ancho real del contenedor (`useWidth`) para que el texto no se escale:
 `HBarChart` (HTML; `stacked` para tarjetas angostas), `VBarChart` ({label, value, alt}[], format), `TrendChart`
 (área suavizada con lectura al pasar el cursor), `DonutChart` (participación con leyenda), `LineChart` (points,
 formatX, formatY, marker, highlightX), `TornadoChart` (data[{label, low, high}], base, format). Encabezado de página:
-`PageHeader` (eyebrow opcional + h1 Fraunces 26px + subtítulo + acciones) y `BrandMark` de `@/components/layout/AppShell`.
-Botones: `primary` 40px verde bosque, `secondary` blanco con borde, `accent` dorado cosecha.
+`PageHeader` (portada con foto del módulo según la ruta —`photo` la cambia—, eyebrow manuscrito, h1 Bebas, subtítulo y acciones; fotos en `public/img`, `photoUrl(nombre)`) y `BrandMark` de `@/components/layout/AppShell`.
+Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary` blanco con borde, `accent` dorado cosecha.
+`EmptyState` muestra una ilustración (unDraw, `src/assets/ill`); `art={false}` la oculta y `art={url}` la cambia.
 
-## Experiencia 3D (`@/components/immersive`)
+## Línea visual «Campo abierto»
 
-- `Stage` es el contenedor de toda escena: cabecera, interruptor 3D/Lista, botones de cámara, capa de etiquetas y
-  pausa fuera de pantalla. **Toda escena necesita su `list` equivalente** (misma información y acciones).
-- Las escenas viven en `immersive/scenes/*Scene.tsx`, se importan con `lazy()` y usan el kit (`StageCanvas`,
-  `SceneCamera`, `Hoverable`, `Label`/`StageHtml`, `Flow`, `Ground`, `SelectionDisc`). Nunca importar `three` ni `kit`
-  desde código que no sea perezoso.
-- Los datos llegan ya calculados por la API; la escena solo los dibuja. Colores 3D en `immersive/palette.ts`.
-- **Realismo**: solo escaneos reales (Poly Haven, CC0) en `public/assets/3d` — modelos con `Model`/`ModelInstances`
-  de `scenes/assets.tsx` (vienen a escala 1/1,6: pasar `scale={1.6}` para 1:1), materiales con `Pbr name=…` de
-  `scenes/materials.tsx` (mapa nombre → escaneo) y cielos HDR con `env` de `StageCanvas` (`morning`, `studio`,
-  `warehouse`). Nada de figuras abstractas ni colores planos inventados. Optimizar modelos nuevos con
-  `gltf-transform optimize in.gltf out.glb --compress meshopt --texture-compress webp --texture-size 512` y anotarlos en
-  `public/assets/3d/CREDITOS.md`. `localStorage["mi-tierrita-calidad"] = "high" | "low"` fuerza la calidad.
-- Respetar `reducedMotion` y `tier` de `useImmersive()`; animaciones con `m.*` de `motion/react` (hay `LazyMotion` estricto).
+- Sin 3D: la autora pidió retirarlo. La identidad la dan las portadas fotográficas (Unsplash, créditos en
+  `public/img/CREDITOS.txt`), los titulares Bebas, el acento Lobster y las ilustraciones planas recoloreadas
+  (`#3F8F3A` y `#1D1E20` en lugar del morado original de unDraw).
+- Fotos nuevas: WebP ≤ 2000 px de ancho y calidad ~74; anotarlas en `CREDITOS.txt` y en `PHOTO_BY_ROUTE` de AppShell.
 
 ## Hooks disponibles (`@/hooks/<entidad>`)
 

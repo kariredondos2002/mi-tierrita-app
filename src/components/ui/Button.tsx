@@ -12,6 +12,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 export const Button = ({ variant = "primary", size = "md", block = false, loading = false, className, children, disabled, type = "button", ...rest }: Props) => (
   <button
     type={type}
+    data-variant={variant}
     className={[styles.button, styles[variant], size !== "md" ? styles[size] : "", block ? styles.block : "", className ?? ""].join(" ")}
     disabled={disabled || loading}
     {...rest}

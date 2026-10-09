@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { ApiError } from "@/lib/errors";
 import { toApiError } from "@/lib/errors";
 import { Button } from "./Button";
+import gardening from "@/assets/ill/gardening_jck1.svg";
 import styles from "./States.module.css";
 
 /** Los tres estados de toda pantalla (documento 02, sección 5): cargando, vacío y con datos. */
@@ -12,8 +13,10 @@ export const Loading = ({ text = "Cargando…", inline = false }: { text?: strin
   </div>
 );
 
-export const EmptyState = ({ title, text, action }: { title: string; text?: string; action?: ReactNode }) => (
+/** Estado vacío con ilustración plana (unDraw, licencia libre); `art={false}` la oculta en tarjetas pequeñas. */
+export const EmptyState = ({ title, text, action, art = true }: { title: string; text?: string; action?: ReactNode; art?: boolean | string }) => (
   <div className={styles.box}>
+    {art ? <img className={styles.art} src={typeof art === "string" ? art : gardening} alt="" aria-hidden="true" loading="lazy" /> : null}
     <span className={styles.title}>{title}</span>
     {text ? <span>{text}</span> : null}
     {action}

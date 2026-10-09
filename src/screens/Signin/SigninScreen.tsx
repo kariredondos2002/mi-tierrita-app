@@ -1,12 +1,9 @@
-import { lazy, Suspense, useState, type FormEvent } from "react";
-import { useImmersive } from "@/components/immersive/useImmersive";
+import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSignin } from "@/hooks/session";
 import { Button, Field, Input } from "@/components/ui";
-import { BrandMark } from "@/components/layout/AppShell";
+import { BrandMark, photoUrl } from "@/components/layout/AppShell";
 import styles from "./SigninScreen.module.css";
-
-const HeroScene = lazy(() => import("@/components/immersive/scenes/HeroScene"));
 
 const Eye = ({ off }: { off: boolean }) => (
   <svg width="21" height="21" viewBox="0 0 24 20" fill="none" aria-hidden="true">
@@ -22,7 +19,6 @@ export const SigninScreen = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const signin = useSignin();
-  const { webgl, tier, reducedMotion } = useImmersive();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -43,37 +39,34 @@ export const SigninScreen = () => {
 
   return (
     <div className={styles.page}>
-      <aside className={styles.hero}>
-        {webgl ? null : <Landscape />}
-        {webgl ? (
-          <div className={styles.hero3d}>
-            <Suspense fallback={null}>
-              <HeroScene tier={tier} reducedMotion={reducedMotion} />
-            </Suspense>
-          </div>
-        ) : null}
+      <aside className={styles.hero} style={{ backgroundImage: `url(${photoUrl("hero-tractor")})` }}>
         <div className={styles.brand}>
-          <BrandMark size={52} />
+          <BrandMark size={50} />
           <div>
             <div className={styles.brandName}>Mi Tierrita</div>
             <div className={styles.brandSub}>Agropecuaria · Sahagún, Córdoba</div>
           </div>
         </div>
         <div className={styles.heroBody}>
-          <span className={styles.kicker}>Sistema de información gerencial</span>
           <h1>
-            Información que <em>siembra</em> mejores decisiones
+            Información para
+            <br />
+            más cosecha, menos
+            <br />
+            <span>pérdidas</span> y mejores
+            <br />
+            decisiones
           </h1>
-          <p>Inventario con lotes y vencimientos, ventas, cartera y proveedores en un solo lugar, con reportes para la gerencia y la evaluación financiera de la ampliación del local.</p>
+          <p className={styles.script}>El sistema que cuida la mercancía, el dinero y la decisión de crecer.</p>
           <ul className={styles.features}>
             <li>
-              <b>ERP</b> Operación diaria: inventario FEFO, punto de venta y cartera
+              <b>ERP</b> Inventario con lotes FEFO, punto de venta y cartera
             </li>
             <li>
               <b>BI</b> Tablero y reportes gerenciales con tendencias
             </li>
             <li>
-              <b>DSS</b> VPN, TIR, sensibilidad y tornado de la inversión
+              <b>DSS</b> VPN, TIR y sensibilidad de la ampliación
             </li>
           </ul>
         </div>
@@ -122,17 +115,3 @@ export const SigninScreen = () => {
     </div>
   );
 };
-
-/** Paisaje de surcos y colinas al pie del panel de marca (decorativo). */
-const Landscape = () => (
-  <svg className={styles.landscape} viewBox="0 0 600 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <circle cx="500" cy="150" r="24" fill="#E3A33B" opacity="0.85" />
-    <circle cx="500" cy="150" r="40" fill="#E3A33B" opacity="0.1" />
-    <path d="M0 210 C 120 150 240 170 330 195 C 420 220 510 170 600 160 V320 H0 Z" fill="#1D4A37" />
-    <path d="M0 250 C 140 205 260 225 360 240 C 460 255 530 230 600 220 V320 H0 Z" fill="#2C6A4E" />
-    <path d="M0 290 C 160 255 300 270 420 280 C 500 287 560 280 600 275 V320 H0 Z" fill="#3D8D68" />
-    {Array.from({ length: 9 }, (_, i) => (
-      <path key={i} d={`M${-40 + i * 80} 320 Q ${40 + i * 70} 285 ${120 + i * 62} 262`} stroke="#9FD4B4" strokeOpacity="0.22" strokeWidth="2" fill="none" />
-    ))}
-  </svg>
-);

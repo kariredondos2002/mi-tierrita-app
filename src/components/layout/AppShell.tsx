@@ -10,7 +10,6 @@ import { initials } from "@/lib/format";
 import { Toasts } from "@/components/ui";
 import { useNavBadges } from "./useNavBadges";
 import { AnimatedOutlet } from "./AnimatedOutlet";
-import { useExperienceStore } from "@/stores/experience";
 import styles from "./AppShell.module.css";
 
 /** Marca del lienzo: hoja sobre cuadrado verde claro. */
@@ -18,15 +17,15 @@ export const BrandMark = ({ size = 38 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 44 44" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
     <defs>
       <linearGradient id="bm-bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#B8E3C8" />
-        <stop offset="1" stopColor="#7CC59B" />
+        <stop offset="0" stopColor="#3DFB93" />
+        <stop offset="1" stopColor="#0FD068" />
       </linearGradient>
     </defs>
-    <rect x="1.5" y="1.5" width="41" height="41" rx="13.5" fill="url(#bm-bg)" />
-    <path d="M9 33.5 C 15 30.5 29 30.5 35 33.5" stroke="#0D261C" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
-    <path d="M22 32 L22 18.5" stroke="#0D261C" strokeWidth="2.6" strokeLinecap="round" />
-    <path d="M22 26 C 16 26 12.5 22 12.5 16 C 18.5 16 22 20 22 26 Z" fill="#0D261C" />
-    <path d="M22 22 C 28 22 31.5 18 31.5 12 C 25.5 12 22 16 22 22 Z" fill="#1D4A37" />
+    <rect x="1.5" y="1.5" width="41" height="41" rx="9" fill="url(#bm-bg)" />
+    <path d="M9 33.5 C 15 30.5 29 30.5 35 33.5" stroke="#121315" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
+    <path d="M22 32 L22 18.5" stroke="#121315" strokeWidth="2.6" strokeLinecap="round" />
+    <path d="M22 26 C 16 26 12.5 22 12.5 16 C 18.5 16 22 20 22 26 Z" fill="#121315" />
+    <path d="M22 22 C 28 22 31.5 18 31.5 12 C 25.5 12 22 16 22 22 Z" fill="#2F3A13" />
   </svg>
 );
 
@@ -60,11 +59,6 @@ export const AppShell = () => {
   const badges = useNavBadges();
   const fetching = useIsFetching();
   const [savedAt, setSavedAt] = useState(timeNow);
-  const markVisited = useExperienceStore((s) => s.markVisited);
-  // misiones: registrar qué módulos revisó cada usuario
-  useEffect(() => {
-    if (user) markVisited(user.username, `/${location.pathname.split("/")[1] ?? ""}`);
-  }, [location.pathname, user, markVisited]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const themeMode = useThemeStore((s) => s.mode);
   const setThemeMode = useThemeStore((s) => s.setMode);
@@ -200,20 +194,57 @@ export const AppShell = () => {
           </div>
         </header>
         <AnimatedOutlet className={styles.content} />
+        <footer className={styles.footer}>
+          <div className={styles.footBrand}>
+            <BrandMark size={34} />
+            <div>
+              <div className={styles.footName}>Mi Tierrita</div>
+              <div className={styles.footSub}>Agropecuaria · Sahagún, Córdoba</div>
+            </div>
+          </div>
+          <p className={styles.footScript}>Información que siembra mejores decisiones</p>
+          <div className={styles.footMeta}>
+            <span>© {new Date().getFullYear()} Mi Tierrita SIG · Universidad de Cartagena</span>
+            <span>Fotografías: Unsplash · Ilustraciones: unDraw</span>
+          </div>
+        </footer>
       </div>
       <Toasts />
     </div>
   );
 };
 
-/** Encabezado de página: antetítulo opcional (módulo), título Fraunces 26px, subtítulo y acciones a la derecha. */
-export const PageHeader = ({ title, subtitle, actions, eyebrow }: { title: string; subtitle?: string; actions?: ReactNode; eyebrow?: string }) => (
-  <div className={styles.pageHead}>
-    <div className={styles.pageHeadText}>
-      {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
-      <h1>{title}</h1>
-      {subtitle ? <div className={styles.pageSub}>{subtitle}</div> : null}
+/** Fotografía de cabecera de cada módulo (Unsplash, licencia libre; créditos en /public/img/CREDITOS.txt). */
+const PHOTO_BY_ROUTE: Record<string, string> = {
+  "": "tablero-ganado",
+  inventario: "bodega-estibas",
+  lotes: "bodega-sacos",
+  ventas: "manos-granos",
+  clientes: "clientes-finca",
+  proveedores: "estibas-bultos",
+  finanzas: "finanzas-escritorio",
+  reportes: "valle-cordoba",
+  usuarios: "manos-tierra",
+  auditoria: "manos-tierra",
+};
+export const photoUrl = (name: string) => `${import.meta.env.BASE_URL}img/${name}.webp`;
+
+/**
+ * Encabezado de página al estilo editorial agrotecnológico: fotografía de campo a todo el ancho con velo oscuro,
+ * antetítulo manuscrito, título condensado en mayúscula, subtítulo y acciones. La foto depende del módulo.
+ */
+export const PageHeader = ({ title, subtitle, actions, eyebrow, photo }: { title: string; subtitle?: string; actions?: ReactNode; eyebrow?: string; photo?: string }) => {
+  const location = useLocation();
+  const key = location.pathname.split("/")[1] ?? "";
+  const img = photo ?? PHOTO_BY_ROUTE[key] ?? "amanecer-pradera";
+  return (
+    <div className={styles.pageHead} style={{ backgroundImage: `url(${photoUrl(img)})` }}>
+      <div className={styles.pageHeadText}>
+        {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
+        <h1>{title}</h1>
+        {subtitle ? <div className={styles.pageSub}>{subtitle}</div> : null}
+      </div>
+      {actions ? <div className={styles.pageActions}>{actions}</div> : null}
     </div>
-    {actions ? <div className={styles.pageActions}>{actions}</div> : null}
-  </div>
-);
+  );
+};

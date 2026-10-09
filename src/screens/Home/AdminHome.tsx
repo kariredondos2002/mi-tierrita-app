@@ -6,8 +6,7 @@ import { useInventoryReport, useReceivablesReport, useSalesReport } from "@/hook
 import { useScenarios } from "@/hooks/financial";
 import { useSuppliers } from "@/hooks/suppliers";
 import { useMemo } from "react";
-import { LiveSystemMap } from "./LiveSystemMap";
-import { MissionsCard } from "./MissionsCard";
+import { BusinessPoints } from "./BusinessPoints";
 import { buildSystemModel } from "./systemModel";
 import { NAV_ICONS } from "@/router/navigation";
 import { addDaysIso, dateOnly, int, money, moneyAxis, moneyCompact, shortDate, todayIso } from "@/lib/format";
@@ -81,7 +80,7 @@ export const AdminHome = ({ user }: { user: User }) => {
   return (
     <>
       <PageHeader
-        eyebrow="Tablero gerencial · SIG"
+        eyebrow="Tablero gerencial"
         title={greetingFor(user.firstName)}
         subtitle={monthCloseLine()}
         actions={
@@ -93,9 +92,6 @@ export const AdminHome = ({ user }: { user: User }) => {
           </>
         }
       />
-
-      <LiveSystemMap nodes={model.nodes} flows={model.flows} username={user.username} />
-      <MissionsCard username={user.username} />
 
       <StatGrid>
         <StatCard
@@ -127,6 +123,8 @@ export const AdminHome = ({ user }: { user: User }) => {
           hint={receivables.data ? `${int(receivables.data.overdueCustomers)} de ${int(receivables.data.customersWithBalance)} clientes con saldo · más de ${receivables.data.overdueDays} días` : "Cargando"}
         />
       </StatGrid>
+
+      <BusinessPoints nodes={model.nodes} />
 
       <div className={styles.grid}>
         <Card title="Ventas de las últimas 13 semanas" subtitle={`Total semanal en pesos, hasta el domingo ${shortDate(lastSunday)} · pase el cursor para ver cada semana`} actions={<Button size="sm" variant="ghost" onClick={() => navigate("/reportes")}>Ver detalle →</Button>}>

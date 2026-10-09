@@ -32,20 +32,22 @@ campo a todo el ancho, titulares condensados e ilustraciones planas.
 2. [Marco Teórico](#marco-teórico)
 3. [Funcionalidades](#funcionalidades)
 4. [Línea visual «Campo abierto»](#línea-visual-campo-abierto)
-5. [Arquitectura y Diseño](#arquitectura-y-diseño)
-6. [Sistema de Diseño (UX/UI)](#sistema-de-diseño-uxui)
-7. [Tecnologías](#tecnologías)
-8. [Estructura del Proyecto](#estructura-del-proyecto)
-9. [Instalación y Ejecución](#instalación-y-ejecución)
-10. [Flujo de Uso por Rol](#flujo-de-uso-por-rol)
-11. [Accesibilidad y Diseño Responsivo](#accesibilidad-y-diseño-responsivo)
-12. [Pruebas](#pruebas)
-13. [Despliegue en Seenode](#despliegue-en-seenode)
-14. [Solución de Problemas](#solución-de-problemas)
-15. [Capturas](#capturas)
-16. [Fases del Desarrollo](#fases-del-desarrollo)
-17. [Autores](#autores)
-18. [Notas Académicas](#notas-académicas)
+5. [Página pública de inicio](#página-pública-de-inicio)
+6. [Tiempo real: chat, notificaciones y presencia](#tiempo-real-chat-notificaciones-y-presencia)
+7. [Arquitectura y Diseño](#arquitectura-y-diseño)
+8. [Sistema de Diseño (UX/UI)](#sistema-de-diseño-uxui)
+9. [Tecnologías](#tecnologías)
+10. [Estructura del Proyecto](#estructura-del-proyecto)
+11. [Instalación y Ejecución](#instalación-y-ejecución)
+12. [Flujo de Uso por Rol](#flujo-de-uso-por-rol)
+13. [Accesibilidad y Diseño Responsivo](#accesibilidad-y-diseño-responsivo)
+14. [Pruebas](#pruebas)
+15. [Despliegue en Seenode](#despliegue-en-seenode)
+16. [Solución de Problemas](#solución-de-problemas)
+17. [Capturas](#capturas)
+18. [Fases del Desarrollo](#fases-del-desarrollo)
+19. [Autores](#autores)
+20. [Notas Académicas](#notas-académicas)
 
 ---
 
@@ -66,6 +68,11 @@ los tres niveles de un sistema de información gerencial:
 
 La interfaz no calcula nada importante: totales, saldos e indicadores llegan ya calculados desde la API.
 
+Desde la v4 tiene además una **página pública de inicio** (portada, ¿qué es?, tres frentes, catálogo, quiénes somos,
+contacto y pie con boletín) y funciona **en tiempo real** con Socket.io: chat del equipo con canal general y
+privados, notificaciones del negocio en una campana, presencia en línea y pantallas que se actualizan solas cuando
+otro usuario vende, abona o registra un lote.
+
 ---
 
 ## Marco Teórico
@@ -74,7 +81,7 @@ La interfaz no calcula nada importante: totales, saldos e indicadores llegan ya 
 
 El navegador descarga la aplicación una vez y luego solo intercambia **datos** JSON con la API. React Router cambia
 de pantalla sin recargar y cada módulo se descarga solo cuando se abre (división por ruta), lo que mantiene la carga
-inicial en ≈ 174 kB comprimidos.
+inicial en ≈ 195 kB comprimidos (incluido el cliente de Socket.io); la página pública se descarga aparte.
 
 ### Cadena de datos en un solo sentido
 
@@ -93,6 +100,15 @@ las consultas afectadas para que todas las pantallas muestren lo mismo.
 | `session` | Usuario, rol y token (cierre de sesión automático ante un 401) |
 | `theme` | Tema claro u oscuro |
 | `toasts` · `ui` | Avisos emergentes · estado del menú lateral |
+| `realtime` (v4) | Socket de la pestaña, estado de la conexión y personas en línea |
+
+### Tiempo real con Socket.io
+
+REST responde cuando se le pregunta; para que el servidor **avise** (un mensaje nuevo, una venta de otra caja) hace
+falta una conexión abierta. La aplicación abre **un solo socket por pestaña** con el mismo token de la sesión
+(`realtime/RealtimeBridge.tsx`) y lo comparte por un almacén. Los componentes se suscriben con `useSocketEvent`, que
+quita el oyente al desmontarse. Si la conexión se cae, Socket.io reintenta solo; al volver, la aplicación vuelve a
+pedir todo para no perder lo que pasó durante la caída.
 
 ### Diseño editorial con fotografía
 
@@ -118,7 +134,14 @@ ilustraciones planas. Las imágenes son livianas (WebP, ≈ 150 kB) y se cargan 
 | Reportes gerenciales | Ventas por día, semana o mes; inventario por vencer; cartera; exportación CSV | RF-08 |
 | Usuarios y roles | Alta de usuarios, rol, activación, cambio de contraseña | RF-01 |
 | Auditoría | Toda escritura con usuario, fecha y recurso | RF-09 |
-| Sistema | Acceso restringido por rol, 404, estados de carga, vacío y error en cada vista, tema oscuro | RNF |
+| Página pública (v4) | Inicio para visitantes con formulario de contacto, boletín y avisos legales | — |
+| Chat del equipo (v4) | Canal #general y privados, historial con «cargar anteriores», «está escribiendo…», ✓✓ leído, presencia y última conexión, panel del equipo | Socket.io |
+| Notificaciones (v4) | Campana con contador: ventas, anulaciones, abonos, compras, stock bajo, escenarios y contactos; avisos emergentes | Socket.io |
+| Actualización en vivo (v4) | Indicador «En vivo / Reconectando…»; las pantallas se refrescan cuando otro usuario cambia datos; `(n)` en el título de la pestaña | Socket.io |
+| Búsqueda global (v4) | `Ctrl + K` o `/`: productos, clientes, proveedores, ventas y personas, con teclado | — |
+| Mi perfil (v4) | Nombre, contraseña y tema | RF-01 |
+| Contactos del sitio (v4) | Bandeja del administrador con los mensajes del formulario público | — |
+| Sistema | Acceso restringido por rol, 404 ilustrado, red de seguridad ante errores (`ErrorBoundary`), estados de carga, vacío y error en cada vista, tema oscuro, exportación Excel (CSV) y PDF | RNF |
 
 ---
 
@@ -143,28 +166,68 @@ obligatoria; aun así se acreditan en [`public/img/CREDITOS.txt`](public/img/CRE
 
 ---
 
+## Página pública de inicio
+
+Quien abre el sitio sin sesión ve la página de la tienda; con sesión, `/` es el tablero (la página sigue en `/sitio`).
+Su estructura sigue la de un sitio agrotecnológico de una sola página:
+
+| Sección | Contenido |
+|---|---|
+| Barra | Marca, enlaces a cada sección y «Ingresar al sistema» en lima; se vuelve negra al desplazarse y es menú hamburguesa en el celular |
+| Portada | Foto a pantalla completa, titular Bebas «Todo para el campo, con información que siembra decisiones», frase Lobster y dos botones |
+| Franja lima | ERP · BI · DSS · Tiempo real |
+| ¿Qué es? | Tarjeta blanca sobre foto de bodega con tres datos clave |
+| Tres frentes | Puntos 01–03 alternando texto e ilustración: inventario, ventas y cartera, ampliación |
+| Catálogo | Seis líneas de producto en tarjetas fotográficas sobre fondo negro |
+| Quiénes somos | La tienda y el equipo universitario |
+| Contacto | Formulario sobre gris claro (`POST /contact`, aviso al administrador en vivo) |
+| Pie negro | Marca, secciones, política de datos (Ley 1581 de 2012), términos y boletín |
+
+---
+
+## Tiempo real: chat, notificaciones y presencia
+
+Adaptado del chat de SoftUnity al dominio de la tienda:
+
+| Pieza | Archivo | Qué hace |
+|---|---|---|
+| Conexión | `realtime/socket.ts` · `RealtimeBridge.tsx` | Un socket por pestaña; estado `connecting → online → reconnecting`; sesión cerrada si el token es rechazado (611) |
+| Presencia | `realtime` (almacén) | `usuarios:conectados`, `usuario:conectado`, `usuario:desconectado` |
+| Conversación | `hooks/chat/useConversation.ts` | Historial REST + mensajes por socket, escribiendo, leído, respaldo REST si no hay socket |
+| Interfaz | `components/chat/*` · `screens/Chat` | Lista con separadores por día, agrupación por autor, «Nuevos mensajes», píldora «N mensajes nuevos», compositor con Enter / Shift+Enter |
+| Notificaciones | `layout/NotificationBell.tsx` | Campana con contador; marcar una o todas; cada aviso lleva al módulo |
+| Datos en vivo | `RealtimeBridge` (`datos:cambio`) | Invalida solo las consultas del recurso que cambió (`AFFECTED_KEYS`) |
+| Título | `hooks/chat/useUnreadInTitle.ts` | `(3) Mi Tierrita` con mensajes y avisos pendientes |
+
+Contrato de eventos: README de la API, sección «Eventos Socket.io».
+
+---
+
 ## Arquitectura y Diseño
 
 ```
 +--------------------------------------------------------------------------+
-|  screens/     Signin · Home · Inventory · Batches · Sales · Customers ·   |  <- Pantallas (React Router, lazy)
-|               Suppliers · Finance · Reports · Users · Audits · Restricted |
+|  screens/     Landing · Signin · Home · Inventory · Batches · Sales ·      |  <- Pantallas (React Router, lazy)
+|               Customers · Suppliers · Finance · Reports · Users · Audits · |
+|               Chat · Profile · Contacts · Restricted                       |
 +------------------------------------+-------------------------------------+
                                      |
 +------------------------------------v-------------------------------------+
-|  components/  ui (kit) · charts (SVG) · layout (menú, portadas, pie)     |  <- Componentes
+|  components/  ui (kit) · charts (SVG) · layout (menú, campana, búsqueda)  |  <- Componentes
+|               chat · system (ErrorBoundary)                               |
 |  hooks/       un hook por operación sobre TanStack Query                  |
 +------------------------------------+-------------------------------------+
                                      |
 +------------------------------------v-------------------------------------+
 |  services/    un archivo por recurso (únicos que arman peticiones HTTP)   |  <- Acceso a datos
-|  stores/      session · theme · experience · toasts (Zustand)             |  <- Estado global
+|  stores/      session · theme · toasts · ui (Zustand)                      |  <- Estado global
+|  realtime/    socket único por pestaña, presencia, useSocketEvent         |  <- Tiempo real
 +------------------------------------+-------------------------------------+
                                      |
-                         lib/http.ts (axios + JWT + 401)
-                                     |
-                                     v
-                     mi-tierrita-api  (puerto 4300, /api/v1)
+              lib/http.ts (axios + JWT + 401)    socket.io-client (auth: token)
+                                     |                    |
+                                     v                    v
+                     mi-tierrita-api  (puerto 4300: /api/v1 y /socket.io)
 ```
 
 | Decisión | Motivo |
@@ -175,9 +238,13 @@ obligatoria; aun así se acreditan en [`public/img/CREDITOS.txt`](public/img/CRE
 | `PageHeader` con foto por módulo | Todas las pantallas comparten la misma portada; la foto se elige por la ruta |
 | CSS Modules + variables de tema | Estilos por componente sin colisiones; el tema oscuro solo cambia variables |
 | Gráficos SVG propios | Sin librería de gráficos: el texto no se escala y el paquete es liviano |
+| Un socket por pestaña en un almacén | Varias pantallas escuchan sin abrir conexiones nuevas; se cierra al cerrar sesión |
+| Socket para avisar, REST para leer | El historial y los listados siguen en caché de TanStack Query; el socket solo empuja novedades o invalida |
+| Librerías en paquetes aparte | `react`, `data`, `motion` y `realtime` se guardan en caché del navegador entre versiones |
 
 Diagramas completos (arquitectura, componentes, navegación, estados, interacción) en
-[FigJam](https://www.figma.com/board/aPQbmmGEGvT4ScW7g9Y7h9), D01–D33.
+[FigJam](https://www.figma.com/board/aPQbmmGEGvT4ScW7g9Y7h9), D01–D40 (D34–D40: Socket.io, chat, reconexión,
+navegación v4 y arquitectura del cliente).
 
 ---
 
@@ -188,12 +255,13 @@ Diagramas completos (arquitectura, componentes, navegación, estados, interacci�
 | Colores «Campo abierto» | Carbón `#1D1E20` (acciones y texto) · negro `#121315` (menú y pie) · oliva `#2F3A13` · verde lima `#14F77B` (acento) · cosecha `#E3A33B` · fondo `#F4F5F7`; semánticos bueno `#14805E`, alerta `#B26A00`, malo `#C23B2E` |
 | Tipografía | **Bebas Neue** para titulares, **Lobster** para el acento manuscrito e **Inter** para interfaz y cifras, incluidas con `@fontsource` (funcionan sin internet) |
 | Componentes (`components/ui`) | `Button`, `Field`, `Input`, `Select`, `Checkbox`, `Card`, `StatCard`, `StatGrid`, `Badge`, `DataTable`, `Modal`, `Tabs`, `Chips`, `Callout`, `Pagination`, `QueryState`, `EmptyState`, `ErrorState`, `Toasts` |
+| Componentes v4 | `PersonAvatar` (color por rol y punto de presencia), `MessageList`, `Composer`, `MembersPanel`, `NotificationBell`, `GlobalSearch`, `ConnectionStatus`, `ErrorBoundary` |
 | Portadas | Foto por módulo con velo `rgba(18,19,21,.86 → .25)`: contraste AA del texto blanco sobre cualquier imagen |
 | Estados | Siempre con texto o ícono además del color |
 
-El mismo sistema está en [Figma](https://www.figma.com/design/O5PvdXx37jNt0NBOSPKhoT) (páginas 00–14: sistema de
-diseño, prototipos de escritorio y móvil, manual, investigación UX, arquitectura de información, validación,
-pensamiento sistémico). Todos los colores están en `src/styles/theme.css`.
+El mismo sistema está en [Figma](https://www.figma.com/design/O5PvdXx37jNt0NBOSPKhoT) (sistema de diseño v4,
+prototipos de escritorio y móvil, página pública, chat, manual, investigación UX, arquitectura de información,
+validación y pensamiento sistémico). Todos los colores están en `src/styles/theme.css`.
 
 ---
 
@@ -208,6 +276,7 @@ pensamiento sistémico). Todos los colores están en `src/styles/theme.css`.
 | TanStack Query | 5 | Estado del servidor |
 | Zustand | 5 | Estado global del cliente |
 | axios | 1.x | Peticiones REST |
+| socket.io-client | 4.8 | Chat, presencia, notificaciones y datos en vivo |
 | Motion | 14 | Transiciones de pantalla y microanimaciones (`LazyMotion`) |
 | @fontsource | 5 | Tipografías locales |
 | Vitest | 3 | Pruebas |
@@ -221,18 +290,22 @@ mi-tierrita-app/
 ├── src/
 │   ├── main.tsx · App.tsx           entrada, proveedores, MotionConfig y LazyMotion
 │   ├── router/                      rutas perezosas, mapa de pantallas por rol, guardas
-│   ├── screens/                     una carpeta por pantalla (Home, Inventory, Batches, Sales, Customers,
-│   │                                Suppliers, Finance, Reports, Users, Audits, Signin, Restricted)
+│   ├── screens/                     una carpeta por pantalla (Landing, Signin, Home, Inventory, Batches, Sales,
+│   │                                Customers, Suppliers, Finance, Reports, Users, Audits, Chat, Profile,
+│   │                                Contacts, Restricted)
+│   ├── realtime/                    socket.ts (almacén, useSocketEvent) · RealtimeBridge.tsx
 │   ├── hooks/<entidad>/             un hook por operación
 │   ├── services/                    un archivo por recurso de la API
-│   ├── stores/                      session · theme · experience · toasts
+│   ├── stores/                      session · theme · toasts · ui
 │   ├── components/
 │   │   ├── ui/                      sistema de diseño
 │   │   ├── charts/                  gráficos SVG
-│   │   ├── layout/                  AppShell, menú, barra superior, transición de pantallas
+│   │   ├── layout/                  AppShell, menú, barra superior, campana, búsqueda, estado de conexión
+│   │   ├── chat/                    lista de mensajes, compositor, panel del equipo, avatar
+│   │   └── system/                  ErrorBoundary
 │   ├── lib/                         cliente HTTP, errores, formato de números y fechas
 │   ├── styles/                      tema claro/oscuro y base
-│   └── __tests__/                   14 pruebas
+│   └── __tests__/                   22 pruebas
 ├── public/img/                      fotografías de las portadas (.webp) y CREDITOS.txt
 ├── src/assets/ill/                  ilustraciones planas (.svg)
 ├── docs/capturas/                   capturas de escritorio, celular y modo oscuro
@@ -341,18 +414,24 @@ Con la carpeta completa del proyecto (la que trae los `.bat`):
 2. Desde *Bodega y lotes* abra **Lotes y vencimientos**: retire los vencidos y revise lo que vence esta semana.
 3. En **Clientes y cartera** revise quién está en mora antes de autorizar más crédito.
 4. En **Evaluación financiera** compare los escenarios y lea el veredicto del panel de decisión.
-5. Exporte los **Reportes** para la propietaria o el banco.
+5. Exporte los **Reportes** a Excel (CSV) o PDF para la propietaria o el banco.
+6. Atienda la **campana**: cada venta, abono, compra o contacto del sitio llega en vivo; los mensajes del formulario
+   público quedan en **Contactos del sitio**.
+7. Use el **Chat del equipo** para coordinar con caja y bodega; `Ctrl + K` busca cualquier cosa.
 
 ### Secretaria
 1. **Ventas → Punto de venta:** busque el producto, agregue cantidades y elija contado o crédito.
 2. Si es a crédito, el sistema muestra el cupo disponible y rechaza la venta si lo excede.
 3. **Clientes y cartera:** registre los abonos.
+4. **Chat:** pregunte a bodega por existencias; las ventas anuladas por el administrador le llegan a la campana.
 
 ### Bodega
 1. **Lotes y vencimientos:** la tabla viene ordenada FEFO (lo que vence primero, arriba) y los vencidos se marcan
    en rojo.
 2. **Proveedores → Registrar compra:** cada compra entra con su lote y fecha de vencimiento.
-3. **Inventario:** revise los productos por debajo del stock mínimo.
+3. **Inventario:** revise los productos por debajo del stock mínimo; la campana avisa cuando una venta deja un
+   producto con 5 unidades o menos.
+4. **Chat:** avise en #general la llegada de mercancía o escriba en privado al administrador.
 
 Manual completo con capturas: `entregables/Compartidos/Manual_de_usuario_MiTierrita.pdf` en la carpeta del proyecto.
 
@@ -365,8 +444,10 @@ Manual completo con capturas: `entregables/Compartidos/Manual_de_usuario_MiTierr
 - Navegación completa con teclado y foco visible; campos con etiqueta y errores asociados.
 - Con **«reducir movimiento»** del sistema se desactivan las transiciones.
 - Estados con texto o ícono además del color; contraste AA en ambos temas.
-- Probado en 390, 820 y 1440 px sin desplazamiento horizontal; en el celular el mapa se gira para aprovechar la
-  pantalla vertical y el detalle aparece como hoja inferior.
+- Probado en 390, 820 y 1440 px sin desplazamiento horizontal; en el celular el chat muestra primero la lista de
+  conversaciones y luego el hilo con botón de regreso.
+- El chat es un `role="log"` con `aria-live="polite"`; «está escribiendo…» es un `role="status"`; la búsqueda global
+  es un `combobox` con `aria-activedescendant` y se maneja solo con el teclado.
 
 ---
 
@@ -382,7 +463,8 @@ pnpm test
 | `business.test.ts` | 3 | Frentes del negocio: puntos críticos de bodega y cartera, mejor escenario de la ampliación |
 | `navigation.test.ts` | 3 | Pantallas permitidas por rol |
 | `charts.test.ts` | 2 | Escalas y series de los gráficos SVG |
-| **Total** | **14** | ✔ todas pasan |
+| `realtime.test.ts` | 8 | Agrupación de mensajes, «Hoy / Ayer», última conexión, nombres de quien escribe, origen del socket, qué se refresca tras una venta, chat y contactos por rol |
+| **Total** | **22** | ✔ todas pasan |
 
 Además `pnpm typecheck` y `pnpm build` terminan sin errores, y las pantallas se revisaron en escritorio, celular y
 tema oscuro sin errores de consola.
@@ -414,28 +496,38 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | Error de CORS en producción | Agregue la URL del sitio a `CORS_ORIGINS` de la API y redepliéguela |
 | Página en blanco al recargar en producción | Active *Client-side routing* en Seenode |
 | `pnpm` no existe | `corepack enable` (Node.js 20.19 o superior) |
+| «Reconectando…» fijo en la barra | La API se detuvo o el proxy bloquea WebSocket; al volver la API se reconecta solo |
+| No llegan notificaciones | Revise que la API sea la v4 (`pnpm db:migrate` creó `notifications`) y que el usuario no sea el autor de la acción |
 
 ---
 
 ## Capturas
 
+**Página pública de inicio**
+
+![Página de inicio](docs/capturas/00-pagina-inicio.png)
+
 | Inicio de sesión | Tablero gerencial |
 |---|---|
 | ![Inicio](docs/capturas/01-inicio-sesion.png) | ![Tablero](docs/capturas/02-tablero.png) |
-| **Tres frentes del negocio** | **Lotes y vencimientos** |
-| ![Frentes](docs/capturas/03-frentes.png) | ![Lotes](docs/capturas/05-lotes.png) |
-| **Punto de venta** | **Clientes y cartera** |
-| ![Ventas](docs/capturas/06-punto-de-venta.png) | ![Clientes](docs/capturas/07-clientes-cartera.png) |
-| **Evaluación financiera** | **Reportes gerenciales** |
-| ![Finanzas](docs/capturas/08-evaluacion-financiera.png) | ![Reportes](docs/capturas/09-reportes.png) |
+| **Chat del equipo · #general** | **Chat privado con ✓✓ leído** |
+| ![Chat](docs/capturas/10-chat-general.png) | ![Privado](docs/capturas/10b-chat-privado.png) |
+| **Notificaciones en vivo** | **Búsqueda global (Ctrl + K)** |
+| ![Campana](docs/capturas/15-notificaciones.png) | ![Búsqueda](docs/capturas/16-busqueda.png) |
+| **Lotes y vencimientos** | **Punto de venta** |
+| ![Lotes](docs/capturas/05-lotes.png) | ![Ventas](docs/capturas/06-punto-de-venta.png) |
+| **Clientes y cartera** | **Evaluación financiera** |
+| ![Clientes](docs/capturas/07-clientes-cartera.png) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png) |
+| **Reportes gerenciales** | **Mi perfil** |
+| ![Reportes](docs/capturas/09-reportes.png) | ![Perfil](docs/capturas/17-perfil.png) |
 
 **Modo oscuro**
 
 ![Oscuro](docs/capturas/11-oscuro.png)
 
-| Celular: inicio | Celular: tablero | Celular: venta |
-|---|---|---|
-| ![Móvil inicio](docs/capturas/12-movil-inicio.png) | ![Móvil tablero](docs/capturas/13-movil-tablero.png) | ![Móvil venta](docs/capturas/14-movil-venta.png) |
+| Celular: página de inicio | Celular: tablero | Celular: venta | Celular: chat |
+|---|---|---|---|
+| ![Móvil inicio](docs/capturas/12-movil-inicio.png) | ![Móvil tablero](docs/capturas/13-movil-tablero.png) | ![Móvil venta](docs/capturas/14-movil-venta.png) | ![Móvil chat](docs/capturas/18-movil-chat.png) |
 
 ---
 
@@ -446,7 +538,8 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | v1 · Base | Autenticación, inventario, lotes, ventas, clientes, proveedores, finanzas, reportes, usuarios y auditoría | Completado |
 | v2 · «Tierra viva» | Rediseño visual completo, tablero gerencial SIG + BI + DSS, estudio del proyecto, tema oscuro, móvil | Completado |
 | v3 · Experiencia inmersiva | Escenas 3D del negocio (retiradas en v4 a pedido de la autora) | Reemplazado |
-| v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima, tres frentes ilustrados, pie negro | Completado · falta publicar en Seenode y validar con usuarios reales |
+| v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima, tres frentes ilustrados, pie negro | Completado |
+| v4.1 · Sitio y tiempo real | Página pública completa con contacto y boletín; chat con Socket.io, presencia, notificaciones, datos en vivo, búsqueda global, Mi perfil, contactos del sitio, ErrorBoundary, 404 ilustrado, exportación PDF | Completado · falta publicar en Seenode y validar con usuarios reales |
 
 ---
 

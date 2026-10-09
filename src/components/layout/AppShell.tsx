@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useIsFetching } from "@tanstack/react-query";
 import { useSessionStore, ROLE_LABELS } from "@/stores/session";
 import { useUiStore } from "@/stores/ui";
 import { useThemeStore } from "@/stores/theme";
@@ -10,6 +9,13 @@ import { initials } from "@/lib/format";
 import { Toasts } from "@/components/ui";
 import { useNavBadges } from "./useNavBadges";
 import { AnimatedOutlet } from "./AnimatedOutlet";
+import { NotificationBell } from "./NotificationBell";
+import { ConnectionStatus } from "./ConnectionStatus";
+import { GlobalSearch } from "./GlobalSearch";
+import { RealtimeBridge } from "@/realtime/RealtimeBridge";
+import { ErrorBoundary } from "@/components/system/ErrorBoundary";
+import { useNotifications } from "@/hooks/notifications";
+import { useUnreadInTitle } from "@/hooks/chat";
 import styles from "./AppShell.module.css";
 
 /** Marca del lienzo: hoja sobre cuadrado verde claro. */
@@ -44,9 +50,7 @@ const Chevron = () => (
   </svg>
 );
 
-const groupOf = (pathname: string) => NAV_GROUPS.find((g) => g.items.some((i) => (i.path === "/" ? pathname === "/" : pathname.startsWith(i.path))))?.title ?? "Inicio";
-
-const timeNow = () => new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+const groupOf = (pathname: string) => NAV_GROUPS.find((g) => g.items.some((i) => (i.path === "/" ? pathname === "/" : pathname.startsWith(i.path))))?.title ?? (pathname === "/perfil" ? "Su cuenta" : "Inicio");
 
 /** Barra lateral, barra superior y panel de contenido, fieles al lienzo de diseño. */
 export const AppShell = () => {
@@ -57,21 +61,17 @@ export const AppShell = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const badges = useNavBadges();
-  const fetching = useIsFetching();
-  const [savedAt, setSavedAt] = useState(timeNow);
+  const notifications = useNotifications();
   const [mobileOpen, setMobileOpen] = useState(false);
   const themeMode = useThemeStore((s) => s.mode);
   const setThemeMode = useThemeStore((s) => s.setMode);
   const isDark = themeMode === "dark" || (themeMode === "system" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
   const current = findRoute(location.pathname);
 
-  useEffect(() => {
-    if (fetching === 0) setSavedAt(timeNow());
-  }, [fetching]);
+  useUnreadInTitle((badges.messages ?? 0) + (notifications.data?.unread ?? 0));
   useEffect(() => setMobileOpen(false), [location.pathname]);
 
   if (!user) return null;
-  const attention = (badges.inventory ?? 0) + (badges.batches ?? 0) + (badges.customers ?? 0) > 0;
 
   return (
     <div className={styles.shell}>
@@ -154,10 +154,8 @@ export const AppShell = () => {
             <strong aria-current="page">{current?.label ?? "Tablero gerencial"}</strong>
             <span id="crumb-slot" style={{ display: "contents" }} />
           </nav>
-          <span className={styles.saved}>
-            <span className={[styles.pulse, fetching > 0 ? styles.pulseBusy : ""].join(" ")} aria-hidden="true" />
-            {fetching > 0 ? "Sincronizando…" : `En línea · ${savedAt}`}
-          </span>
+          <GlobalSearch />
+          <ConnectionStatus />
           <button
             type="button"
             className={styles.iconBtn}
@@ -176,14 +174,8 @@ export const AppShell = () => {
               </svg>
             )}
           </button>
-          <button type="button" className={styles.iconBtn} aria-label="Notificaciones" onClick={() => navigate("/")}>
-            <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M10 2.5 a4.8 4.8 0 0 1 4.8 4.8 v3.2 l1.4 2.4 h-12.4 l1.4 -2.4 v-3.2 A4.8 4.8 0 0 1 10 2.5 z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-              <path d="M8.2 15.6 a1.9 1.9 0 0 0 3.6 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            {attention ? <span className={styles.dot} /> : null}
-          </button>
-          <div className={styles.user}>
+          <NotificationBell />
+          <NavLink to="/perfil" className={styles.user} title="Mi perfil">
             <div className={styles.avatar}>{initials(user.firstName, user.lastName)}</div>
             <div className={styles.userText}>
               <div className={styles.userName}>
@@ -191,9 +183,11 @@ export const AppShell = () => {
               </div>
               <div className={styles.userRole}>{ROLE_LABELS[user.role]}</div>
             </div>
-          </div>
+          </NavLink>
         </header>
-        <AnimatedOutlet className={styles.content} />
+        <ErrorBoundary resetKey={location.pathname}>
+          <AnimatedOutlet className={styles.content} />
+        </ErrorBoundary>
         <footer className={styles.footer}>
           <div className={styles.footBrand}>
             <BrandMark size={34} />
@@ -210,6 +204,7 @@ export const AppShell = () => {
         </footer>
       </div>
       <Toasts />
+      <RealtimeBridge />
     </div>
   );
 };
@@ -226,6 +221,9 @@ const PHOTO_BY_ROUTE: Record<string, string> = {
   reportes: "valle-cordoba",
   usuarios: "manos-tierra",
   auditoria: "manos-tierra",
+  chat: "clientes-finca",
+  contactos: "valle-cordoba",
+  perfil: "amanecer-pradera",
 };
 export const photoUrl = (name: string) => `${import.meta.env.BASE_URL}img/${name}.webp`;
 

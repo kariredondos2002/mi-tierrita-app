@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useState, type ReactNode } from "react";
 import { useSessionStore } from "@/stores/session";
 import { useSales } from "@/hooks/sales";
@@ -28,7 +29,8 @@ export const SalesHistory = ({ tabs }: { tabs: ReactNode }) => {
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [params] = useSearchParams();
+  const [selectedId, setSelectedId] = useState<number | null>(() => (Number(params.get("venta")) > 0 ? Number(params.get("venta")) : null));
   const [showFilters, setShowFilters] = useState(false);
 
   const customers = useCustomers({ limit: 100 });

@@ -6,6 +6,8 @@ import { batchesService } from "@/services/batches";
 import { productsService } from "@/services/products";
 import { customersService } from "@/services/customers";
 import type { NavItem } from "@/router/navigation";
+import { useUnreadMessages } from "@/hooks/chat";
+import { useContactMessages } from "@/hooks/contact";
 
 /**
  * Insignias del menú (como en el lienzo: Inventario 6, Lotes 3, Clientes 2).
@@ -45,7 +47,12 @@ export const useNavBadges = (): Partial<Record<NonNullable<NavItem["badge"]>, nu
     staleTime: 60_000,
   });
 
+  const messages = useUnreadMessages(role !== undefined);
+  const contact = useContactMessages(isAdmin);
+
   return {
+    messages: messages.data,
+    contact: contact.data?.filter((c) => !c.handled).length,
     inventory: isAdmin ? inventory.data?.outOfStock : products.data?.items.filter((p) => p.stock === 0).length,
     batches: batches.data?.count,
     customers: isAdmin ? receivables.data?.overdueCustomers : withBalance.data?.count,

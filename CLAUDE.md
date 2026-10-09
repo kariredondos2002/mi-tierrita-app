@@ -70,6 +70,19 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
   (`#3F8F3A` y `#1D1E20` en lugar del morado original de unDraw).
 - Fotos nuevas: WebP ≤ 2000 px de ancho y calidad ~74; anotarlas en `CREDITOS.txt` y en `PHOTO_BY_ROUTE` de AppShell.
 
+## Tiempo real y página pública (v4.1)
+
+- **Socket.io**: un solo socket por pestaña lo abre `RealtimeBridge` (montado en `AppShell`) y vive en el almacén
+  `useRealtimeStore` (`@/realtime/socket`). Para escuchar un evento: `useSocketEvent("evento", handler)`; nunca
+  `io()` en una pantalla. Contrato de eventos: README de la API, «Eventos Socket.io».
+- `datos:cambio` invalida las consultas del recurso según `AFFECTED_KEYS` (`RealtimeBridge.tsx`); un recurso nuevo
+  se agrega ahí y en `LIVE_RESOURCES` de la API.
+- Chat: `useConversation({ kind: "general" } | { kind: "private", userId })` en `hooks/chat`; componentes en
+  `components/chat`. Notificaciones: `useNotifications` (la campana las recibe por socket y por caché).
+- Página pública: `screens/Landing` en `/` sin sesión y en `/sitio` siempre; sus colores son fijos (no cambia con
+  el tema oscuro) y usa el mismo `BrandMark` y `photoUrl`.
+- `ErrorBoundary` envuelve el contenido del `AppShell`; `GlobalSearch` responde a Ctrl + K y `/`.
+
 ## Hooks disponibles (`@/hooks/<entidad>`)
 
 - session: `useSignin`, `useSignout`, `useMe`
@@ -82,6 +95,8 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
 - sales: `useSales(query)`, `useSale(id)`, `useRegisterSale`, `useVoidSale`
 - audits: `useAudits(query)`
 - reports: `useSalesReport({from, to, groupBy})`, `useInventoryReport(days)`, `useReceivablesReport(overdueDays)`
+- chat: `useConversations`, `usePeople`, `useUnreadMessages`, `useConversation(target)`, `useUnreadInTitle(n)`
+- notifications: `useNotifications`, `useMarkNotificationsRead` · search: `useGlobalSearch(q)` · contact: `useSendContact`, `useContactMessages`, `useMarkContactHandled` · users: `useUpdateProfile`
 - financial: `useScenarios()`, `useScenario(id)`, `useCreateScenario`, `useCompareScenarios(ids)`, `useAmortization(id)`, `useSensitivity(id, variable, range?)`, `useBivariate(id, varX, varY)`, `useTornado(id)`
 
 Las consultas son `useQuery` de TanStack (data, isPending, isError, error, refetch); las mutaciones son

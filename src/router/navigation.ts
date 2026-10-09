@@ -9,7 +9,7 @@ export type NavItem = {
   /** Roles que ven el módulo con candado (van a Acceso restringido), como Finanzas para la Secretaria. */
   lockedFor?: Role[];
   /** Clave de la insignia numérica del menú. */
-  badge?: "inventory" | "batches" | "customers";
+  badge?: "inventory" | "batches" | "customers" | "messages" | "contact";
 };
 export type NavGroup = { title?: string; items: NavItem[] };
 
@@ -26,6 +26,9 @@ const ICONS = {
   reports: '<path d="M5.5 2.5 h8 l4 4 v13 a1.5 1.5 0 0 1 -1.5 1.5 h-10.5 a1.5 1.5 0 0 1 -1.5 -1.5 v-15.5 a1.5 1.5 0 0 1 1.5 -1.5 z"/><line x1="8" y1="12" x2="14" y2="12"/><line x1="8" y1="15.5" x2="12" y2="15.5"/>',
   users: '<circle cx="11" cy="7.5" r="3.6"/><path d="M4 19 c0 -3.6 3.1 -5.6 7 -5.6 s7 2 7 5.6"/>',
   audits: '<path d="M4 5.5 h14"/><path d="M4 11 h14"/><path d="M4 16.5 h9"/><circle cx="17" cy="16.5" r="2"/>',
+  chat: '<path d="M3 4.5 h16 v10 h-9.5 l-4.5 3.8 v-3.8 h-2 z"/><line x1="7" y1="8.5" x2="15" y2="8.5"/><line x1="7" y1="11.5" x2="12.5" y2="11.5"/>',
+  contact: '<rect x="2.5" y="4.5" width="17" height="13" rx="2"/><path d="M3 6 L11 12 L19 6"/>',
+  profile: '<circle cx="11" cy="8" r="3.4"/><path d="M4.5 18.5 c0 -3.4 2.9 -5.2 6.5 -5.2 s6.5 1.8 6.5 5.2"/><circle cx="17" cy="5" r="2"/>',
   signout: '<path d="M8.6 3.5 H5 a1.6 1.6 0 0 0 -1.6 1.6 v11.8 a1.6 1.6 0 0 0 1.6 1.6 h3.6"/><path d="M13.8 7.4 L17.4 11 L13.8 14.6"/><line x1="17.1" y1="11" x2="8.8" y2="11"/>',
 } as const;
 
@@ -52,6 +55,13 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    title: "Comunicación",
+    items: [
+      { path: "/chat", label: "Chat del equipo", icon: ICONS.chat, roles: ALL, badge: "messages" },
+      { path: "/contactos", label: "Contactos del sitio", icon: ICONS.contact, roles: ["ADMIN"], badge: "contact" },
+    ],
+  },
+  {
     title: "Administración",
     items: [
       { path: "/usuarios", label: "Usuarios y roles", icon: ICONS.users, roles: ["ADMIN"] },
@@ -60,7 +70,10 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export const ALL_NAV_ITEMS: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
+/** Rutas que no van en el menú pero tienen título y roles (se abren desde la barra superior). */
+export const EXTRA_ROUTES: NavItem[] = [{ path: "/perfil", label: "Mi perfil", icon: ICONS.profile, roles: ALL }];
+
+export const ALL_NAV_ITEMS: NavItem[] = [...NAV_GROUPS.flatMap((g) => g.items), ...EXTRA_ROUTES];
 
 export const findRoute = (pathname: string): NavItem | undefined =>
   ALL_NAV_ITEMS.find((i) => (i.path === "/" ? pathname === "/" : pathname === i.path || pathname.startsWith(`${i.path}/`)));

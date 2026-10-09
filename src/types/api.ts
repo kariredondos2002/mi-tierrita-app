@@ -224,3 +224,40 @@ export type Sensitivity = { scenarioId: number; variable: SensitivityVariable; r
 export type Bivariate = { scenarioId: number; varX: SensitivityVariable; varY: SensitivityVariable; xValues: number[]; yValues: number[]; npv: number[][] };
 export type TornadoBar = { variable: string; low: number; high: number; npvLow: number; npvHigh: number; amplitude: number };
 export type Tornado = { scenarioId: number; delta: number; baseNpv: number; bars: TornadoBar[] };
+
+// --- Tiempo real (v4): chat, notificaciones, búsqueda, perfil y contacto ---
+
+export type Person = { id: number; name: string; username: string; role: Role };
+export type DirectoryPerson = Person & { online: boolean; lastSeenAt: string | null };
+
+export type ChatMessage = {
+  id: number;
+  sender: Person;
+  /** null en el canal general. */
+  recipientId: number | null;
+  content: string;
+  readAt: string | null;
+  createdAt: string;
+};
+export type MessagePage = { messages: ChatMessage[]; hasMore: boolean };
+export type Conversation = {
+  person: Person;
+  lastMessage: { id: number; content: string; senderId: number; createdAt: string };
+  unread: number;
+};
+
+export type NotificationKind = "SALE" | "SALE_VOIDED" | "PAYMENT" | "PURCHASE" | "LOW_STOCK" | "SCENARIO" | "CONTACT" | "MESSAGE";
+export type AppNotification = { id: number; kind: NotificationKind; message: string; link: string | null; read: boolean; createdAt: string };
+export type NotificationList = { notifications: AppNotification[]; unread: number };
+
+export type SearchResults = {
+  products: { id: number; name: string; sku: string; stock: number }[];
+  customers: { id: number; name: string; document: string | null; balance: number }[];
+  suppliers: { id: number; name: string }[];
+  sales: { id: number; invoiceNumber: string; customerName: string | null; total: number; createdAt: string }[];
+  people: Person[];
+};
+
+export type UpdateProfileInput = { firstName: string; lastName: string };
+export type ContactInput = { name: string; email: string; phone?: string; message: string };
+export type ContactMessage = ContactInput & { id: number; handled: boolean; createdAt: string };

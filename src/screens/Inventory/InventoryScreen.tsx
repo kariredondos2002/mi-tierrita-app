@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/AppShell";
 import { Badge, Button, Card, Checkbox, Chips, DataTable, EmptyState, Input, Modal, Pagination, QueryState, type Column } from "@/components/ui";
@@ -32,8 +33,10 @@ export const InventoryScreen = () => {
 
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState(0);
-  const [search, setSearch] = useState("");
-  const [debounced, setDebounced] = useState("");
+  // ?buscar= llega desde la búsqueda global (Ctrl + K)
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(() => params.get("buscar") ?? "");
+  const [debounced, setDebounced] = useState(() => params.get("buscar") ?? "");
   const [showInactive, setShowInactive] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);

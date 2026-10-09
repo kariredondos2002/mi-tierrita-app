@@ -1,0 +1,117 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.identity {
+  text-align: center;
+  background: var(--app-bg) !important;
+  color: #ffffff;
+  border-color: var(--app-bg) !important;
+}
+.avatar {
+  width: 92px;
+  height: 92px;
+  margin: 8px auto 12px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--lime);
+  color: #121315;
+  font-family: var(--font-heading);
+  font-size: 44px;
+}
+.identity h2 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 36px;
+  color: #ffffff;
+  line-height: 1;
+}
+.username {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.role {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(20, 247, 123, 0.14);
+  color: var(--lime);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.scope {
+  font-family: var(--font-script);
+  font-size: 17px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 16px 6px 4px;
+}
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+.facts dt {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+.facts dd {
+  font-weight: 650;
+  font-size: 13.5px;
+  margin: 2px 0 0;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.error {
+  color: var(--bad);
+  font-size: 13px;
+}
+.themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.theme {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+.themeOn {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: var(--on-forest);
+}
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

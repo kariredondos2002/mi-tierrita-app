@@ -15,6 +15,9 @@ export const keys = {
   audits: ["audits"] as const,
   reports: ["reports"] as const,
   financial: ["financial"] as const,
+  chat: ["chat"] as const,
+  notifications: ["notifications"] as const,
+  contact: ["contact"] as const,
 };
 
 type MutationOptions<TData> = {

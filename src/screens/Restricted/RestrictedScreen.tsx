@@ -3,6 +3,7 @@ import { ROLE_LABELS, useSessionStore } from "@/stores/session";
 import type { Role } from "@/types/api";
 import { Button } from "@/components/ui";
 import { findRoute } from "@/router/navigation";
+import lostArt from "@/assets/ill/farm-girl_cefo.svg";
 import styles from "./RestrictedScreen.module.css";
 
 const LockIcon = () => (
@@ -53,17 +54,24 @@ export const RestrictedScreen = ({ roles }: { roles: Role[] }) => {
   );
 };
 
+/** 404 con ilustración: la ruta no existe dentro del sistema. */
 export const NotFoundScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   return (
     <div className={styles.wrap}>
       <div className={styles.box}>
-        <div className={styles.circle}>
-          <LockIcon />
-        </div>
-        <h1>Página no encontrada</h1>
+        <img src={lostArt} alt="" width={220} className={styles.art} />
+        <div className={styles.code}>404</div>
+        <h1>Esta página no está sembrada</h1>
+        <p>
+          No existe <code>{location.pathname}</code> en Mi Tierrita. Puede que el enlace esté incompleto o que el módulo haya cambiado de lugar.
+        </p>
         <div className={styles.actions}>
-          <Button onClick={() => navigate("/")}>Volver al inicio</Button>
+          <Button onClick={() => navigate("/")}>Volver al tablero</Button>
+          <Button variant="secondary" onClick={() => navigate(-1)}>
+            Regresar
+          </Button>
         </div>
       </div>
     </div>

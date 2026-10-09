@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useSessionStore } from "@/stores/session";
 import { useCustomers } from "@/hooks/customers";
@@ -39,7 +40,8 @@ export const CustomersScreen = () => {
   const debouncedSearch = useDebounced(search.trim());
   const [filter, setFilter] = useState<Filter>("all");
   const [page, setPage] = useState(1);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [params] = useSearchParams();
+  const [selectedId, setSelectedId] = useState<number | null>(() => (Number(params.get("cliente")) > 0 ? Number(params.get("cliente")) : null));
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [form, setForm] = useState<{ open: boolean; customer: Customer | null }>({ open: false, customer: null });
 

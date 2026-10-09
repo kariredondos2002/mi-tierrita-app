@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSignin } from "@/hooks/session";
 import { Button, Field, Input } from "@/components/ui";
 import { BrandMark, photoUrl } from "@/components/layout/AppShell";
@@ -73,6 +73,9 @@ export const SigninScreen = () => {
         <div className={styles.heroFoot}>Universidad de Cartagena · Ingeniería de Software · 2026-2</div>
       </aside>
       <section className={styles.formSide}>
+        <Link to="/" className={styles.backSite}>
+          ← Volver al sitio de Mi Tierrita
+        </Link>
         <form className={styles.form} onSubmit={submit}>
           <div className={styles.formHead}>
             <h2>Bienvenido de nuevo</h2>

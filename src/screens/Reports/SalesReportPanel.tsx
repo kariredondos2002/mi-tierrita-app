@@ -101,9 +101,14 @@ export const SalesReportPanel = () => {
       filters={filters}
       actions={
         query.data && query.data.rows.length > 0 ? (
-          <Button variant="secondary" size="sm" onClick={() => exportCsv(query.data)}>
-            Exportar CSV
-          </Button>
+          <>
+            <Button variant="secondary" size="sm" onClick={() => exportCsv(query.data)}>
+              Excel (CSV)
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => window.print()} title="Abre el diálogo de impresión: elija «Guardar como PDF»">
+              PDF
+            </Button>
+          </>
         ) : undefined
       }
     >

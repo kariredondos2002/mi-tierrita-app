@@ -634,3 +634,48 @@
     align-items: center;
   }
 }
+a.user {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+}
+a.user:hover {
+  color: inherit;
+}
+a.user:hover .userName {
+  text-decoration: underline;
+}
+
+/* Impresión / «Guardar como PDF» de los reportes: solo el contenido, sin menú, barra ni pie. */
+@media print {
+  .nav,
+  .topbar,
+  .footer,
+  .pageActions {
+    display: none !important;
+  }
+  .shell,
+  .panel {
+    display: block !important;
+    background: #ffffff !important;
+  }
+  .content {
+    padding: 0 !important;
+  }
+  .pageHead {
+    min-height: 0 !important;
+    margin: 0 0 12px !important;
+    background: none !important;
+    color: #000000 !important;
+    padding: 0 !important;
+  }
+  .pageHead::before {
+    display: none !important;
+  }
+  .pageHeadText h1,
+  .pageSub,
+  .eyebrow {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+}

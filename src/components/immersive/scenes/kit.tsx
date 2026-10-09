@@ -1,105 +1,162 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react-three/postprocessing";
+import { ToneMappingMode } from "postprocessing";
+import { hdriUrl, usePbr, type PbrName } from "./materials";
 import { useStage } from "../stageContext";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { CameraControls, ContactShadows, Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { CameraControls, Environment, Html, PerformanceMonitor } from "@react-three/drei";
 import * as THREE from "three";
-import { STAGE } from "../palette";
 import { SCENE_EVENT, type SceneCommand } from "../sceneCommands";
 import type { Tier } from "../useImmersive";
 import styles from "./SceneLabel.module.css";
 
-/** Lienzo común: resolución según el equipo, sombras solo en equipos capaces, niebla para dar profundidad. */
+/** Entorno de iluminación (HDRI real de exterior o interior, licencia CC0). */
+export type EnvName = "morning" | "studio" | "warehouse";
+
+/**
+ * Lienzo común con render realista: iluminación por imagen HDRI, sol con sombras suaves, mapeo de tonos
+ * ACES y, en equipos capaces, oclusión ambiental (N8AO), suavizado SMAA, brillo y viñeta muy sutiles.
+ * En equipos modestos se dibuja sin posprocesado y con sombras más pequeñas.
+ */
 export const StageCanvas = ({
   children,
   tier,
   reducedMotion,
   camera,
-  fogFar = 46,
   label,
+  env = "morning",
+  envIntensity = 1,
+  backgroundBlur = 0.6,
+  sun = [9, 14, 7],
+  sunColor = "#fff1dc",
+  sunIntensity = 2.6,
+  shadowBox = 16,
+  exposure = 1,
+  fog,
 }: {
   children: ReactNode;
   tier: Tier;
   reducedMotion: boolean;
   camera: { position: [number, number, number]; fov?: number };
-  fogFar?: number;
   label: string;
+  env?: EnvName;
+  envIntensity?: number;
+  /** null = sin fondo (transparente). */
+  backgroundBlur?: number | null;
+  sun?: [number, number, number];
+  sunColor?: string;
+  sunIntensity?: number;
+  shadowBox?: number;
+  exposure?: number;
+  fog?: { color: string; near: number; far: number };
+  /** @deprecated se conserva por compatibilidad */
+  fogFar?: number;
 }) => {
   const { visible } = useStage();
+  const high = tier === "high";
   // resolución adaptable: si los cuadros por segundo caen, se baja la resolución (y vuelve a subir si mejora)
-  const [dpr, setDpr] = useState(tier === "high" ? 1.75 : 1.25);
+  const [dpr, setDpr] = useState(high ? 1.5 : 1);
   return (
     <Canvas
-      shadows={tier === "high"}
+      shadows={{ type: THREE.PCFSoftShadowMap }}
       dpr={dpr}
       frameloop={!visible ? "never" : reducedMotion ? "demand" : "always"}
-      camera={{ position: camera.position, fov: camera.fov ?? 40, near: 0.1, far: 120 }}
-      gl={{ antialias: tier === "high", powerPreference: tier === "high" ? "high-performance" : "low-power", alpha: true }}
+      camera={{ position: camera.position, fov: camera.fov ?? 40, near: 0.1, far: 200 }}
+      gl={{
+        antialias: !high,
+        powerPreference: high ? "high-performance" : "low-power",
+        alpha: backgroundBlur === null,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: exposure,
+      }}
       aria-label={label}
       role="img"
       style={{ position: "absolute", inset: 0 }}
     >
-      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(tier === "high" ? 1.75 : 1.25)} />
-      <fog attach="fog" args={[STAGE.bgBottom, 18, fogFar]} />
-      <Lights tier={tier} />
+      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(high ? 1.5 : 1)} />
+      {fog ? <fog attach="fog" args={[fog.color, fog.near, fog.far]} /> : null}
+      <Environment
+        files={hdriUrl(env)}
+        background={backgroundBlur !== null}
+        backgroundBlurriness={backgroundBlur ?? 0}
+        environmentIntensity={envIntensity}
+      />
+      <directionalLight
+        position={sun}
+        intensity={sunIntensity}
+        color={sunColor}
+        castShadow
+        shadow-mapSize={high ? [2048, 2048] : [1024, 1024]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.025}
+        shadow-radius={high ? 4 : 2}
+        shadow-camera-left={-shadowBox}
+        shadow-camera-right={shadowBox}
+        shadow-camera-top={shadowBox}
+        shadow-camera-bottom={-shadowBox}
+        shadow-camera-near={1}
+        shadow-camera-far={70}
+      />
       {children}
+      {high ? (
+        <EffectComposer multisampling={0}>
+          <N8AO halfRes aoRadius={1.1} distanceFalloff={0.8} intensity={2.2} quality="medium" />
+          <Bloom luminanceThreshold={1} intensity={0.22} mipmapBlur />
+          <Vignette offset={0.32} darkness={0.42} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <SMAA />
+        </EffectComposer>
+      ) : null}
     </Canvas>
   );
 };
 
-/** Luz de luna fría + relleno cálido de cosecha; reflejos con «lightformers» locales (sin descargar mapas HDR). */
-const Lights = ({ tier }: { tier: Tier }) => (
-  <>
-    <ambientLight intensity={0.55} color="#cfe8da" />
-    <hemisphereLight args={["#9fd4b4", "#08150f", 0.55]} />
-    <directionalLight
-      position={[8, 14, 6]}
-      intensity={1.6}
-      color="#f4faf6"
-      castShadow={tier === "high"}
-      shadow-mapSize={[1024, 1024]}
-      shadow-camera-left={-14}
-      shadow-camera-right={14}
-      shadow-camera-top={14}
-      shadow-camera-bottom={-14}
-    />
-    <pointLight position={[-9, 5, -6]} intensity={30} distance={26} color={STAGE.harvest} />
-    <pointLight position={[9, 4, 8]} intensity={22} distance={24} color={STAGE.sky} />
-    {tier === "high" ? (
-      <Environment resolution={128} frames={1}>
-        <Lightformer form="rect" intensity={2.4} position={[0, 6, -8]} scale={[16, 5, 1]} color="#9fd4b4" />
-        <Lightformer form="rect" intensity={1.6} position={[-8, 3, 4]} rotation-y={Math.PI / 2} scale={[10, 3, 1]} color="#e3a33b" />
-        <Lightformer form="ring" intensity={1.2} position={[6, 5, 6]} scale={3} color="#6aaed6" />
-      </Environment>
-    ) : null}
-  </>
-);
-
-/** Plataforma circular con anillos concéntricos y sombras de contacto (suelo del «campo de noche»). */
-export const Platform = ({ radius = 11, tier }: { radius?: number; tier: Tier }) => (
-  <group>
-    <mesh rotation-x={-Math.PI / 2} position-y={-0.02} receiveShadow>
+/**
+ * Terreno: disco de textura PBR (pasto, concreto…) que se desvanece en los bordes hacia el fondo HDRI,
+ * con un clic invisible que devuelve la cámara a la vista general.
+ */
+export const Ground = ({
+  radius = 16,
+  material = "grass",
+  texSize = 4,
+  color,
+  onMiss,
+}: {
+  radius?: number;
+  material?: PbrName;
+  texSize?: number;
+  color?: string;
+  onMiss?: () => void;
+}) => {
+  const maps = usePbr(material, (radius * 2) / texSize);
+  const alpha = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const x = c.getContext("2d")!;
+    const g = x.createRadialGradient(128, 128, 70, 128, 128, 128);
+    g.addColorStop(0, "#fff");
+    g.addColorStop(1, "#000");
+    x.fillStyle = g;
+    x.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }, []);
+  return (
+    <mesh rotation-x={-Math.PI / 2} receiveShadow onClick={onMiss ? (e) => { e.stopPropagation(); onMiss(); } : undefined}>
       <circleGeometry args={[radius, 96]} />
-      <meshStandardMaterial color={STAGE.ground} roughness={0.92} metalness={0.05} />
+      <meshStandardMaterial {...maps} alphaMap={alpha} transparent depthWrite color={color ?? "#ffffff"} roughness={1} />
     </mesh>
-    {[0.35, 0.62, 0.9].map((f) => (
-      <mesh key={f} rotation-x={-Math.PI / 2} position-y={0.001}>
-        <ringGeometry args={[radius * f - 0.02, radius * f, 128]} />
-        <meshBasicMaterial color={STAGE.groundLine} transparent opacity={0.7} />
-      </mesh>
-    ))}
-    <mesh rotation-x={-Math.PI / 2} position-y={-0.03}>
-      <ringGeometry args={[radius, radius + 0.35, 128]} />
-      <meshBasicMaterial color={STAGE.sprout} transparent opacity={0.18} />
-    </mesh>
-    {tier === "high" ? <ContactShadows position={[0, 0.005, 0]} opacity={0.5} scale={radius * 2.4} blur={2.4} far={6} resolution={512} color="#000000" /> : null}
-  </group>
-);
+  );
+};
+
+/** @deprecated reemplazado por `Ground`; se mantiene para escenas antiguas. */
+export const Platform = ({ radius = 11 }: { radius?: number; tier?: Tier }) => <Ground radius={radius + 4} />;
 
 /** Interpola un valor hacia su objetivo cada cuadro (movimiento suave e independiente de los FPS). */
 export const damp = (current: number, target: number, lambda: number, dt: number) => THREE.MathUtils.damp(current, target, lambda, dt);
 
 /**
- * Objeto interactivo: crece al pasar el cursor, se eleva al seleccionarlo, cambia el cursor y emite eventos.
+ * Objeto interactivo: cambia el cursor y emite eventos. Los objetos pequeños (`lift`) se elevan al pasar el
+ * cursor o seleccionarlos, como si se tomaran del estante; los edificios no se deforman (realismo).
  * Clic = seleccionar · doble clic = abrir el módulo.
  */
 export const Hoverable = ({
@@ -111,10 +168,12 @@ export const Hoverable = ({
   onHover,
   children,
   reducedMotion,
+  lift = false,
 }: {
   position: [number, number, number];
   selected: boolean;
   dimmed: boolean;
+  lift?: boolean;
   onSelect: () => void;
   onOpen?: () => void;
   onHover?: (hovered: boolean) => void;
@@ -133,8 +192,8 @@ export const Hoverable = ({
   useFrame((_, dt) => {
     const g = ref.current;
     if (!g) return;
-    const s = selected ? 1.08 : hovered ? 1.05 : dimmed ? 0.96 : 1;
-    const y = position[1] + (selected ? 0.25 : 0);
+    const s = lift ? (selected ? 1.05 : hovered ? 1.03 : dimmed ? 0.98 : 1) : 1;
+    const y = position[1] + (lift ? (selected ? 0.35 : hovered ? 0.12 : 0) : 0);
     if (reducedMotion) {
       g.scale.setScalar(s);
       g.position.y = y;
@@ -175,47 +234,33 @@ export const Hoverable = ({
   );
 };
 
-/** Disco de selección bajo cada objeto: se ilumina al pasar el cursor o al seleccionar. */
-export const SelectionDisc = ({ radius, active, color = STAGE.sprout }: { radius: number; active: boolean; color?: string }) => {
+/** Marca de selección en el suelo: un halo suave que solo aparece al pasar el cursor o seleccionar. */
+export const SelectionDisc = ({ radius, active, color = "#ffffff" }: { radius: number; active: boolean; color?: string }) => {
   const ref = useRef<THREE.MeshBasicMaterial>(null);
+  const tex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const x = c.getContext("2d")!;
+    const g = x.createRadialGradient(64, 64, 40, 64, 64, 64);
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.84, "rgba(255,255,255,0)");
+    g.addColorStop(0.9, "rgba(255,255,255,0.95)");
+    g.addColorStop(0.95, "rgba(255,255,255,0)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    x.fillStyle = g;
+    x.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  }, []);
   useFrame((state, dt) => {
     if (!ref.current) return;
-    const pulse = active ? 0.55 + Math.sin(state.clock.elapsedTime * 3) * 0.12 : 0.14;
-    ref.current.opacity = damp(ref.current.opacity, pulse, 6, dt);
+    const target = active ? 0.55 + Math.sin(state.clock.elapsedTime * 2.6) * 0.1 : 0;
+    ref.current.opacity = damp(ref.current.opacity, target, 7, dt);
   });
   return (
-    <mesh rotation-x={-Math.PI / 2} position-y={0.012}>
-      <ringGeometry args={[radius * 0.82, radius, 64]} />
-      <meshBasicMaterial ref={ref} color={color} transparent opacity={0.14} depthWrite={false} />
+    <mesh rotation-x={-Math.PI / 2} position-y={0.03} renderOrder={2}>
+      <planeGeometry args={[radius * 2.3, radius * 2.3]} />
+      <meshBasicMaterial ref={ref} map={tex} color={color} transparent opacity={0} depthWrite={false} toneMapped={false} />
     </mesh>
-  );
-};
-
-/** Baliza de punto crítico: anillo que se expande y haz vertical. */
-export const Beacon = ({ color, height = 3.2, reducedMotion }: { color: string; height?: number; reducedMotion: boolean }) => {
-  const ring = useRef<THREE.Mesh>(null);
-  const mat = useRef<THREE.MeshBasicMaterial>(null);
-  useFrame((state) => {
-    if (reducedMotion || !ring.current || !mat.current) return;
-    const t = (state.clock.elapsedTime * 0.7) % 1;
-    ring.current.scale.setScalar(0.6 + t * 1.6);
-    mat.current.opacity = 0.75 * (1 - t);
-  });
-  return (
-    <group>
-      <mesh ref={ring} rotation-x={-Math.PI / 2} position-y={0.03}>
-        <ringGeometry args={[0.9, 1.02, 48]} />
-        <meshBasicMaterial ref={mat} color={color} transparent opacity={0.5} depthWrite={false} />
-      </mesh>
-      <mesh position-y={height / 2}>
-        <cylinderGeometry args={[0.035, 0.08, height, 10, 1, true]} />
-        <meshBasicMaterial color={color} transparent opacity={0.45} depthWrite={false} blending={THREE.AdditiveBlending} />
-      </mesh>
-      <mesh position-y={height}>
-        <sphereGeometry args={[0.13, 16, 16]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-    </group>
   );
 };
 
@@ -243,76 +288,186 @@ export const Label = ({
   </StageHtml>
 );
 
-/** Flujo entre dos puntos: curva elevada con partículas que viajan (velocidad según el volumen). */
+export type FlowKind = "mercancia" | "dinero" | "informacion";
+
+/** Franja suave a lo ancho (bordes que se funden con el pasto). */
+const edgeAlpha = (() => {
+  let t: THREE.CanvasTexture | null = null;
+  return () => {
+    if (t) return t;
+    const c = document.createElement("canvas");
+    c.width = 4;
+    c.height = 64;
+    const x = c.getContext("2d")!;
+    const g = x.createLinearGradient(0, 0, 0, 64);
+    g.addColorStop(0, "#000");
+    g.addColorStop(0.3, "#fff");
+    g.addColorStop(0.7, "#fff");
+    g.addColorStop(1, "#000");
+    x.fillStyle = g;
+    x.fillRect(0, 0, 4, 64);
+    t = new THREE.CanvasTexture(c);
+    return t;
+  };
+})();
+
+/** Cinta plana sobre el suelo que sigue una curva (u = metros recorridos, v = ancho). */
+const ribbon = (curve: THREE.Curve<THREE.Vector3>, width: number, y: number) => {
+  const n = 64;
+  const pts = curve.getSpacedPoints(n);
+  const pos: number[] = [];
+  const uv: number[] = [];
+  const idx: number[] = [];
+  let dist = 0;
+  for (let i = 0; i <= n; i++) {
+    const p = pts[i]!;
+    const q = pts[Math.min(n, i + 1)]!;
+    const r = pts[Math.max(0, i - 1)]!;
+    const dir = new THREE.Vector3().subVectors(q, r).setY(0).normalize();
+    const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(width / 2);
+    if (i > 0) dist += p.distanceTo(pts[i - 1]!);
+    pos.push(p.x + side.x, y, p.z + side.z, p.x - side.x, y, p.z - side.z);
+    uv.push(dist, 0, dist, 1);
+    if (i < n) {
+      const k = i * 2;
+      idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return { geo: g, length: dist };
+};
+
+const FLOW_TINT: Record<FlowKind, string> = { mercancia: "#9fd4b4", dinero: "#e3a33b", informacion: "#6aaed6" };
+
+/**
+ * Flujo entre dos puntos, dibujado como en una maqueta real: un camino de tierra (mercancía y dinero) o una
+ * línea demarcada (información) sobre el terreno, por el que se mueven bultos, monedas u hojas de papel.
+ * La cantidad y la velocidad siguen el volumen. Al seleccionar un punto, sus flujos se resaltan con su color.
+ */
 export const Flow = ({
   from,
   to,
-  color,
+  kind,
   intensity,
-  lift = 2.2,
-  dashed,
+  bend = 0.18,
   tier,
   reducedMotion,
   highlighted,
 }: {
   from: THREE.Vector3;
   to: THREE.Vector3;
-  color: string;
+  kind: FlowKind;
   intensity: number;
-  lift?: number;
-  dashed?: boolean;
+  bend?: number;
   tier: Tier;
   reducedMotion: boolean;
   highlighted: boolean | null;
+  /** compatibilidad */ color?: string;
+  lift?: number;
+  dashed?: boolean;
 }) => {
   const curve = useMemo(() => {
-    const mid = from.clone().add(to).multiplyScalar(0.5);
-    mid.y += lift;
-    return new THREE.QuadraticBezierCurve3(from.clone(), mid, to.clone());
-  }, [from, to, lift]);
-  const tube = useMemo(() => new THREE.TubeGeometry(curve, 48, highlighted ? 0.045 : 0.025, 6, false), [curve, highlighted]);
-  const count = Math.max(2, Math.round((tier === "high" ? 7 : 4) * (0.35 + intensity)));
+    const a = from.clone().setY(0);
+    const b = to.clone().setY(0);
+    const mid = a.clone().add(b).multiplyScalar(0.5);
+    const d = new THREE.Vector3().subVectors(b, a);
+    mid.add(new THREE.Vector3(-d.z, 0, d.x).multiplyScalar(bend));
+    return new THREE.QuadraticBezierCurve3(a, mid, b);
+  }, [from, to, bend]);
+  const info = kind === "informacion";
+  const path = useMemo(() => ribbon(curve, info ? 0.07 : 0.85, info ? 0.016 : 0.012), [curve, info]);
+  const glow = useMemo(() => ribbon(curve, info ? 0.12 : 0.62, 0.02), [curve, info]);
+  const dirt = usePbr("dirt", 1 / 2.5, 1);
+  const dash = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 64;
+    c.height = 4;
+    const x = c.getContext("2d")!;
+    x.fillStyle = "#fff";
+    x.fillRect(0, 0, 36, 4);
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = THREE.RepeatWrapping;
+    t.repeat.set(1 / 0.5, 1);
+    return t;
+  }, []);
+  const count = Math.max(2, Math.round((tier === "high" ? 6 : 4) * (0.35 + intensity)));
   const mesh = useRef<THREE.InstancedMesh>(null);
   const offsets = useMemo(() => Array.from({ length: count }, (_, i) => i / count), [count]);
   const tmp = useMemo(() => new THREE.Object3D(), []);
-  const speed = 0.08 + intensity * 0.22;
+  const speed = (0.04 + intensity * 0.09) * (6 / Math.max(3, path.length));
+  const place = (p: number, t: number) => {
+    const pt = curve.getPointAt(p);
+    const tan = curve.getTangentAt(p);
+    tmp.position.copy(pt);
+    tmp.rotation.set(0, Math.atan2(tan.x, tan.z), 0);
+    if (kind === "mercancia") tmp.position.y = 0.06;
+    else if (kind === "dinero") {
+      tmp.position.y = 0.075;
+      tmp.rotation.z = Math.PI / 2;
+    } else {
+      tmp.position.y = 0.32 + Math.sin(t * 3 + p * 12) * 0.05;
+      tmp.rotation.x = -Math.PI / 2 + Math.sin(t * 2 + p * 9) * 0.25;
+    }
+    const s = Math.min(1, Math.sin(p * Math.PI) * 4);
+    tmp.scale.setScalar(Math.max(0.001, s));
+    tmp.updateMatrix();
+  };
   useEffect(() => {
-    // posición inicial (y definitiva si el usuario pidió reducir el movimiento)
     if (!mesh.current) return;
     offsets.forEach((o, i) => {
-      tmp.position.copy(curve.getPoint(o));
-      tmp.updateMatrix();
+      place(o, 0);
       mesh.current!.setMatrixAt(i, tmp.matrix);
     });
     mesh.current.instanceMatrix.needsUpdate = true;
-  }, [offsets, curve, tmp]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offsets, curve]);
   useFrame((state) => {
     if (reducedMotion || !mesh.current) return;
-    const t = state.clock.elapsedTime * speed;
+    const t = state.clock.elapsedTime;
     offsets.forEach((o, i) => {
-      const p = (o + t) % 1;
-      tmp.position.copy(curve.getPoint(p));
-      const s = 0.6 + Math.sin(p * Math.PI) * 0.6;
-      tmp.scale.setScalar(s);
-      tmp.updateMatrix();
+      place((o + t * speed) % 1, t);
       mesh.current!.setMatrixAt(i, tmp.matrix);
     });
     mesh.current.instanceMatrix.needsUpdate = true;
   });
-  const opacity = highlighted === null ? 0.5 : highlighted ? 0.95 : 0.12;
+  const tint = FLOW_TINT[kind];
   return (
     <group>
-      <mesh geometry={tube}>
-        <meshBasicMaterial color={color} transparent opacity={dashed ? opacity * 0.6 : opacity} depthWrite={false} />
+      <mesh geometry={path.geo} receiveShadow renderOrder={1}>
+        {info ? (
+          <meshStandardMaterial map={dash} color="#f4f1e8" transparent opacity={highlighted === false ? 0.35 : 0.9} alphaMap={dash} depthWrite={false} roughness={0.8} />
+        ) : (
+          <meshStandardMaterial {...dirt} alphaMap={edgeAlpha()} transparent depthWrite={false} roughness={1} />
+        )}
       </mesh>
-      <instancedMesh ref={mesh} args={[undefined, undefined, count]} visible={highlighted !== false}>
-        <sphereGeometry args={[0.09, 12, 12]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+      {highlighted ? (
+        <mesh geometry={glow.geo} renderOrder={2}>
+          <meshBasicMaterial color={tint} transparent opacity={0.5} alphaMap={edgeAlpha()} depthWrite={false} toneMapped={false} />
+        </mesh>
+      ) : null}
+      <instancedMesh ref={mesh} args={[undefined, undefined, count]} visible={highlighted === true && kind !== "informacion"} castShadow>
+        {kind === "mercancia" ? (
+          <boxGeometry args={[0.2, 0.1, 0.3]} />
+        ) : kind === "dinero" ? (
+          <cylinderGeometry args={[0.07, 0.07, 0.025, 20]} />
+        ) : (
+          <planeGeometry args={[0.14, 0.18]} />
+        )}
+        {kind === "mercancia" ? (
+          <meshStandardMaterial color="#b08a5e" roughness={0.9} />
+        ) : kind === "dinero" ? (
+          <meshStandardMaterial color="#c9a23a" metalness={0.9} roughness={0.28} />
+        ) : (
+          <meshStandardMaterial color="#fbfaf6" roughness={0.7} side={THREE.DoubleSide} />
+        )}
       </instancedMesh>
     </group>
   );
 };
-
 
 const ACTION = { NONE: 0, ROTATE: 1, TRUCK: 2, DOLLY: 16, TOUCH_ROTATE: 64, TOUCH_DOLLY_ROTATE: 32768 } as const;
 

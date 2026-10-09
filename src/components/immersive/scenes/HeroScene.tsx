@@ -1,130 +1,107 @@
-import { useMemo, useRef } from "react";
+import { Suspense, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Line } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 import * as THREE from "three";
-import { STAGE } from "../palette";
 import type { Tier } from "../useImmersive";
+import { Model, ModelInstances, preloadModels } from "./assets";
+import { hdriUrl, Pbr } from "./materials";
 
-/** Colinas de baja poligonización: el campo cordobés como terreno del sistema. */
-const Hills = () => {
-  const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(40, 26, 48, 32);
-    const p = g.attributes.position!;
-    for (let i = 0; i < p.count; i++) {
-      const x = p.getX(i);
-      const y = p.getY(i);
-      const h = Math.sin(x * 0.28) * 0.9 + Math.cos(y * 0.35 + x * 0.1) * 0.7 + Math.sin((x + y) * 0.6) * 0.18;
-      p.setZ(i, h - Math.max(0, y) * 0.05);
-    }
-    g.computeVertexNormals();
-    return g;
-  }, []);
-  return (
-    <mesh geometry={geo} rotation-x={-Math.PI / 2} position={[0, -2.4, -6]}>
-      <meshStandardMaterial color={STAGE.leaf} flatShading roughness={0.9} />
-    </mesh>
-  );
-};
+preloadModels(["sack_bovino","sack_sal","wooden_crate_01","plastic_bottle_gallon","multi_cleaner_bottle","bleach_bottle","medical_box","watering_can_metal_01","wooden_lantern_01","potted_plant_02"]);
 
-/** Los tres enfoques del SIG orbitando el núcleo: ERP (cubo), BI (anillo), DSS (cristal). */
-const Orbit = ({ reducedMotion }: { reducedMotion: boolean }) => {
-  const group = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    if (!reducedMotion && group.current) group.current.rotation.y += dt * 0.25;
-  });
-  const items = [
-    { pos: [2.6, 0, 0] as const, color: STAGE.sprout, shape: "box" },
-    { pos: [-1.3, 0.3, 2.25] as const, color: STAGE.harvest, shape: "torus" },
-    { pos: [-1.3, -0.2, -2.25] as const, color: STAGE.sky, shape: "oct" },
-  ];
-  return (
-    <group ref={group} position={[1.8, 0.7, -3]} scale={0.78}>
-      <Float speed={reducedMotion ? 0 : 1.6} rotationIntensity={0.6} floatIntensity={reducedMotion ? 0 : 0.8}>
-        <mesh>
-          <icosahedronGeometry args={[0.9, 0]} />
-          <meshStandardMaterial color={STAGE.sprout} emissive={STAGE.sprout} emissiveIntensity={0.5} flatShading metalness={0.4} roughness={0.2} />
-        </mesh>
-      </Float>
-      {items.map((it, i) => (
-        <group key={i} position={[...it.pos]}>
-          <Float speed={reducedMotion ? 0 : 2 + i * 0.4} floatIntensity={reducedMotion ? 0 : 1}>
-            <mesh>
-              {it.shape === "box" ? <boxGeometry args={[0.7, 0.7, 0.7]} /> : it.shape === "torus" ? <torusGeometry args={[0.42, 0.13, 12, 40]} /> : <octahedronGeometry args={[0.5, 0]} />}
-              <meshStandardMaterial color={it.color} emissive={it.color} emissiveIntensity={0.45} flatShading roughness={0.3} metalness={0.3} />
-            </mesh>
-          </Float>
-        </group>
-      ))}
-      {/* líneas de información entre el núcleo y cada enfoque */}
-      {items.map((it, i) => (
-        <Line key={`l${i}`} points={[[0, 0, 0], [...it.pos]]} color={it.color} lineWidth={1.2} transparent opacity={0.55} />
-      ))}
-    </group>
-  );
-};
+/*
+ * Bienvenida: bodegón fotorrealista del mostrador de la agropecuaria a escala real (metros). Bultos de
+ * concentrado y sal mineralizada, una caja de madera con frascos, botiquín veterinario, regadera, farol y una
+ * mata sobre el mesón de tablas, con la luz cálida de media mañana. Todo son escaneos de objetos reales.
+ */
+const P = 1.6;
 
-/** Partículas que suben como semillas de luz. */
-const Seeds = ({ count, reducedMotion }: { count: number; reducedMotion: boolean }) => {
-  const ref = useRef<THREE.Points>(null);
-  const positions = useMemo(() => {
-    const a = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      a[i * 3] = (Math.random() - 0.5) * 18;
-      a[i * 3 + 1] = Math.random() * 7 - 2;
-      a[i * 3 + 2] = (Math.random() - 0.5) * 10 - 3;
-    }
-    return a;
-  }, [count]);
-  useFrame((_, dt) => {
-    if (reducedMotion || !ref.current) return;
-    const p = ref.current.geometry.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < count; i++) {
-      let y = p.getY(i) + dt * (0.25 + (i % 5) * 0.06);
-      if (y > 5) y = -2;
-      p.setY(i, y);
-    }
-    p.needsUpdate = true;
-  });
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial color={STAGE.harvest} size={0.07} transparent opacity={0.85} sizeAttenuation />
-    </points>
-  );
-};
-
-/** Paralaje: la cámara sigue levemente al puntero (profundidad sin perder la lectura del texto). */
-const Parallax = ({ reducedMotion }: { reducedMotion: boolean }) => {
+/** Paralaje: la cámara sigue levemente al puntero y respira despacio (profundidad sin distraer). */
+const CameraDrift = ({ reducedMotion }: { reducedMotion: boolean }) => {
+  const look = useMemo(() => new THREE.Vector3(0.0, 0.4, -0.05), []);
   useFrame((state, dt) => {
-    if (reducedMotion) return;
-    const { camera, pointer } = state;
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, pointer.x * 1.2, 2.5, dt);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, 1.6 + pointer.y * 0.6, 2.5, dt);
-    camera.lookAt(0.8, 0, -3);
+    const { camera, pointer, clock } = state;
+    if (reducedMotion) {
+      camera.lookAt(look);
+      return;
+    }
+    const t = clock.elapsedTime;
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, 0.2 + pointer.x * 0.35 + Math.sin(t * 0.12) * 0.12, 2, dt);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, 0.66 + pointer.y * 0.1, 2, dt);
+    camera.lookAt(look);
   });
   return null;
 };
 
-/** Escena de bienvenida (decorativa): terreno, núcleo del SIG con sus tres enfoques y semillas de luz. */
+const StillLife = ({ tier }: { tier: Tier }) => {
+  const sacks = useMemo(
+    () => [
+      { p: [-0.62, 0.02, -0.12] as [number, number, number], r: 0.08, s: P },
+      { p: [-0.6, 0.19, -0.1] as [number, number, number], r: -0.06, s: P },
+      { p: [-0.64, 0.36, -0.14] as [number, number, number], r: 0.14, s: P },
+    ],
+    [],
+  );
+  return (
+    <>
+      {/* mesón de tablas viejas */}
+      <mesh position={[0, -0.04, 1.1]} receiveShadow castShadow>
+        <boxGeometry args={[4.4, 0.08, 3.8]} />
+        <Pbr name="wood" repeat={[2.9, 2.5]} roughness={0.95} />
+      </mesh>
+      <ModelInstances name="sack_bovino" items={sacks} />
+      <Model name="sack_sal" at={[-1.18, 0.02, 0.18]} rot={1.2} scale={P} />
+      <Model name="wooden_crate_01" at={[0.42, 0.02, -0.28]} rot={-0.12} scale={P} />
+      <ModelInstances
+        name="plastic_bottle_gallon"
+        items={[
+          { p: [0.16, 0.37, -0.3], r: 0.4, s: P },
+          { p: [0.36, 0.37, -0.32], r: -0.2, s: P },
+        ]}
+      />
+      <ModelInstances
+        name="multi_cleaner_bottle"
+        items={[
+          { p: [0.6, 0.37, -0.26], r: 0.1, s: P },
+          { p: [0.72, 0.37, -0.3], r: 0.9, s: P },
+        ]}
+      />
+      <Model name="bleach_bottle" at={[0.08, 0.02, 0.22]} rot={0.5} scale={P} />
+      <Model name="medical_box" at={[0.42, 0.02, 0.28]} rot={0.2} scale={P} />
+      <Model name="watering_can_metal_01" at={[1.12, 0.02, 0.12]} rot={-0.9} scale={P} />
+      <Model name="wooden_lantern_01" at={[1.02, 0.02, -0.36]} rot={0.3} scale={P} />
+      {tier === "high" ? <Model name="potted_plant_02" at={[-1.45, 0.02, -0.45]} rot={0.6} scale={P * 0.9} /> : null}
+    </>
+  );
+};
+
 const HeroScene = ({ tier, reducedMotion }: { tier: Tier; reducedMotion: boolean }) => (
   <Canvas
-    dpr={tier === "high" ? [1, 1.8] : [1, 1.3]}
+    shadows={{ type: THREE.PCFShadowMap }}
+    dpr={tier === "high" ? [1, 1.8] : [1, 1.25]}
     frameloop={reducedMotion ? "demand" : "always"}
-    camera={{ position: [0, 1.6, 7], fov: 45 }}
-    gl={{ antialias: tier === "high", alpha: true, powerPreference: "low-power" }}
+    camera={{ position: [0.2, 0.66, 3.7], fov: 30, near: 0.05, far: 40 }}
+    gl={{ antialias: true, alpha: true, powerPreference: "low-power", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }}
     style={{ position: "absolute", inset: 0 }}
     aria-hidden="true"
   >
-    <fog attach="fog" args={["#0d261c", 6, 22]} />
-    <ambientLight intensity={0.6} color="#cfe8da" />
-    <directionalLight position={[5, 8, 4]} intensity={1.4} />
-    <pointLight position={[-4, 2, 0]} intensity={18} color={STAGE.harvest} distance={14} />
-    <Hills />
-    <Orbit reducedMotion={reducedMotion} />
-    <Seeds count={tier === "high" ? 220 : 90} reducedMotion={reducedMotion} />
-    <Parallax reducedMotion={reducedMotion} />
+    <Suspense fallback={null}>
+      <Environment files={hdriUrl("morning")} environmentIntensity={0.7} />
+      <directionalLight
+        position={[-2.6, 3.2, 1.8]}
+        intensity={2.6}
+        color="#ffe2b8"
+        castShadow
+        shadow-mapSize={tier === "high" ? [2048, 2048] : [1024, 1024]}
+        shadow-bias={-0.0003}
+        shadow-normalBias={0.02}
+        shadow-camera-left={-2.5}
+        shadow-camera-right={2.5}
+        shadow-camera-top={2}
+        shadow-camera-bottom={-2}
+      />
+      <StillLife tier={tier} />
+    </Suspense>
+    <CameraDrift reducedMotion={reducedMotion} />
   </Canvas>
 );
 

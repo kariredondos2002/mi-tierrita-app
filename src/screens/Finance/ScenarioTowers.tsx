@@ -33,8 +33,9 @@ export const toTowers = (items: ScenarioSummary[]): Tower[] =>
     });
 
 /**
- * Comparación espacial de escenarios: la altura de cada torre es cuántas veces la ampliación paga su propia cuota,
- * el plano de vidrio marca 1,0 ×, el cristal dice si crea valor. Clic en una torre = elegir ese escenario.
+ * Comparación espacial de escenarios: cada escenario es una maqueta de la ampliación sobre la mesa de reuniones.
+ * Cada piso es 0,25 × de cobertura de la cuota; la lámina de acrílico marca 1,0 × y el banderín dice si crea
+ * valor. Clic en una maqueta = elegir ese escenario.
  */
 export const ScenarioTowers = ({ items, selectedId, onSelect }: { items: ScenarioSummary[]; selectedId: number | null; onSelect: (id: number) => void }) => {
   const { tier, reducedMotion, narrow } = useImmersive();
@@ -51,8 +52,8 @@ export const ScenarioTowers = ({ items, selectedId, onSelect }: { items: Scenari
       label="Comparación 3D de escenarios"
       eyebrow="DSS · Comparar alternativas"
       title="¿Qué alternativa paga su propia cuota?"
-      subtitle="Cada torre es un escenario. Su altura es la cobertura de la cuota; si pasa el plano de vidrio, la ampliación se paga sola. El cristal verde indica que crea valor."
-      hint="Clic en una torre para elegir el escenario · arrastre para girar · Ctrl + rueda para acercar"
+      subtitle="Cada maqueta es un escenario de la ampliación. Cada piso es 0,25 × de cobertura de la cuota: si supera la lámina de acrílico (1,0 ×), la ampliación se paga sola. El banderín verde indica que crea valor."
+      hint="Clic en una maqueta para elegir el escenario · arrastre para girar · Ctrl + rueda para acercar"
       scene={<ScenarioTowersScene towers={towers} selected={selectedId} onSelect={choose} tier={tier} reducedMotion={reducedMotion} narrow={narrow} />}
       overlay={
         <>

@@ -79,7 +79,7 @@ export const FefoShelf = ({ items, days }: { items: ProductBatch[]; days: number
       label="Estante FEFO en 3D"
       eyebrow="ERP · Lotes y vencimientos"
       title="Estante FEFO"
-      subtitle={`Lotes que vencen en ${days} días y los ya vencidos. El frente del estante sale primero; la altura de cada caja es lo que queda del lote.`}
+      subtitle={`Lotes que vencen en ${days} días y los ya vencidos. Cada caja es un lote: lo que vence primero está a la izquierda, junto a la salida al mostrador, y su etiqueta dice cuánto queda.`}
       actions={simulateButton}
       hint="Arrastre para girar · Ctrl + rueda para acercar · clic en una caja para ver el lote · Esc vuelve"
       scene={<FefoShelfScene rows={rows} selected={selected} onSelect={setSelected} leaving={leaving} tier={tier} reducedMotion={reducedMotion} narrow={narrow} />}

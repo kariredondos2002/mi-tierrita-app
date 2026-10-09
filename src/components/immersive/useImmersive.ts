@@ -47,6 +47,12 @@ export const useImmersive = () => {
   const webgl = hasWebGL();
   const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 4 : 4;
   const memory = typeof navigator !== "undefined" ? ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) : 8;
-  const tier: Tier = narrow || cores <= 4 || memory <= 4 ? "low" : "high";
+  let forced: string | null = null;
+  try {
+    forced = window.localStorage.getItem("mi-tierrita-calidad");
+  } catch {
+    forced = null;
+  }
+  const tier: Tier = forced === "high" || forced === "low" ? forced : narrow || cores <= 4 || memory <= 4 ? "low" : "high";
   return { mode, setMode, webgl, reducedMotion, narrow, tier, show3D: webgl && mode === "3d" };
 };

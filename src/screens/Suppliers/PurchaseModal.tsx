@@ -64,7 +64,7 @@ export const PurchaseModal = ({ supplier, onClose }: Props) => {
     setLocalErrors(next);
     if (Object.keys(next).length > 0 || form.productId === null || form.supplierId === null) return;
     try {
-      const batch = await register.mutateAsync({ supplierId: form.supplierId, productId: form.productId, quantity, unitCost, expiresAt: form.expiresAt });
+      const { batch } = await register.mutateAsync({ supplierId: form.supplierId, productId: form.productId, quantity, unitCost, expiresAt: form.expiresAt });
       setCreated(batch);
     } catch {
       /* el error queda en la mutación y se pinta en el formulario */

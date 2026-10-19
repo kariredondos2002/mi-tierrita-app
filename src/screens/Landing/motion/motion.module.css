@@ -1,0 +1,80 @@
+/* ---------- Reveal ---------- */
+.reveal {
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  transition-delay: var(--delay, 0ms);
+}
+/* Sin desenfoque: sobre fondo blanco el blur se ve como una sombra gris. */
+.rise {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.fade {
+  opacity: 0;
+}
+.blur {
+  opacity: 0;
+  transform: scale(0.98);
+}
+.scale {
+  opacity: 0;
+  transform: scale(0.96);
+}
+.in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ---------- SplitText ---------- */
+.split {
+  display: inline;
+}
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.word {
+  display: inline-block;
+  animation: wordUp 0.6s var(--ease-out) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.serif {
+  /* Acento del titular: misma letra, sin cursiva; solo cambia el color (--serif-color). */
+  color: var(--serif-color, inherit);
+}
+@keyframes wordUp {
+  from {
+    transform: translateY(110%) rotate(3deg);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Odometer ---------- */
+.odometer {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+.digit {
+  display: inline-block;
+  height: 1.12em;
+  line-height: 1.12em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.strip {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.7s var(--ease-out);
+  transition-delay: var(--delay, 0ms);
+}
+.strip > span {
+  height: 1.12em;
+  line-height: 1.12em;
+}

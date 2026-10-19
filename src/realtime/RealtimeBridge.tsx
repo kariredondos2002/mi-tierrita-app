@@ -5,6 +5,7 @@ import { keys } from "@/hooks/shared";
 import { useSessionStore } from "@/stores/session";
 import { notify } from "@/stores/toasts";
 import type { AppNotification, ChatMessage, NotificationList, Person } from "@/types/api";
+import { previewOf } from "@/components/chat/chatFormat";
 import { createSocket, useRealtimeStore } from "./socket";
 
 /** Qué cachés refrescar cuando otro usuario cambia un recurso (evento datos:cambio). */
@@ -89,16 +90,41 @@ export const RealtimeBridge = () => {
       notify.info(n.message);
     });
 
+    /** Aviso del navegador cuando la pestaña está oculta (solo si la persona lo permitió). */
+    const nativeAlert = (title: string, body: string, path: string) => {
+      if (!document.hidden || typeof Notification === "undefined" || Notification.permission !== "granted") return;
+      const n = new Notification(title, { body, tag: path, icon: "/favicon.svg" });
+      n.onclick = () => {
+        window.focus();
+        navRef.current(path);
+        n.close();
+      };
+    };
+    const refreshChat = () => {
+      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "conversations"] });
+      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "unread"] });
+    };
+
     socket.on("chat:privado", (m: ChatMessage) => {
-      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "conversations"] });
-      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "unread"] });
+      refreshChat();
       const mine = m.sender.id === useSessionStore.getState().user?.id;
-      if (!mine && pathRef.current !== `/chat/${m.sender.id}`) notify.info(`${m.sender.name}: ${m.content.slice(0, 80)}`);
+      if (mine) return;
+      const open = pathRef.current === `/chat/${m.sender.id}`;
+      if (!open) notify.info(`${m.sender.name}: ${previewOf(m).slice(0, 80)}`);
+      if (!open || document.hidden) nativeAlert(m.sender.name, previewOf(m).slice(0, 120), `/chat/${m.sender.id}`);
     });
-    socket.on("chat:leido", () => {
-      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "conversations"] });
-      void queryClient.invalidateQueries({ queryKey: [...keys.chat, "unread"] });
+    // Canal general: solo los contadores; el aviso emergente es para menciones (las demás quedan como no leídos).
+    socket.on("chat:mensaje", (m: ChatMessage) => {
+      const myId = useSessionStore.getState().user?.id;
+      if (m.sender.id === myId) return;
+      refreshChat();
+      if (m.mentions.includes(myId ?? -1) && pathRef.current !== "/chat/general") {
+        notify.info(`${m.sender.name} le mencionó: ${previewOf(m).slice(0, 80)}`);
+        nativeAlert(`${m.sender.name} le mencionó`, previewOf(m).slice(0, 120), "/chat/general");
+      } else if (document.hidden) nativeAlert(`#general · ${m.sender.name}`, previewOf(m).slice(0, 120), "/chat/general");
     });
+    socket.on("chat:leido", refreshChat);
+    socket.on("chat:fijado", () => void queryClient.invalidateQueries({ queryKey: [...keys.chat, "pinned"] }));
 
     return () => {
       socket.removeAllListeners();

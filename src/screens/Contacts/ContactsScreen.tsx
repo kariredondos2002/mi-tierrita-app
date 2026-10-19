@@ -24,13 +24,14 @@ export const ContactsScreen = () => {
                   <li key={c.id} className={[styles.item, c.handled ? styles.done : ""].join(" ")}>
                     <div className={styles.head}>
                       <strong>{c.name}</strong>
+                      {c.topic ? <Badge tone="neutral">{c.topic}</Badge> : null}
                       <Badge tone={c.handled ? "neutral" : "warn"}>{c.handled ? "Atendido" : "Por atender"}</Badge>
                       <time>{dateTime(c.createdAt)}</time>
                     </div>
                     <p className={styles.msg}>{c.message}</p>
                     <div className={styles.foot}>
-                      <a href={`mailto:${c.email}?subject=${encodeURIComponent("Agropecuaria Mi Tierrita")}`}>{c.email}</a>
-                      {c.phone ? <span>{c.phone}</span> : null}
+                      {c.email ? <a href={`mailto:${c.email}?subject=${encodeURIComponent("Agropecuaria Mi Tierrita")}`}>{c.email}</a> : null}
+                      {c.phone ? <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a> : null}
                       {!c.handled ? (
                         <Button size="sm" variant="secondary" loading={handle.isPending && handle.variables === c.id} onClick={() => handle.mutate(c.id)}>
                           Marcar atendido

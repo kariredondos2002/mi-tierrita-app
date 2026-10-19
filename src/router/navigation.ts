@@ -15,7 +15,7 @@ export type NavGroup = { title?: string; items: NavItem[] };
 
 const ALL: Role[] = ["ADMIN", "SALES", "WAREHOUSE"];
 
-const ICONS = {
+export const ICONS = {
   /** Tita: su plantita en trazo (semilla con dos hojas), como su avatar; sin íconos de IA. */
   tita: '<path d="M11 10 V6.2"/><path d="M11 7.6 C 8.3 7.8 6.4 6.2 6 3.4 C 8.8 3.3 10.7 4.9 11 7.6 Z"/><path d="M11 6.6 C 13.6 6.6 15.5 5 15.9 2.4 C 13.3 2.4 11.4 3.9 11 6.6 Z"/><ellipse cx="11" cy="14.6" rx="5.6" ry="5.2"/>',
   home: '<rect x="2.5" y="2.5" width="7" height="9" rx="1.5"/><rect x="12.5" y="2.5" width="7" height="5" rx="1.5"/><rect x="2.5" y="14.5" width="7" height="5" rx="1.5"/><rect x="12.5" y="10.5" width="7" height="9" rx="1.5"/>',

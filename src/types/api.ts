@@ -246,20 +246,53 @@ export type Tornado = { scenarioId: number; delta: number; baseNpv: number; bars
 export type Person = { id: number; name: string; username: string; role: Role };
 export type DirectoryPerson = Person & { online: boolean; lastSeenAt: string | null };
 
+export type MessageKind = "TEXT" | "AUDIO" | "FILE";
+export type ChatAttachment = { id: number; fileName: string; mimeType: string; sizeBytes: number; durationMs: number | null };
+export type ReceiptSummary = { total: number; delivered: number; read: number };
+
 export type ChatMessage = {
   id: number;
   sender: Person;
   /** null en el canal general. */
   recipientId: number | null;
   content: string;
+  kind: MessageKind;
   readAt: string | null;
   createdAt: string;
+  /** Mensaje citado. */
+  replyTo: { id: number; senderName: string; preview: string; kind: MessageKind } | null;
+  /** Si es respuesta dentro de un hilo, el id del mensaje raíz. */
+  threadRootId: number | null;
+  replyCount: number;
+  pinnedAt: string | null;
+  pinnedBy: number | null;
+  mentions: number[];
+  attachment: ChatAttachment | null;
+  /** Solo en mensajes propios: cuántos recibieron y cuántos vieron. */
+  receipts: ReceiptSummary | null;
+  /** Solo en la aplicación: mensaje aún sin confirmar por el servidor o que falló. */
+  pending?: "sending" | "failed";
+  clientId?: string | null;
 };
 export type MessagePage = { messages: ChatMessage[]; hasMore: boolean };
 export type Conversation = {
   person: Person;
-  lastMessage: { id: number; content: string; senderId: number; createdAt: string };
+  lastMessage: { id: number; content: string; kind: MessageKind; senderId: number; createdAt: string };
   unread: number;
+};
+export type ReceiptDetail = ReceiptSummary & {
+  messageId: number;
+  people: { person: Person; deliveredAt: string | null; readAt: string | null; status: "PENDING" | "DELIVERED" | "READ" }[];
+};
+export type ChatThread = { root: ChatMessage; replies: ChatMessage[] };
+export type UnreadSummary = { unread: number; general: number; privates: Record<string, number>; mentions: number };
+export type SendChatInput = {
+  content?: string;
+  recipientId?: number | null;
+  replyToId?: number;
+  threadRootId?: number;
+  attachmentId?: number;
+  clientId?: string;
 };
 
 export type NotificationKind = "SALE" | "SALE_VOIDED" | "PAYMENT" | "PURCHASE" | "LOW_STOCK" | "SCENARIO" | "CONTACT" | "MESSAGE";
@@ -286,8 +319,8 @@ export type MyActivity = {
 
 /** Reportes descargables (v4.2): PDF con gráficos o Excel, generados y auditados por la API. */
 export type ExportFormat = "pdf" | "xlsx";
-export type ContactInput = { name: string; email: string; phone?: string; message: string };
-export type ContactMessage = ContactInput & { id: number; handled: boolean; createdAt: string };
+export type ContactInput = { name: string; email?: string; phone?: string; topic?: string; message: string; /** campo trampa anti-spam: siempre vacío */ website?: string };
+export type ContactMessage = Omit<ContactInput, "website" | "email"> & { email: string | null; id: number; handled: boolean; createdAt: string };
 
 /* ---------- Asistente de IA (rutas /ai; ninguna escribe datos) ---------- */
 export type AiStatus = { enabled: boolean; model: string | null };

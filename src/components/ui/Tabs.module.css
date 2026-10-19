@@ -55,5 +55,5 @@
 .chipActive:hover {
   background: var(--forest);
   border-color: var(--forest);
-  color: #ffffff;
+  color: var(--on-forest);
 }

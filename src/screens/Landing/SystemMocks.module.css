@@ -220,7 +220,7 @@
 .balanceValue {
   font-family: var(--font-heading);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -0.03em;
   animation: numberIn 0.5s var(--ease-out);
 }

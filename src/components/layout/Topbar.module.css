@@ -62,9 +62,9 @@
 }
 .panelHead h3 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 24px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
   color: #ffffff;
 }
 .linkBtn {

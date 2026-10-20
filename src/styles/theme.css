@@ -1,99 +1,101 @@
 /*
- * Sistema de diseño «Campo abierto» (v4, 2026-2), inspirado en la línea editorial agrotecnológica:
- * fotografía de campo a sangre, titulares condensados en mayúscula (Bebas Neue), acento manuscrito (Lobster),
- * texto en Inter, carbón casi negro y verde lima como acento. Fuente única de colores, tipografía, radios y sombras;
- * los mismos tokens están publicados como variables en el archivo de Figma (página 01 · Sistema de diseño).
- * Ningún componente usa un color suelto.
+ * Sistema de diseño «Verde pastel» (v4.6, 2026-10), el mismo de Figma y de la versión de Matos: tinta verdosa #1C2420,
+ * verde oscuro #1D6B3E para acciones, verde #2F9E5B, suave #E6F4EA, rojo #D4554F, ámbar #B45309 y tipografía Urbanist.
+ * Menú claro con píldora activa, tarjetas blancas muy redondeadas y fotografías solo en portadas. Fuente única de
+ * colores, tipografía, radios y sombras; ningún componente usa un color suelto.
  */
 :root {
   /* marca */
-  --forest: #1d1e20;
-  --forest-2: #121315;
-  --leaf: #2f3a13;
-  --sprout: #14f77b;
-  --sprout-soft: #e4f8ea;
-  --forest-fg: #2f5d1c;
-  --lime: #14f77b;
-  --olive: #2f3a13;
+  --forest: #1d6b3e;
+  --forest-2: #174f2e;
+  --leaf: #1d6b3e;
+  --sprout: #2f9e5b;
+  --sprout-soft: #e6f4ea;
+  --sprout-ink: #0f1512;
+  --forest-fg: #1d6b3e;
+  --lime: #9fd3b2;
+  --olive: #1d6b3e;
   --on-forest: #ffffff;
-  --harvest: #e3a33b;
-  --harvest-soft: #fbf0db;
-  --clay: #c0612b;
+  --harvest: #f3c969;
+  --harvest-soft: #fef3c7;
+  --clay: #d4554f;
   --sky: #3a7ca5;
   --sky-soft: #e4eff6;
 
   /* fondos y bordes */
-  --app-bg: #121315;
-  --app-bg-2: #1d1e20;
-  --ground: #f4f5f7;
+  --app-bg: #0f1512;
+  --app-bg-2: #1b2420;
+  --ground: #f4f7f5;
   --surface: #ffffff;
-  --surface-2: #f8f9fb;
-  --surface-3: #eef0f4;
-  --segment-bg: #e9ecf3;
-  --line: #e3e6ec;
-  --line-soft: #eceef2;
-  --line-strong: #cfd3db;
-  --hover: #f1f3f6;
+  --surface-2: #f8faf9;
+  --surface-3: #eef3f0;
+  --segment-bg: #e3ebe6;
+  --line: #e1e9e4;
+  --line-soft: #eaf0ec;
+  --line-strong: #c9d6ce;
+  --hover: #eef5f0;
 
   /* texto */
-  --ink: #1d1e20;
-  --ink-2: #4a4d52;
-  --muted: #7b7f86;
-  --muted-2: #a6aab1;
-  --link: #2f6e1f;
+  --ink: #1c2420;
+  --ink-2: #4b5650;
+  --muted: #7a847e;
+  --muted-2: #a3ada7;
+  --link: #1d6b3e;
 
   /* semánticos */
-  --good: #14805e;
-  --good-soft: #eaf6ef;
-  --good-line: #b3dcc5;
-  --good-tag-bg: #dff3e7;
-  --good-tag-fg: #0d6347;
-  --warn: #b26a00;
-  --warn-soft: #fff7e6;
+  --good: #1d6b3e;
+  --good-soft: #e6f4ea;
+  --good-line: #9fd3b2;
+  --good-tag-bg: #d7eedf;
+  --good-tag-fg: #175a33;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
   --warn-line: #ecd29b;
-  --warn-tag-bg: #fbeed4;
-  --warn-tag-fg: #8a5300;
-  --bad: #c23b2e;
-  --bad-soft: #fdf0ee;
+  --warn-tag-bg: #fdeab0;
+  --warn-tag-fg: #8a4106;
+  --bad: #d4554f;
+  --bad-soft: #fdeeed;
   --bad-line: #efc0ba;
-  --bad-tag-bg: #fbe3df;
-  --bad-tag-fg: #9a2b20;
-  --accent: #c0612b;
+  --bad-tag-bg: #fbe0de;
+  --bad-tag-fg: #a63a35;
+  --accent: #d4554f;
 
   /* gráficos: categorías en orden fijo (validado para daltonismo) */
-  --chart-1: #2f7a3e;
+  --chart-1: #2f9e5b;
   --chart-2: #e3a33b;
   --chart-3: #3a7ca5;
-  --chart-4: #c0612b;
-  --chart-5: #2f3a13;
-  --chart-6: #8aa65a;
-  --chart-grid: #ecebe4;
-  --chart-area: rgba(47, 122, 62, 0.14);
+  --chart-4: #d4554f;
+  --chart-5: #1d6b3e;
+  --chart-6: #9fd3b2;
+  --chart-grid: #e6eee9;
+  --chart-area: rgba(47, 158, 91, 0.16);
 
   /* barra lateral */
-  --nav-ink: #c4c8ce;
-  --nav-muted: #7b7f86;
-  --nav-exit: #9a9ea5;
-  --nav-line: rgba(255, 255, 255, 0.08);
-  --nav-hover: rgba(255, 255, 255, 0.06);
-  --nav-active: rgba(20, 247, 123, 0.1);
-  --nav-active-rail: rgba(20, 247, 123, 0.14);
-  --nav-badge-bg: rgba(227, 163, 59, 0.2);
-  --nav-badge-fg: #f2c477;
-  --nav-badge-dot: #e3a33b;
-  --nav-brand: #ffffff;
+  --nav-ink: #3b4741;
+  --nav-muted: #7a847e;
+  --nav-exit: #4b5650;
+  --nav-line: rgba(28, 36, 32, 0.08);
+  --nav-hover: rgba(47, 158, 91, 0.08);
+  --nav-active: #e6f4ea;
+  --nav-active-rail: #cdebd8;
+  --nav-badge-bg: #fef3c7;
+  --nav-badge-fg: #8a4106;
+  --nav-badge-dot: #b45309;
+  --nav-bg: #ffffff;
+  --nav-on: #1d6b3e;
+  --nav-brand: #1c2420;
 
   /* geometría, sombras y tipografía */
-  --radius: 10px;
-  --radius-sm: 6px;
-  --radius-panel: 14px;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-panel: 20px;
   --shadow: var(--elev-1);
   --shadow-card: var(--ring), var(--elev-2);
   --shadow-pop: var(--elev-3);
   --shadow-panel: var(--elev-4);
-  --font-body: "Inter Variable", "Inter", system-ui, sans-serif;
-  --font-heading: "Bebas Neue", "Oswald", "Arial Narrow", sans-serif;
-  --font-script: "Lobster", "Brush Script MT", cursive;
+  --font-body: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
+  --font-heading: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
+  --font-script: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
   --nav-width: 252px;
   --nav-rail: 76px;
   --content-max: 1440px;
@@ -116,23 +118,23 @@
   --track-caps: 0.06em;
 
   /* elevación en capas: borde fino + sombra de contacto + sombra ambiental */
-  --ring: 0 0 0 1px rgba(18, 19, 21, 0.04);
-  --elev-1: 0 1px 1px rgba(18, 19, 21, 0.04), 0 1px 2px rgba(18, 19, 21, 0.06);
-  --elev-2: 0 1px 2px rgba(18, 19, 21, 0.05), 0 4px 10px -4px rgba(18, 19, 21, 0.1), 0 10px 24px -14px rgba(18, 19, 21, 0.14);
-  --elev-3: 0 2px 4px rgba(18, 19, 21, 0.06), 0 12px 24px -8px rgba(18, 19, 21, 0.16), 0 24px 48px -24px rgba(18, 19, 21, 0.2);
-  --elev-4: 0 4px 8px rgba(18, 19, 21, 0.08), 0 24px 48px -12px rgba(18, 19, 21, 0.32);
+  --ring: 0 0 0 1px rgba(28, 36, 32, 0.04);
+  --elev-1: 0 1px 1px rgba(28, 36, 32, 0.04), 0 1px 2px rgba(28, 36, 32, 0.06);
+  --elev-2: 0 1px 2px rgba(28, 36, 32, 0.05), 0 4px 10px -4px rgba(28, 36, 32, 0.1), 0 10px 24px -14px rgba(28, 36, 32, 0.14);
+  --elev-3: 0 2px 4px rgba(28, 36, 32, 0.06), 0 12px 24px -8px rgba(28, 36, 32, 0.16), 0 24px 48px -24px rgba(28, 36, 32, 0.2);
+  --elev-4: 0 4px 8px rgba(28, 36, 32, 0.08), 0 24px 48px -12px rgba(28, 36, 32, 0.32);
   --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  --inset-well: inset 0 1px 2px rgba(18, 19, 21, 0.06);
-  --scrim: rgba(18, 19, 21, 0.52);
+  --inset-well: inset 0 1px 2px rgba(28, 36, 32, 0.06);
+  --scrim: rgba(15, 21, 18, 0.52);
   --focus-ring: 0 0 0 3px var(--sprout-soft), 0 0 0 4px var(--leaf);
-  --tab-shadow: 0 1px 2px rgba(18, 19, 21, 0.1), 0 0 0 1px var(--line);
-  --on-harvest: #2b1d05;
+  --tab-shadow: 0 1px 2px rgba(28, 36, 32, 0.1), 0 0 0 1px var(--line);
+  --on-harvest: #4a2a05;
   --on-photo: #ffffff;
   --on-photo-2: rgba(255, 255, 255, 0.86);
   --on-photo-line: rgba(255, 255, 255, 0.5);
-  --photo-veil: rgba(18, 19, 21, 0.86);
-  --photo-veil-mid: rgba(18, 19, 21, 0.55);
-  --photo-veil-soft: rgba(18, 19, 21, 0.25);
+  --photo-veil: rgba(15, 21, 18, 0.86);
+  --photo-veil-mid: rgba(15, 21, 18, 0.55);
+  --photo-veil-soft: rgba(15, 21, 18, 0.25);
   --glass: rgba(255, 255, 255, 0.1);
   --glass-hover: rgba(255, 255, 255, 0.2);
 
@@ -141,39 +143,40 @@
   --t-fast: 0.12s;
   --t-base: 0.18s;
   color-scheme: light;
+  font-weight: 700;
 }
 
 /* Tema oscuro: mismas variables, activado con data-theme="dark" (selector en la barra superior). */
 :root[data-theme="dark"] {
-  --sprout-soft: #12301f;
-  --on-forest: #121315;
-  --forest-fg: #7fe0a6;
-  --forest: #f2f3f5;
-  --forest-2: #121315;
-  --leaf: #8fbf5a;
+  --sprout-soft: #16301f;
+  --on-forest: #0f1512;
+  --forest-fg: #8fd9ae;
+  --forest: #9fd3b2;
+  --forest-2: #0f1512;
+  --leaf: #8fd9ae;
   --harvest-soft: #3a2e14;
   --sky-soft: #172b38;
-  --app-bg: #0b0c0d;
-  --app-bg-2: #151618;
-  --ground: #101113;
-  --surface: #18191c;
-  --surface-2: #1c1d20;
-  --surface-3: #232428;
-  --segment-bg: #232428;
-  --line: #2a2c30;
-  --line-soft: #222327;
-  --line-strong: #3a3d42;
-  --hover: #202125;
-  --ink: #eceef1;
-  --ink-2: #b9bdc4;
-  --muted: #8a8f97;
-  --muted-2: #6b7078;
-  --link: #7fe0a6;
-  --good: #6fcf9a;
+  --app-bg: #0a0f0c;
+  --app-bg-2: #121915;
+  --ground: #0f1512;
+  --surface: #1b2420;
+  --surface-2: #1f2a24;
+  --surface-3: #222d27;
+  --segment-bg: #222d27;
+  --line: #2a372f;
+  --line-soft: #222d27;
+  --line-strong: #3a4a40;
+  --hover: #222d27;
+  --ink: #e9f0eb;
+  --ink-2: #b7c3bb;
+  --muted: #8a978f;
+  --muted-2: #6b7871;
+  --link: #8fd9ae;
+  --good: #7fd9a3;
   --good-soft: #15301f;
   --good-line: #2f6a4c;
   --good-tag-bg: #15301f;
-  --good-tag-fg: #6fcf9a;
+  --good-tag-fg: #7fd9a3;
   --warn: #e9b764;
   --warn-soft: #33290f;
   --warn-line: #6e5a25;
@@ -184,15 +187,15 @@
   --bad-line: #6e3a34;
   --bad-tag-bg: #3c211e;
   --bad-tag-fg: #f19a90;
-  --accent: #e8925e;
+  --accent: #f19a90;
   --chart-1: #5cc47e;
   --chart-2: #ebb85c;
   --chart-3: #6aaed6;
-  --chart-4: #e8925e;
-  --chart-5: #b5c76a;
-  --chart-6: #a9c47b;
-  --chart-grid: #222e28;
-  --chart-area: rgba(92, 196, 147, 0.16);
+  --chart-4: #f19a90;
+  --chart-5: #8fd9ae;
+  --chart-6: #9fd3b2;
+  --chart-grid: #222d27;
+  --chart-area: rgba(92, 196, 126, 0.16);
   --ring: 0 0 0 1px rgba(255, 255, 255, 0.03);
   --elev-1: 0 1px 2px rgba(0, 0, 0, 0.5);
   --elev-2: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 20px -10px rgba(0, 0, 0, 0.6);
@@ -206,5 +209,18 @@
   --shadow-card: var(--ring), var(--elev-2);
   --shadow-pop: var(--elev-3);
   --shadow-panel: var(--elev-4);
+  --nav-bg: #121915;
+  --nav-on: #8fd9ae;
+  --nav-ink: #b7c3bb;
+  --nav-muted: #8a978f;
+  --nav-exit: #9aa7a0;
+  --nav-line: rgba(255, 255, 255, 0.08);
+  --nav-hover: rgba(255, 255, 255, 0.06);
+  --nav-active: rgba(143, 217, 174, 0.14);
+  --nav-active-rail: rgba(143, 217, 174, 0.2);
+  --nav-brand: #ffffff;
+  --nav-badge-bg: rgba(227, 163, 59, 0.2);
+  --nav-badge-fg: #f2c477;
+  --nav-badge-dot: #e3a33b;
   color-scheme: dark;
 }

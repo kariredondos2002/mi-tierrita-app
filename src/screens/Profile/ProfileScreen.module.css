@@ -27,10 +27,11 @@
   color: #121315;
   font-family: var(--font-heading);
   font-size: 44px;
+  font-weight: 700;
 }
 .identity h2 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 36px;
   color: #ffffff;
   line-height: 1;
@@ -172,7 +173,7 @@
 }
 .mini strong {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 30px;
   line-height: 1;
   color: var(--lime);

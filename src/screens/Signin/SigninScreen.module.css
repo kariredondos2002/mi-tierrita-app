@@ -33,10 +33,10 @@
 .brandName {
   font-family: var(--font-heading);
   font-size: 38px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1;
   color: #ffffff;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
 }
 .brandSub {
   font-size: 10.5px;
@@ -94,9 +94,9 @@
   height: 26px;
   border-radius: 4px;
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 17px;
-  letter-spacing: 0.06em;
+  letter-spacing: -0.015em;
   background: var(--lime);
   color: #121315;
 }
@@ -132,8 +132,8 @@
 .formHead h2 {
   font-family: var(--font-heading);
   font-size: 36px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 .formHead p {
   color: var(--ink-2);

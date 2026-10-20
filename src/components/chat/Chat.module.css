@@ -31,9 +31,9 @@
 }
 .sideTitle h2 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 34px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
   color: #ffffff;
 }
 .newBtn {
@@ -125,6 +125,7 @@
   font-family: var(--font-heading);
   font-size: 22px;
   flex-shrink: 0;
+  font-weight: 700;
 }
 .convText {
   display: flex;
@@ -180,9 +181,9 @@
 }
 .threadHead h3 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 28px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
   line-height: 1;
 }
 .threadHead p {
@@ -292,9 +293,9 @@
 .welcome h3,
 .empty h3 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 24px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
 }
 .welcome p,
 .empty p {
@@ -649,7 +650,7 @@
 }
 .membersHead h3 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 24px;
 }
 .iconGhost {

@@ -46,7 +46,8 @@
   font-size: 96px;
   line-height: 0.9;
   color: var(--forest);
-  letter-spacing: 0.04em;
+  letter-spacing: -0.015em;
+  font-weight: 700;
 }
 .box code {
   background: var(--surface-3);

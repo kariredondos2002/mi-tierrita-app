@@ -8,13 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@fontsource-variable/inter':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/bebas-neue':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/lobster':
+      '@fontsource-variable/urbanist':
         specifier: ^5.3.0
         version: 5.3.0
       '@tanstack/react-query':
@@ -305,14 +299,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fontsource-variable/inter@5.3.0':
-    resolution: {integrity: sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==}
-
-  '@fontsource/bebas-neue@5.3.0':
-    resolution: {integrity: sha512-nCxMEb9Bg9sjNWm9TIOsvHKDMLRUfEZPWpLgYu6m9KavZZVSA/WoHzI5wROwqA+eNwEi/PNBAcB5Co7HA3S0Cw==}
-
-  '@fontsource/lobster@5.3.0':
-    resolution: {integrity: sha512-jt+RDk/8Sstl1Omhox62gTbvRSLbh06kn5BNfDFgf4rNuDPHF+19eWYFxzq5FsdkalbRJNtc5p5C3qE0+leNVg==}
+  '@fontsource-variable/urbanist@5.3.0':
+    resolution: {integrity: sha512-riHbcRgoOhEdCwVw3n3R1JLEwvRD1N9GlXtBcwl/UJ2KabfyDBuryE2Yq10308QJgbXw3F/IFF+VoMuuqwVfIA==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1260,11 +1248,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@fontsource-variable/inter@5.3.0': {}
-
-  '@fontsource/bebas-neue@5.3.0': {}
-
-  '@fontsource/lobster@5.3.0': {}
+  '@fontsource-variable/urbanist@5.3.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

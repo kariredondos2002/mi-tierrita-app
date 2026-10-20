@@ -19,15 +19,15 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 
 1. **Toda pantalla contempla sus tres estados**: cargando, vacío (con llamada a la acción) y con datos.
    Usar `QueryState` / `Loading` / `EmptyState` / `ErrorState` de `@/components/ui`.
-2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, sistema de diseño «Campo abierto» (v4, 2026-2,
-   línea editorial agrotecnológica). Carbón `--forest` #1D1E20 (acciones; texto `--on-forest`), negro `--app-bg`
-   #121315 (menú y pie), oliva `--leaf`/`--olive` #2F3A13, acento `--lime` #14F77B (solo sobre fondos oscuros o como
-   franja; nunca texto lima sobre blanco), `--harvest` #E3A33B; fondo `--ground` #F4F5F7, tarjetas `--surface` #FFF
-   con borde `--line` #E3E6EC y radio `--radius` 10px; texto `--ink` #1D1E20, `--ink-2`, `--muted`; semánticos
-   `--good`, `--warn`, `--bad` con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; gráficos `--chart-1` a `--chart-6`.
-   Tipografía (autoalojada con @fontsource): `--font-body` Inter para interfaz y cifras; `--font-heading` Bebas Neue
-   (siempre `font-weight: 400`, es mayúscula y condensada) para h1, marca y titulares; `--font-script` Lobster solo
-   para antetítulos y frases cortas. Tema oscuro con `data-theme="dark"`. Los SVG de iconos usan `currentColor`.
+2. **Ningún color suelto**: solo variables de `src/styles/theme.css`, sistema de diseño «Verde pastel» (v4.6, 2026-10, el
+   mismo del prototipo en Figma). Verde oscuro `--forest` #1D6B3E (acciones; texto `--on-forest`), `--sprout` #2F9E5B,
+   suave `--sprout-soft` #E6F4EA, menta `--lime` #9FD3B2 (sobre fondos oscuros), `--harvest` #F3C969, `--bad` #D4554F,
+   `--warn` #B45309; fondo `--ground` #F4F7F5, tarjetas `--surface` #FFF con borde `--line` #E1E9E4 y radio `--radius`
+   14px; texto `--ink` #1C2420, `--ink-2`, `--muted`; menú claro con `--nav-bg` y `--nav-on`; semánticos `--good`, `--warn`,
+   `--bad` con sus `-soft`, `-line`, `-tag-bg`, `-tag-fg`; gráficos `--chart-1` a `--chart-6`. Tipografía única **Urbanist**
+   (autoalojada con `@fontsource-variable/urbanist`): `--font-body`, `--font-heading` y `--font-script` apuntan a ella;
+   los titulares van en peso 700, sin mayúsculas forzadas. Tema oscuro con `data-theme="dark"` (#0F1512, #1B2420,
+   #222D27). Los SVG de iconos usan `currentColor`.
 3. **Estilos encapsulados**: cada pantalla/componente tiene su `X.module.css`; nada de CSS global nuevo.
 4. **El frontend no calcula**: totales, saldos e indicadores se muestran tal como los devuelve la API.
    Lo único que suma el cliente es una vista previa del carrito, marcada como estimada.
@@ -53,21 +53,21 @@ hint, tone neutral|good|warn|bad) y `StatGrid` · `Badge` (tone) · `DataTable<T
 align, render, width}], rows, rowKey, onRowClick, footer) · `Loading`, `EmptyState`, `ErrorState`,
 `QueryState` · `Pagination` (page, onPage) · `Modal` (open, title, description, onClose, footer, wide) ·
 `Tabs` (segmentado gris #E7E8E0 con pestaña activa blanca) y `Chips` (píldoras; activa carbón) ·
-`Callout` (veredicto: tone good|warn|bad con ícono circular, title Bebas, aside a la derecha) · `Toasts` (botones: se cierran con teclado; los errores usan role=alert) · `Carousel` (slides[{id,image,title,text,tag,to,cta}], label, interval: zoom lento, autoavance con pausa, puntos con progreso, teclado y deslizamiento; sin movimiento si el sistema pide reducirlo) · `PhotoBackdrop` (images[], fondo fotográfico con zoom y fundido para portadas; el contenedor debe ser `position: relative; isolation: isolate; overflow: hidden`) · `useReducedMotion`. `Input` acepta `invalid` (error) y `valid` (éxito). `Modal` acepta `wide` y `xl`, atrapa el foco y lo devuelve al cerrar.
+`Callout` (veredicto: tone good|warn|bad con ícono circular, title Urbanist, aside a la derecha) · `Toasts` (botones: se cierran con teclado; los errores usan role=alert) · `Carousel` (slides[{id,image,title,text,tag,to,cta}], label, interval: zoom lento, autoavance con pausa, puntos con progreso, teclado y deslizamiento; sin movimiento si el sistema pide reducirlo) · `PhotoBackdrop` (images[], fondo fotográfico con zoom y fundido para portadas; el contenedor debe ser `position: relative; isolation: isolate; overflow: hidden`) · `useReducedMotion`. `Input` acepta `invalid` (error) y `valid` (éxito). `Modal` acepta `wide` y `xl`, atrapa el foco y lo devuelve al cerrar.
 `StatCard` acepta además `icon` (trazos SVG 22×22), `delta` (variación en fracción) y `spark` (serie corta).
 `DataTable`: texto a la izquierda por defecto, `align: "right"` para cifras, `mobile: false` oculta la columna en celular.
 Gráficos en `@/components/charts`, dibujados al ancho real del contenedor (`useWidth`) para que el texto no se escale:
 `HBarChart` (HTML; `stacked` para tarjetas angostas), `VBarChart` ({label, value, alt}[], format), `TrendChart`
 (área suavizada con lectura al pasar el cursor), `DonutChart` (participación con leyenda), `LineChart` (points,
 formatX, formatY, marker, highlightX), `TornadoChart` (data[{label, low, high}], base, format). Encabezado de página:
-`PageHeader` (portada con foto del módulo según la ruta —`photo` la cambia—, eyebrow manuscrito, h1 Bebas, subtítulo y acciones; fotos en `public/img`, `photoUrl(nombre)`) y `BrandMark` de `@/components/layout/AppShell`.
-Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary` blanco con borde, `accent` dorado cosecha.
+`PageHeader` (portada con foto del módulo según la ruta —`photo` la cambia—, antetítulo, h1 Urbanist, subtítulo y acciones; fotos en `public/img`, `photoUrl(nombre)`) y `BrandMark` de `@/components/layout/AppShell`.
+Botones: `primary` 40px verde oscuro (en la portada se vuelve menta), `secondary` blanco con borde, `accent` dorado cosecha.
 `EmptyState` muestra una ilustración (unDraw, `src/assets/ill`); `art={false}` la oculta y `art={url}` la cambia.
 
-## Línea visual «Campo abierto»
+## Línea visual «Verde pastel»
 
 - Sin 3D: la autora pidió retirarlo. La identidad la dan las portadas fotográficas (Unsplash, créditos en
-  `public/img/CREDITOS.txt`), los titulares Bebas, el acento Lobster y las ilustraciones planas recoloreadas
+  `public/img/CREDITOS.txt`), los titulares Urbanist y las ilustraciones planas recoloreadas
   (`#3F8F3A` y `#1D1E20` en lugar del morado original de unDraw).
 - Fotos nuevas: WebP ≤ 2000 px de ancho y calidad ~74; anotarlas en `CREDITOS.txt` y en `PHOTOS_BY_ROUTE` de AppShell.
 

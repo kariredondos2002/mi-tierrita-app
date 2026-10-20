@@ -1,9 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
-import "@fontsource-variable/inter";
-import "@fontsource/bebas-neue";
-import "@fontsource/lobster";
+import "@fontsource-variable/urbanist";
 import "./styles/global.css";
 import "./stores/theme";
 

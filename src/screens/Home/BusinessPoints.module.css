@@ -7,10 +7,10 @@
 }
 .heading {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 40px;
   line-height: 1.02;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.015em;
   text-align: center;
   color: var(--ink);
   margin-bottom: 18px;
@@ -68,8 +68,9 @@
 .nodeTitle {
   font-family: var(--font-heading);
   font-size: 22px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
   color: var(--ink);
+  font-weight: 700;
 }
 .tag {
   font-size: 11px;

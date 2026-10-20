@@ -22,7 +22,7 @@ diaria del negocio (inventario con lotes, punto de venta, cartera, proveedores),
 evaluación financiera de la ampliación del local, con una línea visual editorial agrotecnológica: fotografía de
 campo a todo el ancho, titulares condensados e ilustraciones planas.
 
-![Tablero gerencial](docs/capturas/02-tablero.png?v=20261020)
+![Tablero gerencial](docs/capturas/02-tablero.png?v=20261021)
 
 ---
 
@@ -31,7 +31,7 @@ campo a todo el ancho, titulares condensados e ilustraciones planas.
 1. [Descripción](#descripción)
 2. [Marco Teórico](#marco-teórico)
 3. [Funcionalidades](#funcionalidades)
-4. [Línea visual «Campo abierto»](#línea-visual-campo-abierto)
+4. [Línea visual «Verde pastel»](#línea-visual-verde-pastel)
 5. [Página pública de inicio](#página-pública-de-inicio)
 6. [Tiempo real: chat, notificaciones y presencia](#tiempo-real-chat-notificaciones-y-presencia)
 7. [Arquitectura y Diseño](#arquitectura-y-diseño)
@@ -149,20 +149,20 @@ ilustraciones planas. Las imágenes son livianas (WebP, ≈ 150 kB) y se cargan 
 
 ---
 
-## Línea visual «Campo abierto»
+## Línea visual «Verde pastel»
 
-Rediseño v4 inspirado en la línea editorial de los sitios agrotecnológicos colombianos (por ejemplo,
-agritechcolombia.com): no se copia ningún contenido, solo el lenguaje visual.
+Desde v4.6 la aplicación usa el mismo sistema de diseño del prototipo en Figma y de la versión de Matos: tinta
+verdosa, verde oscuro para las acciones, tarjetas blancas muy redondeadas y tipografía Urbanist. Toda la identidad vive
+en `src/styles/theme.css`; ningún componente usa un color suelto.
 
 | Elemento | Cómo se aplica |
 |---|---|
-| Portadas | Fotografía de campo a todo el ancho en el inicio de sesión y en el encabezado de cada módulo, con velo oscuro y texto blanco |
-| Titulares | **Bebas Neue** en mayúscula, grandes y condensados |
-| Acento manuscrito | **Lobster** para antetítulos y frases cortas («Tablero gerencial», «El sistema que cuida la mercancía…») |
-| Texto | **Inter**, legible en tablas y formularios |
-| Color | Carbón `#1D1E20`, negro del pie de página, oliva `#2F3A13` y verde lima `#14F77B` como acento |
+| Portadas | Fotografía de campo en el inicio de sesión y en el encabezado de cada módulo, con velo oscuro y texto blanco |
+| Tipografía | **Urbanist** (variable, `@fontsource-variable`, funciona sin internet) para titulares, interfaz y cifras |
+| Color | Tinta `#1C2420`, verde oscuro `#1D6B3E` (acciones), verde `#2F9E5B`, suave `#E6F4EA`, menta `#9FD3B2`, rojo `#D4554F`, ámbar `#B45309` / `#FEF3C7`; fondos `#F4F7F5` y `#F8FAF9` |
+| Tema oscuro | Fondos `#0F1512`, `#1B2420` y `#222D27`, con los mismos tonos de marca aclarados |
+| Menú | Claro, con píldora verde suave en la opción activa (oscuro en el tema oscuro) |
 | Secciones explicativas | «Tres frentes del negocio»: puntos numerados que alternan texto e ilustración plana |
-| Pie de página | Negro, con la marca, una frase manuscrita y los créditos |
 
 **Recursos:** 13 fotografías de [Unsplash](https://unsplash.com) (licencia Unsplash: uso libre, sin atribución
 obligatoria; aun así se acreditan en [`public/img/CREDITOS.txt`](public/img/CREDITOS.txt)) y 26 ilustraciones de
@@ -182,9 +182,9 @@ El formulario de contacto envía `POST /contact` con `message`, `topic`, `phone`
 `website`; el administrador recibe el aviso en vivo y lo ve en «Contactos».
 
 ---|---|
-| Barra | Marca, enlaces a cada sección y «Ingresar al sistema» en lima; se vuelve negra al desplazarse y es menú hamburguesa en el celular |
-| Portada | Foto a pantalla completa, titular Bebas «Todo para el campo, con información que siembra decisiones», frase Lobster y dos botones |
-| Franja lima | ERP · BI · DSS · Tiempo real |
+| Barra | Marca, enlaces a cada sección y «Ingresar al sistema» en verde; se vuelve sólida al desplazarse y es menú hamburguesa en el celular |
+| Portada | Foto a pantalla completa, titular «Todo para el campo, con información que siembra decisiones» y dos botones |
+| Franja verde | ERP · BI · DSS · Tiempo real |
 | ¿Qué es? | Tarjeta blanca sobre foto de bodega con tres datos clave |
 | Tres frentes | Puntos 01–03 alternando texto e ilustración: inventario, ventas y cartera, ampliación |
 | Catálogo | Seis líneas de producto en tarjetas fotográficas sobre fondo negro |
@@ -261,8 +261,8 @@ navegación v4 y arquitectura del cliente).
 
 | Elemento | Decisión |
 |---|---|
-| Colores «Campo abierto» | Carbón `#1D1E20` (acciones y texto) · negro `#121315` (menú y pie) · oliva `#2F3A13` · verde lima `#14F77B` (acento) · cosecha `#E3A33B` · fondo `#F4F5F7`; semánticos bueno `#14805E`, alerta `#B26A00`, malo `#C23B2E` |
-| Tipografía | **Bebas Neue** para titulares, **Lobster** para el acento manuscrito e **Inter** para interfaz y cifras, incluidas con `@fontsource` (funcionan sin internet) |
+| Colores «Verde pastel» | Tinta `#1C2420` · verde oscuro `#1D6B3E` (acciones) · verde `#2F9E5B` · suave `#E6F4EA` · menta `#9FD3B2` · rojo `#D4554F` · ámbar `#B45309` · fondo `#F4F7F5`; oscuro `#0F1512` / `#1B2420` / `#222D27` |
+| Tipografía | **Urbanist** (variable) para titulares, interfaz y cifras, incluida con `@fontsource-variable` (funciona sin internet) |
 | Componentes (`components/ui`) | `Button`, `Field`, `Input`, `Select`, `Checkbox`, `Card`, `StatCard`, `StatGrid`, `Badge`, `DataTable`, `Modal`, `Tabs`, `Chips`, `Callout`, `Pagination`, `QueryState`, `EmptyState`, `ErrorState`, `Toasts` |
 | Componentes v4 | `PersonAvatar` (color por rol y punto de presencia), `MessageList`, `Composer`, `MembersPanel`, `NotificationBell`, `GlobalSearch`, `ConnectionStatus`, `ErrorBoundary` |
 | Portadas | Foto por módulo con velo `rgba(18,19,21,.86 → .25)`: contraste AA del texto blanco sobre cualquier imagen |
@@ -519,35 +519,35 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 
 **Página pública de inicio**
 
-![Página de inicio](docs/capturas/00-pagina-inicio.png?v=20261020)
+![Página de inicio](docs/capturas/00-pagina-inicio.png?v=20261021)
 
 | Inicio de sesión | Tablero gerencial |
 |---|---|
-| ![Inicio](docs/capturas/01-inicio-sesion.png?v=20261020) | ![Tablero](docs/capturas/02-tablero.png?v=20261020) |
+| ![Inicio](docs/capturas/01-inicio-sesion.png?v=20261021) | ![Tablero](docs/capturas/02-tablero.png?v=20261021) |
 | **Chat del equipo · #general** | **Chat privado con chulitos** |
-| ![Chat](docs/capturas/10-chat-general.png?v=20261020) | ![Privado](docs/capturas/10b-chat-privado.png?v=20261020) |
+| ![Chat](docs/capturas/10-chat-general.png?v=20261021) | ![Privado](docs/capturas/10b-chat-privado.png?v=20261021) |
 | **Notificaciones en vivo** | **Búsqueda global (Ctrl + K)** |
-| ![Campana](docs/capturas/15-notificaciones.png?v=20261020) | ![Búsqueda](docs/capturas/16-busqueda.png?v=20261020) |
+| ![Campana](docs/capturas/15-notificaciones.png?v=20261021) | ![Búsqueda](docs/capturas/16-busqueda.png?v=20261021) |
 | **Lotes y vencimientos** | **Punto de venta** |
-| ![Lotes](docs/capturas/05-lotes.png?v=20261020) | ![Ventas](docs/capturas/06-punto-de-venta.png?v=20261020) |
+| ![Lotes](docs/capturas/05-lotes.png?v=20261021) | ![Ventas](docs/capturas/06-punto-de-venta.png?v=20261021) |
 | **Clientes y cartera** | **Evaluación financiera** |
-| ![Clientes](docs/capturas/07-clientes-cartera.png?v=20261020) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png?v=20261020) |
+| ![Clientes](docs/capturas/07-clientes-cartera.png?v=20261021) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png?v=20261021) |
 | **Reportes gerenciales** | **Mi perfil** |
-| ![Reportes](docs/capturas/09-reportes.png?v=20261020) | ![Perfil](docs/capturas/17-perfil.png?v=20261020) |
+| ![Reportes](docs/capturas/09-reportes.png?v=20261021) | ![Perfil](docs/capturas/17-perfil.png?v=20261021) |
 | **Mi actividad** | **Auditoría de reportes** |
-| ![Actividad](docs/capturas/17b-perfil-actividad.png?v=20261020) | ![Auditoría](docs/capturas/20-auditoria-reportes.png?v=20261020) |
+| ![Actividad](docs/capturas/17b-perfil-actividad.png?v=20261021) | ![Auditoría](docs/capturas/20-auditoria-reportes.png?v=20261021) |
 | **Detalle de recibos (solo el autor)** | **Reporte de ventas en PDF** |
-| ![Recibos](docs/capturas/10c-chat-recibos.png?v=20261020) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png?v=20261020) |
+| ![Recibos](docs/capturas/10c-chat-recibos.png?v=20261021) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png?v=20261021) |
 | **Página pública · catálogo** | **Preferencias de tema** |
-| ![Catálogo](docs/capturas/00b-pagina-catalogo.png?v=20261020) | ![Tema](docs/capturas/23-preferencias-tema.png?v=20261020) |
+| ![Catálogo](docs/capturas/00b-pagina-catalogo.png?v=20261021) | ![Tema](docs/capturas/23-preferencias-tema.png?v=20261021) |
 
 **Modo oscuro**
 
-![Oscuro](docs/capturas/11-oscuro.png?v=20261020)
+![Oscuro](docs/capturas/11-oscuro.png?v=20261021)
 
 | Celular: página de inicio | Celular: tablero | Celular: venta | Celular: chat |
 |---|---|---|---|
-| ![Móvil inicio](docs/capturas/12-movil-inicio.png?v=20261020) | ![Móvil tablero](docs/capturas/13-movil-tablero.png?v=20261020) | ![Móvil venta](docs/capturas/14-movil-venta.png?v=20261020) | ![Móvil chat](docs/capturas/18-movil-chat.png?v=20261020) |
+| ![Móvil inicio](docs/capturas/12-movil-inicio.png?v=20261021) | ![Móvil tablero](docs/capturas/13-movil-tablero.png?v=20261021) | ![Móvil venta](docs/capturas/14-movil-venta.png?v=20261021) | ![Móvil chat](docs/capturas/18-movil-chat.png?v=20261021) |
 
 ---
 
@@ -558,10 +558,11 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | v1 · Base | Autenticación, inventario, lotes, ventas, clientes, proveedores, finanzas, reportes, usuarios y auditoría | Completado |
 | v2 · «Tierra viva» | Rediseño visual completo, tablero gerencial SIG + BI + DSS, estudio del proyecto, tema oscuro, móvil | Completado |
 | v3 · Experiencia inmersiva | Escenas 3D del negocio (retiradas en v4 a pedido de la autora) | Reemplazado |
-| v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima, tres frentes ilustrados, pie negro | Completado |
+| v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima (reemplazada en v4.6), tres frentes ilustrados, pie negro | Reemplazado por v4.6 |
 | v4.2 · Reportes y perfil | Reportes en PDF con gráficos y Excel generados por la API, historial de reportes y auditoría por acción, Mi perfil completo, inicio de sesión sin atajos de demostración | Completado |
 | v4.3 · Pulido visual | Sistema de diseño en tokens (espacio, tipografía, elevación, foco, movimiento), estados en todo control, Modal accesible, vista previa de reportes con «Guardar como…», carruseles y fondos fotográficos | Completado |
 | v4.5 · Chat avanzado, tema y Tita | Chat con chulitos por persona, citas, hilos, fijados, menciones, adjuntos y voz; tema claro/oscuro/sistema; Tita (asistente con IA, opcional); página pública de Matos; en `main` | Completado · falta publicar en Seenode |
+| v4.6 · «Verde pastel» | La aplicación adopta el sistema de diseño del prototipo en Figma: paleta verde pastel, Urbanist, menú claro, tema oscuro nuevo; PDF de reportes en la misma paleta; las 31 capturas se regeneran | Completado |
 | v4.1 · Sitio y tiempo real | Página pública completa con contacto y boletín; chat con Socket.io, presencia, notificaciones, datos en vivo, búsqueda global, Mi perfil, contactos del sitio, ErrorBoundary, 404 ilustrado, exportación PDF | Completado · falta publicar en Seenode y validar con usuarios reales |
 
 ---

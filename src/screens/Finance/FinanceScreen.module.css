@@ -262,7 +262,7 @@
 }
 .asideValue {
   font-size: 26px;
-  font-weight: 400;
+  font-weight: 700;
   font-family: var(--font-heading);
   color: var(--ink);
 }
@@ -288,7 +288,7 @@
 .dialValue {
   font-size: 22px;
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 700;
   color: var(--ink);
 }
 .track {

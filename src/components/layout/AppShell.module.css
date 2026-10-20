@@ -1,7 +1,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: radial-gradient(1200px 600px at -10% -10%, var(--app-bg-2), transparent 60%), var(--app-bg);
+  background: var(--nav-bg);
 }
 
 /* ---------- barra lateral ---------- */
@@ -41,10 +41,10 @@
 .brandName {
   font-family: var(--font-heading);
   font-size: 25px;
-  font-weight: 400;
+  font-weight: 700;
   color: var(--nav-brand);
   line-height: 1.05;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.015em;
 }
 .brandSub {
   font-size: 10.5px;
@@ -103,7 +103,7 @@
 }
 .item:hover {
   background: var(--nav-hover);
-  color: #ffffff;
+  color: var(--nav-on);
 }
 .item:focus-visible {
   outline: 2px solid var(--sprout);
@@ -120,7 +120,7 @@
 .active,
 .active:hover {
   background: var(--nav-active);
-  color: #ffffff;
+  color: var(--nav-on);
 }
 .active::before {
   content: "";
@@ -225,7 +225,7 @@
   gap: 10px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--nav-hover);
 }
 .rail .navUser {
   padding: 0;
@@ -238,8 +238,8 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--lime);
-  color: #121315;
+  background: var(--sprout);
+  color: #ffffff;
   display: grid;
   place-items: center;
   font-size: 12.5px;
@@ -547,7 +547,7 @@
     padding: 18px 14px 14px;
     transform: translateX(-100%);
     transition: transform 0.22s ease;
-    background: var(--app-bg);
+    background: var(--nav-bg);
     box-shadow: var(--shadow-pop);
   }
   .navMobileOpen {
@@ -619,7 +619,8 @@
   font-size: 26px;
   line-height: 1;
   color: #ffffff;
-  letter-spacing: 0.03em;
+  letter-spacing: -0.015em;
+  font-weight: 700;
 }
 .footSub {
   font-size: 10px;

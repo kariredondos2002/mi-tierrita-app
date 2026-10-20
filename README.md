@@ -11,7 +11,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
 ![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5-FF4154?logo=reactquery&logoColor=white)
-![Pruebas](https://img.shields.io/badge/Pruebas-14%20pasando-brightgreen)
+![Pruebas](https://img.shields.io/badge/Pruebas-32%20pasando-brightgreen)
 ![Responsivo](https://img.shields.io/badge/Responsivo-desde%20360%20px-blueviolet)
 ![Accesibilidad](https://img.shields.io/badge/Accesibilidad-WCAG%202.2%20AA-informational)
 ![Licencia](https://img.shields.io/badge/Licencia-Académica-lightgrey)
@@ -131,16 +131,19 @@ ilustraciones planas. Las imágenes son livianas (WebP, ≈ 150 kB) y se cargan 
 | Clientes y cartera | Cupo, saldo, abonos, cartera vencida | RF-04 |
 | Proveedores | Ficha, compras con lote y vencimiento | RF-05 |
 | Evaluación financiera | Panel de decisión, estudio del proyecto, supuestos, escenarios, flujo de caja, amortización, sensibilidad y tornado | RF-06 |
-| Reportes gerenciales | Ventas por día o producto, inventario por vencer y cartera; **descarga en PDF con gráficos o en Excel** generada por la API, con historial de quién generó cada reporte (v4.2) | RF-08 |
+| Reportes gerenciales | Ventas por día o producto, inventario por vencer y cartera; **PDF con gráficos o Excel** generados por la API (v4.2/v4.4), con **vista previa y «Guardar como…»** (v4.3) e historial de quién generó cada reporte | RF-08 |
 | Usuarios y roles | Alta de usuarios, rol, activación, cambio de contraseña | RF-01 |
 | Auditoría | Escrituras, reportes generados e inicios de sesión, filtrables por usuario, acción, recurso y fecha, con el detalle legible | RF-09 |
 | Página pública (v4) | Inicio para visitantes con formulario de contacto, boletín y avisos legales | — |
-| Chat del equipo (v4) | Canal #general y privados, historial con «cargar anteriores», «está escribiendo…», ✓✓ leído, presencia y última conexión, panel del equipo | Socket.io |
+| Chat del equipo (v4 · v4.5) | Canal #general y privados, historial, «está escribiendo…», presencia y panel del equipo. **v4.5:** chulitos reloj → ✓ → ✓✓ → ✓✓ azul con detalle por persona (solo para el autor), citas, hilos, responder en privado, fijados, @menciones, adjuntos (6 MB), notas de voz, búsqueda y no leídos desde el servidor | Socket.io |
+| Tita, asistente con IA (v4.5) | Pantalla `/tita` y panel flotante: resumen del día por rol, conversación con consultas, borradores de venta, abono o compra que la persona confirma, lectura de facturas y voz. Opcional: sin `ANTHROPIC_API_KEY` en la API se oculta | `/ai/*` |
+| Tema (v4.5) | Claro, oscuro o «Sistema» (sigue al dispositivo en vivo); se aplica antes de pintar para evitar el destello | — |
 | Notificaciones (v4) | Campana con contador: ventas, anulaciones, abonos, compras, stock bajo, escenarios y contactos; avisos emergentes | Socket.io |
 | Actualización en vivo (v4) | Indicador «En vivo / Reconectando…»; las pantallas se refrescan cuando otro usuario cambia datos; `(n)` en el título de la pestaña | Socket.io |
 | Búsqueda global (v4) | `Ctrl + K` o `/`: productos, clientes, proveedores, ventas y personas, con teclado | — |
 | Mi perfil (v4.2) | Como en SoftUnity: tarjeta de identidad, datos personales con correo y teléfono, seguridad (contraseña con requisitos y cerrar sesión en todos los dispositivos), mi actividad de 30 días, qué puede hacer mi rol y apariencia | RF-01 |
 | Contactos del sitio (v4) | Bandeja del administrador con los mensajes del formulario público | — |
+| Imágenes en movimiento (v4.3) | Carrusel con zoom lento en el Inicio de cada rol, galería en la página pública y fondos fotográficos animados en portada e inicio de sesión; sin movimiento si el sistema pide reducirlo | — |
 | Sistema | Acceso restringido por rol, 404 ilustrado, red de seguridad ante errores (`ErrorBoundary`), estados de carga, vacío y error en cada vista, tema oscuro, descarga de reportes en PDF y Excel | RNF |
 
 ---
@@ -169,10 +172,15 @@ obligatoria; aun así se acreditan en [`public/img/CREDITOS.txt`](public/img/CRE
 ## Página pública de inicio
 
 Quien abre el sitio sin sesión ve la página de la tienda; con sesión, `/` es el tablero (la página sigue en `/sitio`).
-Su estructura sigue la de un sitio agrotecnológico de una sola página:
+Desde la v4.5 es la página del repositorio de Matos (`screens/Landing`, medios en `public/media`, créditos en
+`public/media/LEEME.txt`): barra de navegación, portada, qué es el sistema, catálogo por líneas de producto, proyecto y
+equipo universitario, y contacto. Sus colores son fijos (no cambian con el tema oscuro) y usa el mismo `BrandMark` y
+`photoUrl` que el resto de la aplicación.
 
-| Sección | Contenido |
-|---|---|
+El formulario de contacto envía `POST /contact` con `message`, `topic`, `phone` o `email` (basta uno) y el campo trampa
+`website`; el administrador recibe el aviso en vivo y lo ve en «Contactos».
+
+---|---|
 | Barra | Marca, enlaces a cada sección y «Ingresar al sistema» en lima; se vuelve negra al desplazarse y es menú hamburguesa en el celular |
 | Portada | Foto a pantalla completa, titular Bebas «Todo para el campo, con información que siembra decisiones», frase Lobster y dos botones |
 | Franja lima | ERP · BI · DSS · Tiempo real |
@@ -463,8 +471,9 @@ pnpm test
 | `navigation.test.ts` | 3 | Pantallas permitidas por rol |
 | `charts.test.ts` | 2 | Escalas y series de los gráficos SVG |
 | `realtime.test.ts` | 8 | Agrupación de mensajes, «Hoy / Ayer», última conexión, nombres de quien escribe, origen del socket, qué se refresca tras una venta, chat y contactos por rol |
-| `reports-profile.test.ts` | 4 | Nombre del archivo descargado, detalle del historial de reportes, actividad en palabras y permisos por rol (v4.2) |
-| **Total** | **26** | ✔ todas pasan |
+| `reports-profile.test.ts` | 5 | Nombre del archivo descargado, tamaño legible, detalle del historial de reportes, actividad en palabras y permisos por rol (v4.2/v4.3) |
+| `chat-avanzado.test.ts` | 5 | Mezcla de mensajes sin duplicar (id y `clientId`), estado de los chulitos, citas e hilos, menciones y no leídos (v4.5) |
+| **Total** | **32** | ✔ todas pasan |
 
 Además `pnpm typecheck` y `pnpm build` terminan sin errores, y las pantallas se revisaron en escritorio, celular y
 tema oscuro sin errores de consola.
@@ -542,6 +551,8 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | v3 · Experiencia inmersiva | Escenas 3D del negocio (retiradas en v4 a pedido de la autora) | Reemplazado |
 | v4 · «Campo abierto» | Se retira el 3D. Línea editorial agrotecnológica: portadas fotográficas, Bebas Neue + Lobster + Inter, carbón y verde lima, tres frentes ilustrados, pie negro | Completado |
 | v4.2 · Reportes y perfil | Reportes en PDF con gráficos y Excel generados por la API, historial de reportes y auditoría por acción, Mi perfil completo, inicio de sesión sin atajos de demostración | Completado |
+| v4.3 · Pulido visual | Sistema de diseño en tokens (espacio, tipografía, elevación, foco, movimiento), estados en todo control, Modal accesible, vista previa de reportes con «Guardar como…», carruseles y fondos fotográficos | Completado |
+| v4.5 · Chat avanzado, tema y Tita | Chat con chulitos por persona, citas, hilos, fijados, menciones, adjuntos y voz; tema claro/oscuro/sistema; Tita (asistente con IA, opcional); página pública de Matos; en `main` | Completado · falta publicar en Seenode |
 | v4.1 · Sitio y tiempo real | Página pública completa con contacto y boletín; chat con Socket.io, presencia, notificaciones, datos en vivo, búsqueda global, Mi perfil, contactos del sitio, ErrorBoundary, 404 ilustrado, exportación PDF | Completado · falta publicar en Seenode y validar con usuarios reales |
 
 ---

@@ -128,3 +128,9 @@ Las consultas son `useQuery` de TanStack (data, isPending, isError, error, refet
 - Toda descarga queda auditada como `EXPORT`; los hooks de exportación invalidan el historial, la auditoría y la
   actividad propia. El inicio de sesión no muestra cuentas de demostración.
 - `ProfileScreen` tiene pestañas (datos, seguridad, actividad, rol, preferencias); textos de actividad y permisos en `@/lib/activity`.
+
+## Tita (v4.5)
+
+- Asistente con IA opcional: pantalla `screens/Tita`, componentes en `components/ai`, hooks en `hooks/ai` (`useAiStatus`, `useAiChat`, `useAiDraft`, `useBriefing`, `useReadInvoice`, `useTitaConversation`, `useTitaVoice`) y estado en `stores/ai.ts`. Habla con `/ai/*` de la API; sin `ANTHROPIC_API_KEY` la API responde 660 y la app oculta la IA.
+- Tita propone y la persona confirma: nunca ejecuta una escritura por su cuenta; el borrador se confirma con el flujo normal y la API marca la auditoría con `ai_suggested`. Respeta el rol activo (no ofrecer herramientas que el rol no puede usar).
+- Página pública: es la de Matos (`screens/Landing`, `public/media`); sus colores son fijos y no se tocan con las reglas del tema.

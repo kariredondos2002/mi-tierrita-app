@@ -22,7 +22,7 @@ diaria del negocio (inventario con lotes, punto de venta, cartera, proveedores),
 evaluación financiera de la ampliación del local, con una línea visual editorial agrotecnológica: fotografía de
 campo a todo el ancho, titulares condensados e ilustraciones planas.
 
-![Tablero gerencial](docs/capturas/02-tablero.png?v=20261021)
+![Tablero gerencial](docs/capturas/02-tablero.png?v=20261022)
 
 ---
 
@@ -515,39 +515,39 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 
 ## Capturas
 
-*Capturas del 20/10/2026 con la versión v4.5 y datos de demostración simulados.*
+*Capturas exportadas del diseño en Figma «Mi Tierrita SIG · TCC 2026-2» (prototipo en verde pastel, 20/10/2026), con datos de demostración simulados; el reporte en PDF es el generado por la API.*
 
 **Página pública de inicio**
 
-![Página de inicio](docs/capturas/00-pagina-inicio.png?v=20261021)
+![Página de inicio](docs/capturas/00-pagina-inicio.png?v=20261022)
 
 | Inicio de sesión | Tablero gerencial |
 |---|---|
-| ![Inicio](docs/capturas/01-inicio-sesion.png?v=20261021) | ![Tablero](docs/capturas/02-tablero.png?v=20261021) |
+| ![Inicio](docs/capturas/01-inicio-sesion.png?v=20261022) | ![Tablero](docs/capturas/02-tablero.png?v=20261022) |
 | **Chat del equipo · #general** | **Chat privado con chulitos** |
-| ![Chat](docs/capturas/10-chat-general.png?v=20261021) | ![Privado](docs/capturas/10b-chat-privado.png?v=20261021) |
+| ![Chat](docs/capturas/10-chat-general.png?v=20261022) | ![Chat oscuro](docs/capturas/10d-chat-oscuro.png?v=20261022) |
 | **Notificaciones en vivo** | **Búsqueda global (Ctrl + K)** |
-| ![Campana](docs/capturas/15-notificaciones.png?v=20261021) | ![Búsqueda](docs/capturas/16-busqueda.png?v=20261021) |
+| ![Campana](docs/capturas/15-notificaciones.png?v=20261022) | ![Búsqueda](docs/capturas/16-busqueda.png?v=20261022) |
 | **Lotes y vencimientos** | **Punto de venta** |
-| ![Lotes](docs/capturas/05-lotes.png?v=20261021) | ![Ventas](docs/capturas/06-punto-de-venta.png?v=20261021) |
+| ![Lotes](docs/capturas/05-lotes.png?v=20261022) | ![Ventas](docs/capturas/06-punto-de-venta.png?v=20261022) |
 | **Clientes y cartera** | **Evaluación financiera** |
-| ![Clientes](docs/capturas/07-clientes-cartera.png?v=20261021) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png?v=20261021) |
+| ![Clientes](docs/capturas/07-clientes-cartera.png?v=20261022) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png?v=20261022) |
 | **Reportes gerenciales** | **Mi perfil** |
-| ![Reportes](docs/capturas/09-reportes.png?v=20261021) | ![Perfil](docs/capturas/17-perfil.png?v=20261021) |
+| ![Reportes](docs/capturas/09-reportes.png?v=20261022) | ![Perfil](docs/capturas/17-perfil.png?v=20261022) |
 | **Mi actividad** | **Auditoría de reportes** |
-| ![Actividad](docs/capturas/17b-perfil-actividad.png?v=20261021) | ![Auditoría](docs/capturas/20-auditoria-reportes.png?v=20261021) |
+| ![Actividad](docs/capturas/17b-perfil-actividad.png?v=20261022) | ![Auditoría](docs/capturas/20-auditoria-reportes.png?v=20261022) |
 | **Detalle de recibos (solo el autor)** | **Reporte de ventas en PDF** |
-| ![Recibos](docs/capturas/10c-chat-recibos.png?v=20261021) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png?v=20261021) |
+| ![Recibos](docs/capturas/10c-chat-recibos.png?v=20261022) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png?v=20261022) |
 | **Página pública · catálogo** | **Preferencias de tema** |
-| ![Catálogo](docs/capturas/00b-pagina-catalogo.png?v=20261021) | ![Tema](docs/capturas/23-preferencias-tema.png?v=20261021) |
+| ![Catálogo](docs/capturas/00b-pagina-catalogo.png?v=20261022) | ![Punto de venta oscuro](docs/capturas/23-oscuro-punto-de-venta.png?v=20261022) |
 
 **Modo oscuro**
 
-![Oscuro](docs/capturas/11-oscuro.png?v=20261021)
+![Oscuro](docs/capturas/11-oscuro.png?v=20261022)
 
 | Celular: página de inicio | Celular: tablero | Celular: venta | Celular: chat |
 |---|---|---|---|
-| ![Móvil inicio](docs/capturas/12-movil-inicio.png?v=20261021) | ![Móvil tablero](docs/capturas/13-movil-tablero.png?v=20261021) | ![Móvil venta](docs/capturas/14-movil-venta.png?v=20261021) | ![Móvil chat](docs/capturas/18-movil-chat.png?v=20261021) |
+| ![Móvil inicio](docs/capturas/12-movil-inicio.png?v=20261022) | ![Móvil tablero](docs/capturas/13-movil-tablero.png?v=20261022) | ![Móvil venta](docs/capturas/14-movil-venta.png?v=20261022) | ![Móvil chat](docs/capturas/18-movil-chat.png?v=20261022) |
 
 ---
 
@@ -562,7 +562,7 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | v4.2 · Reportes y perfil | Reportes en PDF con gráficos y Excel generados por la API, historial de reportes y auditoría por acción, Mi perfil completo, inicio de sesión sin atajos de demostración | Completado |
 | v4.3 · Pulido visual | Sistema de diseño en tokens (espacio, tipografía, elevación, foco, movimiento), estados en todo control, Modal accesible, vista previa de reportes con «Guardar como…», carruseles y fondos fotográficos | Completado |
 | v4.5 · Chat avanzado, tema y Tita | Chat con chulitos por persona, citas, hilos, fijados, menciones, adjuntos y voz; tema claro/oscuro/sistema; Tita (asistente con IA, opcional); página pública de Matos; en `main` | Completado · falta publicar en Seenode |
-| v4.6 · «Verde pastel» | La aplicación adopta el sistema de diseño del prototipo en Figma: paleta verde pastel, Urbanist, menú claro, tema oscuro nuevo; PDF de reportes en la misma paleta; las 31 capturas se regeneran | Completado |
+| v4.6 · «Verde pastel» | La aplicación adopta el sistema de diseño del prototipo en Figma: paleta verde pastel, Urbanist, menú claro, tema oscuro nuevo; PDF de reportes en la misma paleta; las 31 capturas son las del diseño en Figma | Completado |
 | v4.1 · Sitio y tiempo real | Página pública completa con contacto y boletín; chat con Socket.io, presencia, notificaciones, datos en vivo, búsqueda global, Mi perfil, contactos del sitio, ErrorBoundary, 404 ilustrado, exportación PDF | Completado · falta publicar en Seenode y validar con usuarios reales |
 
 ---

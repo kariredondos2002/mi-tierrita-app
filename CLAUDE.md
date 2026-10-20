@@ -42,6 +42,7 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 8. **Un archivo por componente/pantalla** con función flecha exportada; sin clases; `camelCase` en
    TypeScript; textos de la interfaz en español.
 9. Formato de números y fechas siempre con `@/lib/format` (`money`, `moneyCompact`, `int`, `pct`,
+10. **Pulido visual (v4.3)**: toda la identidad vive en `theme.css`. Espacio con `--space-1..8`, texto con `--text-xs..xl`, elevación con `--elev-1..4` (`--shadow*` apuntan a ellas), foco con `--focus-ring`, movimiento con `--ease`, `--t-fast`, `--t-base`; texto y velos sobre fotografía con `--on-photo`, `--on-photo-2`, `--on-photo-line`, `--photo-veil*`, `--glass*`. Estados de todo control: normal, hover, foco (`--focus-ring`), activo, deshabilitado, carga (`loading`), error (`invalid`) y éxito (`valid`). No escribir `rgba()` ni hex sueltos en componentes: crear el token en `theme.css` (claro y oscuro).
    `num2`, `years`, `times`, `dateOnly`, `dateTime`).
 
 ## Kit disponible (`@/components/ui`)
@@ -52,7 +53,7 @@ hint, tone neutral|good|warn|bad) y `StatGrid` · `Badge` (tone) · `DataTable<T
 align, render, width}], rows, rowKey, onRowClick, footer) · `Loading`, `EmptyState`, `ErrorState`,
 `QueryState` · `Pagination` (page, onPage) · `Modal` (open, title, description, onClose, footer, wide) ·
 `Tabs` (segmentado gris #E7E8E0 con pestaña activa blanca) y `Chips` (píldoras; activa carbón) ·
-`Callout` (veredicto: tone good|warn|bad con ícono circular, title Bebas, aside a la derecha) · `Toasts`.
+`Callout` (veredicto: tone good|warn|bad con ícono circular, title Bebas, aside a la derecha) · `Toasts` (botones: se cierran con teclado; los errores usan role=alert) · `Carousel` (slides[{id,image,title,text,tag,to,cta}], label, interval: zoom lento, autoavance con pausa, puntos con progreso, teclado y deslizamiento; sin movimiento si el sistema pide reducirlo) · `PhotoBackdrop` (images[], fondo fotográfico con zoom y fundido para portadas; el contenedor debe ser `position: relative; isolation: isolate; overflow: hidden`) · `useReducedMotion`. `Input` acepta `invalid` (error) y `valid` (éxito). `Modal` acepta `wide` y `xl`, atrapa el foco y lo devuelve al cerrar.
 `StatCard` acepta además `icon` (trazos SVG 22×22), `delta` (variación en fracción) y `spark` (serie corta).
 `DataTable`: texto a la izquierda por defecto, `align: "right"` para cifras, `mobile: false` oculta la columna en celular.
 Gráficos en `@/components/charts`, dibujados al ancho real del contenedor (`useWidth`) para que el texto no se escale:
@@ -117,9 +118,13 @@ Las consultas son `useQuery` de TanStack (data, isPending, isError, error, refet
 
 ## Reportes y perfil (v4.2)
 
-- Los PDF y Excel los genera la API (`/reports/*/export`, `/financial/scenarios/:id/export`); el navegador solo
-  descarga con `downloadFile` de `@/lib/download` (token incluido, nombre desde Content-Disposition). Nunca
-  `window.print()` ni CSV armado en el cliente. Botones: `ExportButtons` de `@/components/exports`.
+- Los PDF y Excel los genera la API (`/reports/*/export`, `/financial/scenarios/:id/export`). Desde v4.3 el navegador
+  los pide con `fetchFile` de `@/lib/download` (token incluido, nombre desde Content-Disposition) y `ExportButtons` abre
+  `ExportPreviewDialog`: vista previa del PDF en un iframe, «Guardar como…» (`saveBlobAs`: selector del sistema con
+  `showSaveFilePicker` en Chromium y contexto seguro; si no existe cae a descarga) y «Descargar». Excel no tiene vista
+  previa en el navegador: se muestra su ficha. La generación se audita una sola vez. Nunca `window.print()` ni CSV armado en el cliente.
+- `PageHeader` rota 2–3 fotos por módulo con `PhotoBackdrop` (`PHOTOS_BY_ROUTE` en AppShell); el Inicio de cada rol trae
+  `HomeCarousel` (accesos visuales a los módulos del rol) y la página pública tiene la galería «Así se ve Mi Tierrita».
 - Toda descarga queda auditada como `EXPORT`; los hooks de exportación invalidan el historial, la auditoría y la
   actividad propia. El inicio de sesión no muestra cuentas de demostración.
 - `ProfileScreen` tiene pestañas (datos, seguridad, actividad, rol, preferencias); textos de actividad y permisos en `@/lib/activity`.

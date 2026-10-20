@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filenameFrom } from "@/lib/download";
+import { fileSize, filenameFrom } from "@/lib/download";
 import { describeActivity, ROLE_PERMISSIONS } from "@/lib/activity";
 import { splitExportDetail } from "@/screens/Reports/ExportHistory";
 
@@ -8,6 +8,12 @@ describe("descarga de reportes (v4.2)", () => {
     expect(filenameFrom('attachment; filename="ventas_2026-09-10_2026-10-09_por-dia.pdf"', "x.pdf")).toBe("ventas_2026-09-10_2026-10-09_por-dia.pdf");
     expect(filenameFrom("attachment; filename*=UTF-8''cartera%20vencida.xlsx", "x.xlsx")).toBe("cartera vencida.xlsx");
     expect(filenameFrom(undefined, "respaldo.pdf")).toBe("respaldo.pdf");
+  });
+
+  it("muestra el tamaño del archivo en KB o MB", () => {
+    expect(fileSize(10)).toBe("1 KB");
+    expect(fileSize(2048)).toBe("2 KB");
+    expect(fileSize(5 * 1024 * 1024)).toBe("5.0 MB");
   });
 
   it("separa el detalle auditado en reporte, formato y filtros", () => {

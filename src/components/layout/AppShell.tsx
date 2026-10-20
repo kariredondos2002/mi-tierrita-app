@@ -6,7 +6,7 @@ import { useThemeStore } from "@/stores/theme";
 import { useSignout } from "@/hooks/session";
 import { NAV_GROUPS, NAV_ICONS, findRoute, isLockedFor, isVisibleFor } from "@/router/navigation";
 import { initials } from "@/lib/format";
-import { Toasts } from "@/components/ui";
+import { PhotoBackdrop, Toasts } from "@/components/ui";
 import { useNavBadges } from "./useNavBadges";
 import { AnimatedOutlet } from "./AnimatedOutlet";
 import { NotificationBell } from "./NotificationBell";
@@ -75,6 +75,9 @@ export const AppShell = () => {
 
   return (
     <div className={styles.shell}>
+      <a href="#contenido" className={styles.skip}>
+        Saltar al contenido
+      </a>
       <nav className={[styles.nav, navOpen ? "" : styles.rail, mobileOpen ? styles.navMobileOpen : ""].join(" ")} aria-label="Menú principal">
         <div className={styles.brand}>
           <BrandMark />
@@ -210,33 +213,35 @@ export const AppShell = () => {
 };
 
 /** Fotografía de cabecera de cada módulo (Unsplash, licencia libre; créditos en /public/img/CREDITOS.txt). */
-const PHOTO_BY_ROUTE: Record<string, string> = {
-  "": "tablero-ganado",
-  inventario: "bodega-estibas",
-  lotes: "bodega-sacos",
-  ventas: "manos-granos",
-  clientes: "clientes-finca",
-  proveedores: "estibas-bultos",
-  finanzas: "finanzas-escritorio",
-  reportes: "valle-cordoba",
-  usuarios: "manos-tierra",
-  auditoria: "manos-tierra",
-  chat: "clientes-finca",
-  contactos: "valle-cordoba",
-  perfil: "amanecer-pradera",
+const PHOTOS_BY_ROUTE: Record<string, string[]> = {
+  "": ["tablero-ganado", "amanecer-pradera", "valle-cordoba"],
+  inventario: ["bodega-estibas", "estibas-bultos", "bodega-sacos"],
+  lotes: ["bodega-sacos", "bodega-estibas", "manos-granos"],
+  ventas: ["manos-granos", "clientes-finca", "alimentando-vaca"],
+  clientes: ["clientes-finca", "vaca-campo", "manos-tierra"],
+  proveedores: ["estibas-bultos", "bodega-sacos", "hero-tractor"],
+  finanzas: ["finanzas-escritorio", "valle-cordoba", "tablero-ganado"],
+  reportes: ["valle-cordoba", "finanzas-escritorio", "amanecer-pradera"],
+  usuarios: ["manos-tierra", "clientes-finca"],
+  auditoria: ["manos-tierra", "bodega-estibas"],
+  chat: ["clientes-finca", "vaca-campo"],
+  contactos: ["valle-cordoba", "amanecer-pradera"],
+  perfil: ["amanecer-pradera", "valle-cordoba"],
 };
 export const photoUrl = (name: string) => `${import.meta.env.BASE_URL}img/${name}.webp`;
 
 /**
  * Encabezado de página al estilo editorial agrotecnológico: fotografía de campo a todo el ancho con velo oscuro,
- * antetítulo manuscrito, título condensado en mayúscula, subtítulo y acciones. La foto depende del módulo.
+ * antetítulo manuscrito, título condensado en mayúscula, subtítulo y acciones. Las fotos dependen del módulo: se funden
+ * entre sí y se mueven despacio (zoom suave); `photo` fija una sola.
  */
 export const PageHeader = ({ title, subtitle, actions, eyebrow, photo }: { title: string; subtitle?: string; actions?: ReactNode; eyebrow?: string; photo?: string }) => {
   const location = useLocation();
   const key = location.pathname.split("/")[1] ?? "";
-  const img = photo ?? PHOTO_BY_ROUTE[key] ?? "amanecer-pradera";
+  const names = photo ? [photo] : (PHOTOS_BY_ROUTE[key] ?? ["amanecer-pradera", "valle-cordoba"]);
   return (
-    <div className={styles.pageHead} style={{ backgroundImage: `url(${photoUrl(img)})` }}>
+    <div className={styles.pageHead}>
+      <PhotoBackdrop images={names.map(photoUrl)} />
       <div className={styles.pageHeadText}>
         {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
         <h1>{title}</h1>

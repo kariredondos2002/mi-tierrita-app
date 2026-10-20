@@ -6,5 +6,5 @@ import type { ExportFormat } from "@/types/api";
 export const useExportScenario = () =>
   useApiMutation(({ id, format }: { id: number; format: ExportFormat }) => financialService.exportScenario(id, format), {
     invalidate: [[...keys.reports, "exports"], keys.audits, [...keys.users, "me", "activity"]],
-    success: (name) => `Descargado ${name}. Quedó registrado en la auditoría.`,
+    success: (file) => `Evaluación generada: ${file.name}. Quedó registrado en la auditoría.`,
   });

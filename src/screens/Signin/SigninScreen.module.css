@@ -7,9 +7,7 @@
   position: relative;
   width: min(52vw, 760px);
   flex-shrink: 0;
-  background-color: #121315;
-  background-size: cover;
-  background-position: 62% center;
+  background-color: var(--app-bg);
   color: #ffffff;
   padding: 44px 56px;
   display: flex;

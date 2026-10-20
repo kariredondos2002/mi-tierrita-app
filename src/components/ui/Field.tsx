@@ -29,9 +29,10 @@ export const Field = ({ label, hint, error, children, htmlFor }: FieldProps) => 
   </div>
 );
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean };
-export const Input = ({ invalid = false, className, ...rest }: InputProps) => (
-  <input className={[styles.control, className ?? ""].join(" ")} aria-invalid={invalid} {...rest} />
+/** `invalid` marca el error y `valid` el éxito (dato aceptado); sin ninguno el campo está en estado normal. */
+type InputProps = InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean; valid?: boolean };
+export const Input = ({ invalid = false, valid = false, className, ...rest }: InputProps) => (
+  <input className={[styles.control, className ?? ""].join(" ")} aria-invalid={invalid} data-valid={valid && !invalid ? "true" : undefined} {...rest} />
 );
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & { invalid?: boolean };

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSignin } from "@/hooks/session";
-import { Button, Field, Input } from "@/components/ui";
+import { Button, Field, Input, PhotoBackdrop } from "@/components/ui";
 import { BrandMark, photoUrl } from "@/components/layout/AppShell";
 import styles from "./SigninScreen.module.css";
 
@@ -32,7 +32,8 @@ export const SigninScreen = () => {
 
   return (
     <div className={styles.page}>
-      <aside className={styles.hero} style={{ backgroundImage: `url(${photoUrl("hero-tractor")})` }}>
+      <aside className={styles.hero}>
+        <PhotoBackdrop images={["hero-tractor", "amanecer-pradera", "vaca-campo", "valle-cordoba"].map(photoUrl)} position="62% center" />
         <div className={styles.brand}>
           <BrandMark size={50} />
           <div>

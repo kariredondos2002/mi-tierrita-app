@@ -50,7 +50,7 @@ export const InventoryReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de inventario · lotes por vencer a ${int(days)} días · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={<ExportButtons disabled={!query.data || query.data.byCategory.length === 0} onExport={(format) => exporter.mutateAsync({ report: "inventory", format, days })} />}
+      actions={<ExportButtons title="Reporte de inventario" disabled={!query.data || query.data.byCategory.length === 0} onExport={(format) => exporter.mutateAsync({ report: "inventory", format, days })} />}
     >
       <QueryState query={query} isEmpty={(r) => r.products === 0} empty={<EmptyState title="Sin productos registrados" text="Registre productos y compras en Inventario para ver el valor del stock." />}>
         {(report) => {

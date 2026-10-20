@@ -9,6 +9,7 @@ import type { Customer, Sale, User } from "@/types/api";
 import { QueryStat } from "./QueryStat";
 import { AttentionList, type AttentionItem } from "./AttentionList";
 import { greetingFor, timeOnly } from "./homeDates";
+import { HomeCarousel } from "./HomeCarousel";
 import styles from "./HomeScreen.module.css";
 
 const PAYMENT_LABELS = { CASH: "Contado", CREDIT: "Crédito" } as const;
@@ -58,6 +59,8 @@ export const SalesHome = ({ user }: { user: User }) => {
         <QueryStat query={sales} label="Crédito hoy" value={(r) => moneyCompact(r.creditTotal)} hint={() => "por cobrar"} tone={(r) => (r.creditTotal > 0 ? "warn" : "neutral")} />
         <QueryStat query={customers} label="Clientes con saldo" value={(p) => int(p.count)} hint={() => "con cartera pendiente"} tone={(p) => (p.count > 0 ? "warn" : "neutral")} />
       </StatGrid>
+
+      <HomeCarousel role="SALES" />
 
       <div className={styles.gridEven}>
         <Card title="Pendientes de hoy">

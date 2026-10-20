@@ -82,7 +82,7 @@ export const SalesReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de ventas · ${dateOnly(from)} – ${dateOnly(to)} · ${groupLabel} · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={<ExportButtons disabled={!query.data || query.data.rows.length === 0 || Boolean(rangeError)} onExport={(format) => exporter.mutateAsync({ report: "sales", format, from, to, groupBy })} />}
+      actions={<ExportButtons title="Reporte de ventas" disabled={!query.data || query.data.rows.length === 0 || Boolean(rangeError)} onExport={(format) => exporter.mutateAsync({ report: "sales", format, from, to, groupBy })} />}
     >
       <QueryState query={query} empty={null}>
         {(report) => {

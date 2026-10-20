@@ -1,56 +1,89 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(10, 30, 22, 0.5);
-  backdrop-filter: blur(3px);
+  background: var(--scrim);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: var(--space-4);
   z-index: 50;
+  animation: fadeIn var(--t-base) var(--ease) both;
 }
 .dialog {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: var(--shadow-pop);
   box-shadow: var(--shadow-panel);
   width: 100%;
   max-width: 560px;
   max-height: calc(100vh - 32px);
   overflow: auto;
-  padding: 24px 26px;
+  padding: var(--space-6) 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
+  animation: popIn 0.24s var(--ease) both;
 }
 .wide {
   max-width: 860px;
+}
+.xl {
+  max-width: min(1080px, 100%);
+}
+.dialog:focus {
+  outline: none;
 }
 .head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
 }
 .head h2 {
-  font-size: 18px;
+  font-size: var(--text-xl);
+  letter-spacing: -0.016em;
 }
 .desc {
   color: var(--ink-2);
   font-size: 13px;
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 .close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   border: none;
+  border-radius: 8px;
   background: transparent;
   font-size: 20px;
   cursor: pointer;
   color: var(--muted);
   line-height: 1;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.close:hover {
+  background: var(--hover);
+  color: var(--ink);
 }
 .footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line-soft);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
 }

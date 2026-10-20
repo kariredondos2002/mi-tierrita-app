@@ -41,7 +41,7 @@ export const ReceivablesReportPanel = () => {
     <ReportPreview
       subtitle={`Reporte de cartera · vencida a ${int(overdueDays)} días · generado el ${dateOnly(todayIso())}`}
       filters={filters}
-      actions={<ExportButtons disabled={!query.data || query.data.items.length === 0} onExport={(format) => exporter.mutateAsync({ report: "receivables", format, overdueDays })} />}
+      actions={<ExportButtons title="Reporte de cartera" disabled={!query.data || query.data.items.length === 0} onExport={(format) => exporter.mutateAsync({ report: "receivables", format, overdueDays })} />}
     >
       <QueryState query={query} empty={null}>
         {(report) => (

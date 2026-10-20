@@ -15,6 +15,7 @@ import { AttentionCard } from "./AttentionCard";
 import { DecisionCard } from "./DecisionCard";
 import { ReceivablesCard } from "./ReceivablesCard";
 import { greetingFor, monthCloseLine, monthName } from "./homeDates";
+import { HomeCarousel } from "./HomeCarousel";
 import styles from "./HomeScreen.module.css";
 
 const ICON_CASH = '<rect x="2.5" y="5.5" width="17" height="11" rx="2"/><circle cx="11" cy="11" r="2.6"/><path d="M5.5 8.5v5M16.5 8.5v5"/>';
@@ -123,6 +124,8 @@ export const AdminHome = ({ user }: { user: User }) => {
           hint={receivables.data ? `${int(receivables.data.overdueCustomers)} de ${int(receivables.data.customersWithBalance)} clientes con saldo · más de ${receivables.data.overdueDays} días` : "Cargando"}
         />
       </StatGrid>
+
+      <HomeCarousel role="ADMIN" />
 
       <BusinessPoints nodes={model.nodes} />
 

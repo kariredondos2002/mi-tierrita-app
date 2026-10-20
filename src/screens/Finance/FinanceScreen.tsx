@@ -154,7 +154,7 @@ export const FinanceScreen = () => {
         subtitle="¿Conviene ampliar el local? VPN, TIR, cobertura de la cuota y sensibilidad de cada escenario del crédito."
         actions={
           <>
-            {selectedId !== null ? <ExportButtons onExport={(format) => exportScenario.mutateAsync({ id: selectedId, format })} /> : null}
+            {selectedId !== null ? <ExportButtons title="Evaluación financiera" onExport={(format) => exportScenario.mutateAsync({ id: selectedId, format })} /> : null}
             <Button onClick={openNew}>Nuevo escenario</Button>
           </>
         }

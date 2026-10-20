@@ -10,3 +10,6 @@ export * from "./Modal";
 export * from "./Tabs";
 export * from "./Toasts";
 export * from "./Callout";
+export * from "./Carousel";
+export * from "./PhotoBackdrop";
+export * from "./useReducedMotion";

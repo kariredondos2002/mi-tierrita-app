@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { m } from "motion/react";
+import { Carousel, PhotoBackdrop, type CarouselSlide } from "@/components/ui";
 import { BrandMark, photoUrl } from "@/components/layout/AppShell";
 import { useSendContact } from "@/hooks/contact";
 import { fieldErrors } from "@/lib/errors";
@@ -22,6 +23,7 @@ const LINKS = [
   { href: "#que-es", label: "¿Qué es?" },
   { href: "#frentes", label: "Frentes" },
   { href: "#catalogo", label: "Catálogo" },
+  { href: "#galeria", label: "Galería" },
   { href: "#quienes-somos", label: "Quiénes somos" },
   { href: "#contacto", label: "Contacto" },
 ];
@@ -51,6 +53,15 @@ const POINTS = [
     bullets: ["Escenarios comparables", "VPN, TIR y cobertura de la cuota", "Sensibilidad y punto de quiebre"],
     art: investing,
   },
+];
+
+const GALLERY: CarouselSlide[] = [
+  { id: "bodega", image: photoUrl("bodega-estibas"), tag: "La bodega", title: "Mercancía ordenada, lote por lote", text: "Cada compra entra con su fecha de vencimiento y se vende primero lo que vence antes." },
+  { id: "campo", image: photoUrl("amanecer-pradera"), tag: "El campo", title: "Atendemos al ganadero, al avicultor y al agricultor", text: "Insumos para cada temporada, con el consejo de quien conoce la región." },
+  { id: "ganado", image: photoUrl("alimentando-vaca"), tag: "El ganado", title: "Alimento y sanidad para el hato", text: "Concentrados, sales, vacunas y desparasitantes con control de lote." },
+  { id: "granos", image: photoUrl("manos-granos"), tag: "La cosecha", title: "Semillas y granos de confianza", text: "Maíz, pastos y abonos para sembrar bien desde el primer día." },
+  { id: "clientes", image: photoUrl("clientes-finca"), tag: "Los clientes", title: "Crédito con cupo y abonos al instante", text: "La cartera se ve en el tablero, no en un cuaderno." },
+  { id: "valle", image: photoUrl("valle-cordoba"), tag: "Sahagún, Córdoba", title: "Una tienda del campo cordobés", text: "Un negocio familiar que crece con información para decidir." },
 ];
 
 const CATALOG = [
@@ -156,7 +167,8 @@ export const LandingScreen = () => {
       </header>
 
       {/* ---------- portada ---------- */}
-      <section id="inicio" className={styles.hero} style={{ backgroundImage: `url(${photoUrl("hero-tractor")})` }}>
+      <section id="inicio" className={styles.hero}>
+        <PhotoBackdrop images={["hero-tractor", "amanecer-pradera", "tablero-ganado", "valle-cordoba"].map(photoUrl)} interval={10000} />
         <div className={styles.heroInner}>
           <Reveal>
             <p className={styles.kicker}>Insumos agropecuarios · Sahagún, Córdoba</p>
@@ -265,6 +277,17 @@ export const LandingScreen = () => {
             </Reveal>
           ))}
         </div>
+      </section>
+
+      {/* ---------- galería ---------- */}
+      <section id="galeria" className={styles.gallery}>
+        <Reveal className={styles.sectionHead}>
+          <p className={styles.eyebrow}>Del campo a la bodega</p>
+          <h2>Así se ve Mi Tierrita</h2>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <Carousel slides={GALLERY} label="Galería de fotografías de Mi Tierrita" interval={7000} />
+        </Reveal>
       </section>
 
       {/* ---------- quiénes somos ---------- */}

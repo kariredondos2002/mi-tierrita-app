@@ -1,7 +1,8 @@
 .callout {
-  border-radius: var(--radius);
-  padding: 18px 22px;
+  border-radius: var(--radius-panel);
+  padding: 18px 24px;
   border: 1px solid var(--line);
+  box-shadow: var(--elev-1);
   display: flex;
   gap: 16px;
   align-items: center;

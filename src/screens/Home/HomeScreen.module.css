@@ -252,3 +252,8 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* carrusel de accesos visuales */
+.carouselWrap {
+  min-width: 0;
+}

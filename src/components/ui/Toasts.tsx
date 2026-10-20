@@ -1,6 +1,7 @@
 import { useToastStore } from "@/stores/toasts";
 import styles from "./Toasts.module.css";
 
+/** Avisos breves: los errores se anuncian de inmediato (role="alert") y todos se pueden cerrar con teclado. */
 export const Toasts = () => {
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
@@ -8,9 +9,9 @@ export const Toasts = () => {
   return (
     <div className={styles.stack} aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.id} className={[styles.toast, styles[t.kind]].join(" ")} onClick={() => dismiss(t.id)}>
+        <button key={t.id} type="button" className={[styles.toast, styles[t.kind]].join(" ")} role={t.kind === "error" ? "alert" : "status"} onClick={() => dismiss(t.id)} title="Cerrar aviso">
           {t.text}
-        </div>
+        </button>
       ))}
     </div>
   );

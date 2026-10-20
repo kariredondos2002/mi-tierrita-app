@@ -135,10 +135,10 @@
   min-height: 100svh;
   display: flex;
   align-items: center;
-  background-size: cover;
-  background-position: center 40%;
+  background-color: #121315;
   color: #ffffff;
   isolation: isolate;
+  overflow: hidden;
 }
 .hero::before {
   content: "";
@@ -352,6 +352,11 @@
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(70px, 9vw, 120px) clamp(16px, 4vw, 56px);
+}
+.gallery {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(70px, 9vw, 120px) clamp(16px, 4vw, 56px) 0;
 }
 .sectionHead {
   text-align: center;

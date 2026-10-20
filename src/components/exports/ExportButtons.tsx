@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui";
+import type { ExportedFile } from "@/lib/download";
 import type { ExportFormat } from "@/types/api";
+import { ExportPreviewDialog } from "./ExportPreviewDialog";
 import styles from "./ExportButtons.module.css";
 
 const PdfIcon = () => (
@@ -18,28 +20,31 @@ const SheetIcon = () => (
   </svg>
 );
 
-type Props = { onExport: (format: ExportFormat) => Promise<unknown>; disabled?: boolean };
+type Props = { onExport: (format: ExportFormat) => Promise<ExportedFile>; disabled?: boolean; title?: string };
 
 /**
- * v4.2: descarga el reporte generado por la API — PDF con gráficos o Excel con hojas formateadas.
- * Cada descarga queda en la auditoría con usuario, hora y filtros.
+ * v4.3: genera el reporte en la API (PDF con gráficos o Excel con hojas formateadas) y abre la vista previa, desde donde
+ * se elige «Guardar como…» o «Descargar». La generación queda en la auditoría con usuario, hora y filtros.
  */
-export const ExportButtons = ({ onExport, disabled }: Props) => {
+export const ExportButtons = ({ onExport, disabled, title = "Reporte" }: Props) => {
   const [busy, setBusy] = useState<ExportFormat | null>(null);
+  const [file, setFile] = useState<ExportedFile | null>(null);
   const run = (format: ExportFormat) => {
     setBusy(format);
     onExport(format)
+      .then(setFile)
       .catch(() => undefined)
       .finally(() => setBusy(null));
   };
   return (
     <div className={styles.exportButtons}>
-      <Button size="sm" onClick={() => run("pdf")} loading={busy === "pdf"} disabled={disabled || busy !== null} title="PDF con indicadores, gráficos y detalle">
+      <Button size="sm" onClick={() => run("pdf")} loading={busy === "pdf"} disabled={disabled || busy !== null} title="Vista previa del PDF con indicadores, gráficos y detalle">
         <PdfIcon /> PDF
       </Button>
       <Button variant="secondary" size="sm" onClick={() => run("xlsx")} loading={busy === "xlsx"} disabled={disabled || busy !== null} title="Libro de Excel con hojas formateadas">
         <SheetIcon /> Excel
       </Button>
+      <ExportPreviewDialog file={file} title={`${title} · vista previa`} onClose={() => setFile(null)} />
     </div>
   );
 };

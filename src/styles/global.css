@@ -17,9 +17,11 @@ body {
   background: var(--app-bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: var(--text-md);
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "cv11", "ss03";
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -43,12 +45,14 @@ h1 {
 }
 
 h2 {
-  font-size: 15px;
+  font-size: var(--text-lg);
   line-height: 1.35;
+  letter-spacing: -0.012em;
 }
 
 h3 {
-  font-size: 13.5px;
+  font-size: var(--text-md);
+  letter-spacing: -0.006em;
 }
 
 p {
@@ -72,8 +76,9 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--leaf);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
 table {

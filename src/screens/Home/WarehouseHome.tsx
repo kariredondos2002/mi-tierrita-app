@@ -11,6 +11,7 @@ import { RegisterBatchModal } from "@/screens/Batches/RegisterBatchModal";
 import { QueryStat } from "./QueryStat";
 import { AttentionList, type AttentionItem } from "./AttentionList";
 import { greetingFor } from "./homeDates";
+import { HomeCarousel } from "./HomeCarousel";
 import styles from "./HomeScreen.module.css";
 
 const EXPIRING_DAYS = 30;
@@ -75,6 +76,8 @@ export const WarehouseHome = ({ user }: { user: User }) => {
         <QueryStat query={expiring} label="Lotes vencidos" value={(p) => int(expired(p.items))} hint={(p) => (expired(p.items) > 0 ? "retirar del estante" : "ninguno en bodega")} tone={(p) => (expired(p.items) > 0 ? "bad" : "good")} />
         <QueryStat query={products} label="Productos activos" value={(p) => int(p.count)} hint={() => "en el catálogo"} />
       </StatGrid>
+
+      <HomeCarousel role="WAREHOUSE" />
 
       <div className={styles.gridEven}>
         <Card title="Qué hacer hoy">

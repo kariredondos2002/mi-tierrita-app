@@ -20,6 +20,8 @@ export const AnimatedOutlet = ({ className }: { className?: string }) => {
     <AnimatePresence mode="wait" initial={false}>
       <m.main
         key={key}
+        id="contenido"
+        tabIndex={-1}
         className={className}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

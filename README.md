@@ -313,7 +313,7 @@ mi-tierrita-app/
 │   │   └── system/                  ErrorBoundary
 │   ├── lib/                         cliente HTTP, errores, formato de números y fechas
 │   ├── styles/                      tema claro/oscuro y base
-│   └── __tests__/                   26 pruebas
+│   └── __tests__/                   32 pruebas
 ├── public/img/                      fotografías de las portadas (.webp) y CREDITOS.txt
 ├── src/assets/ill/                  ilustraciones planas (.svg)
 ├── docs/capturas/                   capturas de escritorio, celular y modo oscuro
@@ -403,7 +403,7 @@ Con la carpeta completa del proyecto (la que trae los `.bat`):
 | `pnpm typecheck` | Verificación de tipos |
 | `pnpm build` | Compilación optimizada en `dist/` |
 | `pnpm preview` | Sirve la compilación para revisarla |
-| `pnpm test` | Ejecuta las 26 pruebas |
+| `pnpm test` | Ejecuta las 32 pruebas |
 
 ### Variables de entorno
 

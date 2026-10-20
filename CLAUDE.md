@@ -13,7 +13,7 @@ CSS modules con variables de tema). Consume la API de `../mi-tierrita-api` (`VIT
 
 `pantalla → hook de la entidad → servicio HTTP → API`. Una pantalla nunca importa un servicio ni el cliente
 HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un servicio por recurso
-(`src/services/<recurso>.ts`), tipos de la API en `src/types/api.ts`, estado global en `src/stores/`.
+(`src/services/<recurso>.ts`), tipos de la API en `src/types/api.ts`, estado global en `src/stores/` (`session`, `theme`, `toasts`, `ui`, `ai`). Los hooks de mutación comparten `useApiMutation` (`hooks/shared.ts`).
 
 ## Reglas de oro
 
@@ -42,8 +42,8 @@ HTTP; solo usa hooks. Un hook por operación (`src/hooks/<entidad>/useX.ts`), un
 8. **Un archivo por componente/pantalla** con función flecha exportada; sin clases; `camelCase` en
    TypeScript; textos de la interfaz en español.
 9. Formato de números y fechas siempre con `@/lib/format` (`money`, `moneyCompact`, `int`, `pct`,
-10. **Pulido visual (v4.3)**: toda la identidad vive en `theme.css`. Espacio con `--space-1..8`, texto con `--text-xs..xl`, elevación con `--elev-1..4` (`--shadow*` apuntan a ellas), foco con `--focus-ring`, movimiento con `--ease`, `--t-fast`, `--t-base`; texto y velos sobre fotografía con `--on-photo`, `--on-photo-2`, `--on-photo-line`, `--photo-veil*`, `--glass*`. Estados de todo control: normal, hover, foco (`--focus-ring`), activo, deshabilitado, carga (`loading`), error (`invalid`) y éxito (`valid`). No escribir `rgba()` ni hex sueltos en componentes: crear el token en `theme.css` (claro y oscuro).
    `num2`, `years`, `times`, `dateOnly`, `dateTime`).
+10. **Pulido visual (v4.3)**: toda la identidad vive en `theme.css`. Espacio con `--space-1..8`, texto con `--text-xs..xl`, elevación con `--elev-1..4` (`--shadow*` apuntan a ellas), foco con `--focus-ring`, movimiento con `--ease`, `--t-fast`, `--t-base`; texto y velos sobre fotografía con `--on-photo`, `--on-photo-2`, `--on-photo-line`, `--photo-veil*`, `--glass*`. Estados de todo control: normal, hover, foco (`--focus-ring`), activo, deshabilitado, carga (`loading`), error (`invalid`) y éxito (`valid`). No escribir `rgba()` ni hex sueltos en componentes: crear el token en `theme.css` (claro y oscuro).
 
 ## Kit disponible (`@/components/ui`)
 
@@ -69,7 +69,7 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
 - Sin 3D: la autora pidió retirarlo. La identidad la dan las portadas fotográficas (Unsplash, créditos en
   `public/img/CREDITOS.txt`), los titulares Bebas, el acento Lobster y las ilustraciones planas recoloreadas
   (`#3F8F3A` y `#1D1E20` en lugar del morado original de unDraw).
-- Fotos nuevas: WebP ≤ 2000 px de ancho y calidad ~74; anotarlas en `CREDITOS.txt` y en `PHOTO_BY_ROUTE` de AppShell.
+- Fotos nuevas: WebP ≤ 2000 px de ancho y calidad ~74; anotarlas en `CREDITOS.txt` y en `PHOTOS_BY_ROUTE` de AppShell.
 
 ## Tiempo real y página pública (v4.1)
 
@@ -133,4 +133,3 @@ Las consultas son `useQuery` de TanStack (data, isPending, isError, error, refet
 
 - Asistente con IA opcional: pantalla `screens/Tita`, componentes en `components/ai`, hooks en `hooks/ai` (`useAiStatus`, `useAiChat`, `useAiDraft`, `useBriefing`, `useReadInvoice`, `useTitaConversation`, `useTitaVoice`) y estado en `stores/ai.ts`. Habla con `/ai/*` de la API; sin `ANTHROPIC_API_KEY` la API responde 660 y la app oculta la IA.
 - Tita propone y la persona confirma: nunca ejecuta una escritura por su cuenta; el borrador se confirma con el flujo normal y la API marca la auditoría con `ai_suggested`. Respeta el rol activo (no ofrecer herramientas que el rol no puede usar).
-- Página pública: es la de Matos (`screens/Landing`, `public/media`); sus colores son fijos y no se tocan con las reglas del tema.

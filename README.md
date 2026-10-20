@@ -68,10 +68,11 @@ los tres niveles de un sistema de información gerencial:
 
 La interfaz no calcula nada importante: totales, saldos e indicadores llegan ya calculados desde la API.
 
-Desde la v4 tiene además una **página pública de inicio** (portada, ¿qué es?, tres frentes, catálogo, quiénes somos,
-contacto y pie con boletín) y funciona **en tiempo real** con Socket.io: chat del equipo con canal general y
-privados, notificaciones del negocio en una campana, presencia en línea y pantallas que se actualizan solas cuando
-otro usuario vende, abona o registra un lote.
+Desde la v4 tiene además una **página pública de inicio** (catálogo, el sistema, Tita, visítenos, proyecto y contacto)
+y funciona **en tiempo real** con Socket.io: chat del equipo con canal general y privados, notificaciones del negocio
+en una campana, presencia en línea y pantallas que se actualizan solas cuando otro usuario vende, abona o registra un
+lote. La v4.5 suma el **chat avanzado** (chulitos por persona, citas, hilos, fijados, menciones, adjuntos y voz), el
+**tema claro, oscuro o del sistema** y **Tita**, una asistente con IA opcional que propone y la persona confirma.
 
 ---
 
@@ -81,7 +82,7 @@ otro usuario vende, abona o registra un lote.
 
 El navegador descarga la aplicación una vez y luego solo intercambia **datos** JSON con la API. React Router cambia
 de pantalla sin recargar y cada módulo se descarga solo cuando se abre (división por ruta), lo que mantiene la carga
-inicial en ≈ 195 kB comprimidos (incluido el cliente de Socket.io); la página pública se descarga aparte.
+inicial liviana (el archivo de entrada pesa ≈ 98 kB comprimidos y el resto llega por fragmentos); la página pública se descarga aparte.
 
 ### Cadena de datos en un solo sentido
 
@@ -299,22 +300,24 @@ mi-tierrita-app/
 │   ├── main.tsx · App.tsx           entrada, proveedores, MotionConfig y LazyMotion
 │   ├── router/                      rutas perezosas, mapa de pantallas por rol, guardas
 │   ├── screens/                     una carpeta por pantalla (Landing, Signin, Home, Inventory, Batches, Sales,
-│   │                                Customers, Suppliers, Finance, Reports, Users, Audits, Chat, Profile,
-│   │                                Contacts, Restricted)
+│   │                                Customers, Suppliers, Finance, Reports, Users, Audits, Chat, Tita,
+│   │                                Profile, Contacts, Restricted)
 │   ├── realtime/                    socket.ts (almacén, useSocketEvent) · RealtimeBridge.tsx
 │   ├── hooks/<entidad>/             un hook por operación
 │   ├── services/                    un archivo por recurso de la API
-│   ├── stores/                      session · theme · toasts · ui
+│   ├── stores/                      session · theme · toasts · ui · ai
 │   ├── components/
 │   │   ├── ui/                      sistema de diseño
 │   │   ├── charts/                  gráficos SVG
 │   │   ├── layout/                  AppShell, menú, barra superior, campana, búsqueda, estado de conexión
-│   │   ├── chat/                    lista de mensajes, compositor, panel del equipo, avatar
+│   │   ├── chat/                    mensajes, compositor, hilos, fijados, búsqueda, recibos, chulitos, adjuntos
+│   │   ├── ai/                      Tita: conversación, panel flotante, borradores y avatar
+│   │   ├── exports/                 botones PDF/Excel y vista previa con «Guardar como…»
 │   │   └── system/                  ErrorBoundary
-│   ├── lib/                         cliente HTTP, errores, formato de números y fechas
+│   ├── lib/                         cliente HTTP, errores, formato, descargas, adjuntos y textos de actividad
 │   ├── styles/                      tema claro/oscuro y base
 │   └── __tests__/                   32 pruebas
-├── public/img/                      fotografías de las portadas (.webp) y CREDITOS.txt
+├── public/img/ · public/media/      fotografías de las portadas (.webp) y de la página pública; créditos en CREDITOS.txt y LEEME.txt
 ├── src/assets/ill/                  ilustraciones planas (.svg)
 ├── docs/capturas/                   capturas de escritorio, celular y modo oscuro
 ├── Dockerfile · nginx.conf          imagen alternativa con Nginx
@@ -512,6 +515,8 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 
 ## Capturas
 
+*Capturas del 20/10/2026 con la versión v4.5 y datos de demostración simulados.*
+
 **Página pública de inicio**
 
 ![Página de inicio](docs/capturas/00-pagina-inicio.png)
@@ -519,7 +524,7 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | Inicio de sesión | Tablero gerencial |
 |---|---|
 | ![Inicio](docs/capturas/01-inicio-sesion.png) | ![Tablero](docs/capturas/02-tablero.png) |
-| **Chat del equipo · #general** | **Chat privado con ✓✓ leído** |
+| **Chat del equipo · #general** | **Chat privado con chulitos** |
 | ![Chat](docs/capturas/10-chat-general.png) | ![Privado](docs/capturas/10b-chat-privado.png) |
 | **Notificaciones en vivo** | **Búsqueda global (Ctrl + K)** |
 | ![Campana](docs/capturas/15-notificaciones.png) | ![Búsqueda](docs/capturas/16-busqueda.png) |
@@ -531,6 +536,10 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 | ![Reportes](docs/capturas/09-reportes.png) | ![Perfil](docs/capturas/17-perfil.png) |
 | **Mi actividad** | **Auditoría de reportes** |
 | ![Actividad](docs/capturas/17b-perfil-actividad.png) | ![Auditoría](docs/capturas/20-auditoria-reportes.png) |
+| **Detalle de recibos (solo el autor)** | **Reporte de ventas en PDF** |
+| ![Recibos](docs/capturas/10c-chat-recibos.png) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png) |
+| **Página pública · catálogo** | **Preferencias de tema** |
+| ![Catálogo](docs/capturas/00b-pagina-catalogo.png) | ![Tema](docs/capturas/23-preferencias-tema.png) |
 
 **Modo oscuro**
 

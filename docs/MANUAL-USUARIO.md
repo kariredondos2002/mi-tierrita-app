@@ -11,18 +11,18 @@ Quien abre el sitio sin sesión ve la página de la tienda. Su barra tiene **Cat
 escriba su nombre, un **teléfono o WhatsApp** o un correo (basta uno), el tema y el mensaje: llega al instante a la
 campana del administrador (máximo 5 mensajes por hora desde la misma conexión).
 
-![Página pública](capturas/00-pagina-inicio.png)
+![Página pública](capturas/00-pagina-inicio.png?v=20261020)
 
-![Catálogo](capturas/00b-pagina-catalogo.png)
+![Catálogo](capturas/00b-pagina-catalogo.png?v=20261020)
 
-![Contacto](capturas/25-pagina-contacto.png)
+![Contacto](capturas/25-pagina-contacto.png?v=20261020)
 
 ## 2. Ingresar
 
 Escriba su usuario y contraseña y pulse **Entrar al sistema**. Después de 10 intentos en 15 minutos hay que esperar.
 **Volver al sitio de Mi Tierrita** regresa a la página pública.
 
-![Ingreso](capturas/01-inicio-sesion.png)
+![Ingreso](capturas/01-inicio-sesion.png?v=20261020)
 
 ## 3. La pantalla principal
 
@@ -35,11 +35,11 @@ Escriba su usuario y contraseña y pulse **Entrar al sistema**. Después de 10 i
   en bodega; la secretaria, lo vendido hoy (contado y crédito), clientes con saldo y sus pendientes; bodega, **qué hacer
   hoy** y los lotes próximos a vencer.
 
-![Tablero](capturas/02-tablero.png)
+![Tablero](capturas/02-tablero.png?v=20261020)
 
 | Secretaria | Bodega |
 |---|---|
-| ![](capturas/28-tablero-secretaria.png) | ![](capturas/27-tablero-bodega.png) |
+| ![](capturas/28-tablero-secretaria.png?v=20261020) | ![](capturas/27-tablero-bodega.png?v=20261020) |
 
 ### Indicador de conexión
 
@@ -56,7 +56,7 @@ Escriba su usuario y contraseña y pulse **Entrar al sistema**. Después de 10 i
 **Ctrl + K** (o `/`) y escriba dos letras: productos con existencia, clientes con saldo, ventas por factura,
 proveedores y personas. Flechas para moverse, **Enter** para abrir; una persona abre el chat privado.
 
-![Búsqueda](capturas/16-busqueda.png)
+![Búsqueda](capturas/16-busqueda.png?v=20261020)
 
 ## 5. Chat del equipo
 
@@ -71,11 +71,11 @@ proveedores y personas. Flechas para moverse, **Enter** para abrir; una persona 
   mensajes que usted puede ver.
 - Si lee mensajes antiguos y llegan nuevos, aparece **↓ N mensajes nuevos**. La pestaña muestra «(n)» con lo pendiente.
 
-![Chat general](capturas/10-chat-general.png)
+![Chat general](capturas/10-chat-general.png?v=20261020)
 
-![Chat privado](capturas/10b-chat-privado.png)
+![Chat privado](capturas/10b-chat-privado.png?v=20261020)
 
-![Detalle de recibos](capturas/10c-chat-recibos.png)
+![Detalle de recibos](capturas/10c-chat-recibos.png?v=20261020)
 
 ## 5b. Tita, la asistente
 
@@ -96,7 +96,7 @@ Tita avisa «no está disponible» y el resto del sistema funciona igual.
 Pulse un aviso para ir al módulo; **Marcar todas como leídas** limpia el contador. Quien hace la acción no recibe su
 propio aviso.
 
-![Notificaciones](capturas/15-notificaciones.png)
+![Notificaciones](capturas/15-notificaciones.png?v=20261020)
 
 ## 7. Operación diaria
 
@@ -106,9 +106,9 @@ propio aviso.
 - **Bodega · Lotes:** rojo = vencido (retirar), dorado = vence pronto (sacar al frente).
 - **Bodega · Proveedores:** **Registrar compra** crea el lote con su vencimiento y avisa al administrador.
 
-![Punto de venta](capturas/06-punto-de-venta.png)
+![Punto de venta](capturas/06-punto-de-venta.png?v=20261020)
 
-![Lotes](capturas/05-lotes.png)
+![Lotes](capturas/05-lotes.png?v=20261020)
 
 ## 8. Administración y decisión
 
@@ -123,15 +123,15 @@ propio aviso.
 - **Usuarios y roles · Auditoría:** alta de usuarios y bitácora. El filtro **Acción** separa altas, cambios,
   borrados, **reportes generados** e **inicios de sesión**; la columna de detalle dice qué reporte y con qué filtros.
 
-![Reportes](capturas/09-reportes.png)
+![Reportes](capturas/09-reportes.png?v=20261020)
 
-![Reporte de ventas en PDF](capturas/22-reporte-ventas-pdf.png)
+![Reporte de ventas en PDF](capturas/22-reporte-ventas-pdf.png?v=20261020)
 
-![Auditoría de reportes](capturas/20-auditoria-reportes.png)
+![Auditoría de reportes](capturas/20-auditoria-reportes.png?v=20261020)
 
-![Evaluación financiera](capturas/08-evaluacion-financiera.png)
+![Evaluación financiera](capturas/08-evaluacion-financiera.png?v=20261020)
 
-![Contactos](capturas/19-contactos.png)
+![Contactos](capturas/19-contactos.png?v=20261020)
 
 ## 9. Perfil y tema
 
@@ -146,15 +146,15 @@ que ha hecho en 30 días. A la derecha, cinco pestañas:
 | Mi rol | Lo que puede hacer y a qué no tiene acceso |
 | Preferencias | Claro, oscuro o **según el sistema** (sigue al dispositivo en vivo); se guarda en este navegador |
 
-![Perfil](capturas/17-perfil.png)
+![Perfil](capturas/17-perfil.png?v=20261020)
 
-![Mi actividad](capturas/17b-perfil-actividad.png)
+![Mi actividad](capturas/17b-perfil-actividad.png?v=20261020)
 
-![Seguridad](capturas/17c-perfil-seguridad.png)
+![Seguridad](capturas/17c-perfil-seguridad.png?v=20261020)
 
-![Preferencias](capturas/23-preferencias-tema.png)
+![Preferencias](capturas/23-preferencias-tema.png?v=20261020)
 
-![Oscuro](capturas/11-oscuro.png)
+![Oscuro](capturas/11-oscuro.png?v=20261020)
 
 ## 10. En el celular
 
@@ -162,7 +162,7 @@ El menú se abre con el botón de la esquina; en el chat se ve primero la lista 
 
 | Página pública | Tablero | Venta | Chat |
 |---|---|---|---|
-| ![](capturas/12-movil-inicio.png) | ![](capturas/13-movil-tablero.png) | ![](capturas/14-movil-venta.png) | ![](capturas/18-movil-chat.png) |
+| ![](capturas/12-movil-inicio.png?v=20261020) | ![](capturas/13-movil-tablero.png?v=20261020) | ![](capturas/14-movil-venta.png?v=20261020) | ![](capturas/18-movil-chat.png?v=20261020) |
 
 ## 11. Si algo falla
 

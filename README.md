@@ -22,7 +22,7 @@ diaria del negocio (inventario con lotes, punto de venta, cartera, proveedores),
 evaluación financiera de la ampliación del local, con una línea visual editorial agrotecnológica: fotografía de
 campo a todo el ancho, titulares condensados e ilustraciones planas.
 
-![Tablero gerencial](docs/capturas/02-tablero.png)
+![Tablero gerencial](docs/capturas/02-tablero.png?v=20261020)
 
 ---
 
@@ -519,35 +519,35 @@ Después agregue la URL del sitio a `CORS_ORIGINS` de la API. Guía completa (ba
 
 **Página pública de inicio**
 
-![Página de inicio](docs/capturas/00-pagina-inicio.png)
+![Página de inicio](docs/capturas/00-pagina-inicio.png?v=20261020)
 
 | Inicio de sesión | Tablero gerencial |
 |---|---|
-| ![Inicio](docs/capturas/01-inicio-sesion.png) | ![Tablero](docs/capturas/02-tablero.png) |
+| ![Inicio](docs/capturas/01-inicio-sesion.png?v=20261020) | ![Tablero](docs/capturas/02-tablero.png?v=20261020) |
 | **Chat del equipo · #general** | **Chat privado con chulitos** |
-| ![Chat](docs/capturas/10-chat-general.png) | ![Privado](docs/capturas/10b-chat-privado.png) |
+| ![Chat](docs/capturas/10-chat-general.png?v=20261020) | ![Privado](docs/capturas/10b-chat-privado.png?v=20261020) |
 | **Notificaciones en vivo** | **Búsqueda global (Ctrl + K)** |
-| ![Campana](docs/capturas/15-notificaciones.png) | ![Búsqueda](docs/capturas/16-busqueda.png) |
+| ![Campana](docs/capturas/15-notificaciones.png?v=20261020) | ![Búsqueda](docs/capturas/16-busqueda.png?v=20261020) |
 | **Lotes y vencimientos** | **Punto de venta** |
-| ![Lotes](docs/capturas/05-lotes.png) | ![Ventas](docs/capturas/06-punto-de-venta.png) |
+| ![Lotes](docs/capturas/05-lotes.png?v=20261020) | ![Ventas](docs/capturas/06-punto-de-venta.png?v=20261020) |
 | **Clientes y cartera** | **Evaluación financiera** |
-| ![Clientes](docs/capturas/07-clientes-cartera.png) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png) |
+| ![Clientes](docs/capturas/07-clientes-cartera.png?v=20261020) | ![Finanzas](docs/capturas/08-evaluacion-financiera.png?v=20261020) |
 | **Reportes gerenciales** | **Mi perfil** |
-| ![Reportes](docs/capturas/09-reportes.png) | ![Perfil](docs/capturas/17-perfil.png) |
+| ![Reportes](docs/capturas/09-reportes.png?v=20261020) | ![Perfil](docs/capturas/17-perfil.png?v=20261020) |
 | **Mi actividad** | **Auditoría de reportes** |
-| ![Actividad](docs/capturas/17b-perfil-actividad.png) | ![Auditoría](docs/capturas/20-auditoria-reportes.png) |
+| ![Actividad](docs/capturas/17b-perfil-actividad.png?v=20261020) | ![Auditoría](docs/capturas/20-auditoria-reportes.png?v=20261020) |
 | **Detalle de recibos (solo el autor)** | **Reporte de ventas en PDF** |
-| ![Recibos](docs/capturas/10c-chat-recibos.png) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png) |
+| ![Recibos](docs/capturas/10c-chat-recibos.png?v=20261020) | ![PDF](docs/capturas/22-reporte-ventas-pdf.png?v=20261020) |
 | **Página pública · catálogo** | **Preferencias de tema** |
-| ![Catálogo](docs/capturas/00b-pagina-catalogo.png) | ![Tema](docs/capturas/23-preferencias-tema.png) |
+| ![Catálogo](docs/capturas/00b-pagina-catalogo.png?v=20261020) | ![Tema](docs/capturas/23-preferencias-tema.png?v=20261020) |
 
 **Modo oscuro**
 
-![Oscuro](docs/capturas/11-oscuro.png)
+![Oscuro](docs/capturas/11-oscuro.png?v=20261020)
 
 | Celular: página de inicio | Celular: tablero | Celular: venta | Celular: chat |
 |---|---|---|---|
-| ![Móvil inicio](docs/capturas/12-movil-inicio.png) | ![Móvil tablero](docs/capturas/13-movil-tablero.png) | ![Móvil venta](docs/capturas/14-movil-venta.png) | ![Móvil chat](docs/capturas/18-movil-chat.png) |
+| ![Móvil inicio](docs/capturas/12-movil-inicio.png?v=20261020) | ![Móvil tablero](docs/capturas/13-movil-tablero.png?v=20261020) | ![Móvil venta](docs/capturas/14-movil-venta.png?v=20261020) | ![Móvil chat](docs/capturas/18-movil-chat.png?v=20261020) |
 
 ---
 

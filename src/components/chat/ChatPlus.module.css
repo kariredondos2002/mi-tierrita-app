@@ -1,0 +1,123 @@
+/* Chat v4.5: chulitos, citas, hilos, fijados, menciones, adjuntos, audio y búsqueda. Solo usa tokens de theme.css (claro y oscuro). */
+.muted { color: var(--muted); font-size: 12.5px; padding: 6px 4px; }
+.convWrap { flex: 1; display: flex; min-width: 0; min-height: 0; }
+
+/* ---------- chulitos ---------- */
+.tickBtn { display: inline-flex; align-items: center; gap: 3px; border: none; background: transparent; padding: 0 2px; font: inherit; color: var(--muted); cursor: default; vertical-align: middle; }
+button.tickBtn { cursor: pointer; border-radius: 4px; }
+button.tickBtn:hover { background: var(--hover); }
+.tick { display: inline-flex; align-items: center; color: var(--muted-2); }
+.tick_delivered { color: var(--muted); }
+.tick_read { color: var(--sky); }
+.tick_failed { color: var(--bad); font-weight: 800; }
+.tickCount { font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.metaRow { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.retry { border: none; background: transparent; color: var(--bad); font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; }
+.sending { opacity: 0.72; }
+
+/* ---------- burbuja enriquecida ---------- */
+.bubbleWrap { position: relative; display: flex; flex-direction: column; min-width: 0; }
+.bubbleBox { display: flex; flex-direction: column; gap: 6px; }
+.bubbleFailed { border-color: var(--bad-line) !important; }
+.text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.pinnedTag { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; opacity: 0.8; }
+.quote { display: flex; flex-direction: column; gap: 1px; text-align: left; border: none; border-left: 3px solid var(--lime); background: color-mix(in srgb, currentColor 10%, transparent); color: inherit; border-radius: 6px; padding: 5px 9px; font: inherit; font-size: 12.5px; cursor: pointer; max-width: 100%; }
+.quote strong { font-size: 12px; }
+.quote span { opacity: 0.85; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.mention { font-weight: 700; color: var(--link); background: var(--sprout-soft); border-radius: 4px; padding: 0 3px; }
+.mentionMe { background: var(--warn-tag-bg); color: var(--warn-tag-fg); }
+.mentionedMe .bubbleBox { box-shadow: 0 0 0 2px var(--harvest); }
+.flash .bubbleBox { animation: flash 2.2s ease; }
+@keyframes flash { 0%, 60% { box-shadow: 0 0 0 3px var(--lime); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.threadLink { align-self: flex-start; margin-top: 3px; border: none; background: transparent; color: var(--link); font-size: 12px; font-weight: 700; cursor: pointer; padding: 2px 0; }
+.threadLink:hover { text-decoration: underline; }
+
+/* acciones al pasar el cursor o al enfocar con teclado */
+.actions { position: absolute; top: -14px; right: 6px; display: none; gap: 2px; padding: 2px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-pop); z-index: 2; }
+.bubbleWrap:hover .actions, .bubbleWrap:focus-within .actions { display: inline-flex; }
+.actions button { border: none; background: transparent; width: 28px; height: 26px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--ink); }
+.actions button:hover, .actions button:focus-visible { background: var(--hover); }
+.actions button[aria-pressed="true"] { background: var(--sprout-soft); }
+@media (hover: none) { .actions { display: inline-flex; position: static; margin-top: 4px; align-self: flex-end; box-shadow: none; } }
+
+/* ---------- audio, imagen, archivo ---------- */
+.audio { display: flex; align-items: center; gap: 8px; min-width: 210px; }
+.playBtn { width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center; background: var(--lime); color: #121315; flex-shrink: 0; }
+.seek { flex: 1; min-width: 70px; accent-color: var(--lime); }
+.audioTime { font-size: 11.5px; font-variant-numeric: tabular-nums; opacity: 0.85; min-width: 34px; }
+.speed { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 10px; font-size: 10.5px; padding: 1px 6px; cursor: pointer; opacity: 0.8; }
+.image { border: none; padding: 0; background: var(--surface-3); border-radius: 8px; cursor: zoom-in; overflow: hidden; max-width: 260px; min-height: 60px; display: block; }
+.image img { display: block; max-width: 100%; max-height: 240px; }
+.imageLoading { display: block; padding: 22px; font-size: 12px; color: var(--muted); }
+.lightbox { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.82); display: grid; place-items: center; padding: 20px; }
+.lightbox img { max-width: 94vw; max-height: 90vh; border-radius: 8px; }
+.lightbox button { position: absolute; top: 14px; right: 18px; font-size: 32px; color: #fff; background: transparent; border: none; cursor: pointer; }
+.file { display: flex; align-items: center; gap: 10px; text-align: left; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); background: color-mix(in srgb, currentColor 8%, transparent); color: inherit; border-radius: 8px; padding: 8px 10px; cursor: pointer; font: inherit; max-width: 280px; }
+.fileIcon { display: grid; place-items: center; }
+.fileText { display: flex; flex-direction: column; min-width: 0; }
+.fileText strong { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fileText small { font-size: 11px; opacity: 0.75; }
+
+/* ---------- redacción ---------- */
+.replyChip { display: flex; align-items: center; gap: 8px; padding: 6px 10px; margin-bottom: 6px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.quoteBar { width: 3px; align-self: stretch; border-radius: 2px; background: var(--lime); }
+.replyText { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 12.5px; }
+.replyText strong { font-size: 12px; }
+.replyText small { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toolBtn, .micBtn { width: 36px; height: 40px; border: none; background: transparent; color: var(--ink-2); cursor: pointer; display: grid; place-items: center; border-radius: 8px; flex-shrink: 0; }
+.toolBtn:hover:not(:disabled), .micBtn:hover:not(:disabled) { background: var(--hover); color: var(--ink); }
+.toolBtn:disabled, .micBtn:disabled { opacity: 0.4; cursor: default; }
+.micBtn { background: var(--surface-3); }
+.mentions { position: absolute; bottom: calc(100% + 6px); left: 0; list-style: none; margin: 0; padding: 4px; min-width: 240px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-pop); z-index: 5; }
+.mentions button { width: 100%; text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.mentions small { color: var(--muted); }
+.mentionOn, .mentions button:hover { background: var(--sprout-soft) !important; }
+.recording { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 14px; border: 1px solid var(--bad-line); background: var(--bad-soft); border-radius: 12px; color: var(--bad-tag-fg); font-size: 13.5px; }
+.recording > span:nth-child(2) { flex: 1; font-variant-numeric: tabular-nums; }
+.recDot { width: 10px; height: 10px; border-radius: 50%; background: var(--bad); animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.25; } }
+.recCancel { border: none; background: transparent; color: inherit; font-weight: 700; cursor: pointer; }
+
+/* ---------- fijados ---------- */
+.pinned { border-bottom: 1px solid var(--line); background: var(--warn-soft); color: var(--warn-tag-fg); font-size: 12.5px; }
+.pinnedRow { display: flex; align-items: center; gap: 8px; padding: 6px 18px; }
+.pinnedMain { flex: 1; min-width: 0; text-align: left; border: none; background: transparent; font: inherit; color: inherit; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pinnedMore { border: none; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.pinnedList { list-style: none; margin: 0; padding: 0 18px 8px; display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+.pinnedList li { display: flex; align-items: center; gap: 8px; }
+.pinnedList li > button:first-child { flex: 1; min-width: 0; text-align: left; border: none; background: var(--surface); border-radius: 8px; padding: 6px 10px; font: inherit; color: var(--ink); cursor: pointer; display: flex; flex-direction: column; }
+.pinnedList span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+
+/* ---------- hilo y detalle de recibos ---------- */
+.thread { width: 340px; flex-shrink: 0; border-left: 1px solid var(--line); background: var(--surface-2); display: flex; flex-direction: column; min-height: 0; padding-top: 12px; }
+.threadRoot { padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.threadCount { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 10px 14px 4px; margin: 0; }
+.threadList { flex: 1; overflow-y: auto; padding: 4px 12px; display: flex; flex-direction: column; gap: 10px; }
+.reply { display: flex; gap: 8px; font-size: 13px; }
+.reply header { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 12.5px; }
+.reply time { font-size: 10.5px; color: var(--muted); }
+.replyBody { margin-top: 2px; white-space: pre-wrap; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 4px; }
+.replyOwn .replyBody { color: var(--ink); }
+.receiptGroup { margin-bottom: 14px; }
+.receiptGroup h4 { margin: 0 0 6px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.toneRead { color: var(--sky); }
+.toneDelivered { color: var(--ink-2); }
+.tonePending { color: var(--warn); }
+.receiptRow { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+.receiptName { flex: 1; display: flex; flex-direction: column; font-size: 13.5px; }
+.receiptName small { color: var(--muted); font-size: 11.5px; }
+.receiptRow time { font-size: 11.5px; color: var(--muted); }
+
+/* ---------- búsqueda ---------- */
+.searchPanel { width: 320px; flex-shrink: 0; border-left: 1px solid var(--line); background: var(--surface-2); padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+.searchInput { border: 1px solid var(--line-strong); border-radius: 8px; padding: 9px 12px; font: inherit; font-size: 13.5px; background: var(--surface); color: var(--ink); }
+.searchScope { font-size: 12px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; }
+.hits { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.hits button { width: 100%; display: flex; gap: 8px; text-align: left; border: none; background: var(--surface); border-radius: 8px; padding: 8px; cursor: pointer; font: inherit; color: var(--ink); }
+.hits button:hover { background: var(--hover); }
+.hits small { display: block; color: var(--muted); font-size: 11px; }
+.hitText { display: block; font-size: 12.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.hits mark { background: var(--warn-tag-bg); color: var(--warn-tag-fg); border-radius: 2px; }
+
+@media (max-width: 1100px) { .thread, .searchPanel { position: absolute; right: 0; top: 0; bottom: 0; z-index: 6; box-shadow: var(--shadow-panel); } }
+@media (prefers-reduced-motion: reduce) { .flash .bubbleBox, .recDot { animation: none; } }

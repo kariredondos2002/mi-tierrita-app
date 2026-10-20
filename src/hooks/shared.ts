@@ -5,6 +5,7 @@ import { notify } from "@/stores/toasts";
 /** Claves de caché por entidad: invalidar la raíz refresca todos los listados de esa entidad. */
 export const keys = {
   session: ["session"] as const,
+  ai: ["ai"] as const,
   users: ["users"] as const,
   categories: ["categories"] as const,
   products: ["products"] as const,

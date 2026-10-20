@@ -1,0 +1,13 @@
+Fotos e imágenes de la página pública de Mi Tierrita (créditos y licencias).
+
+Página pública (banda de cierre y proyecto):
+- manos-recorte.webp: recorte hecho sobre la foto original a 3456 × 5184 (zona de las manos, 2556 × 2080; fondo quitado con Vision de macOS, luego reducido a 1440 px) de «Fotografía bokeh de una persona que lleva tierra», de Gabriel Jimenez, Unsplash (unsplash.com/photos/jin4W1HqgL4), licencia Unsplash. En la página, un filtro SVG leve (LandingCta) quita el halo del borde.
+- universidad-de-cartagena.jpg: logo de la Universidad de Cartagena (programa de Ingeniería de Software).
+
+Página pública (catálogo, carpeta catalogo/; todas de Unsplash, licencia Unsplash, recortadas y pasadas a WebP):
+- 01.webp Alimentos balanceados: vacas en el establo (unsplash.com/photos/slDCGrK8LOM).
+- 02.webp Medicina veterinaria: jeringa y frasco (unsplash.com/photos/_zFRhU7jqzc).
+- 03.webp Semillas y fertilizantes: mazorcas de maíz (unsplash.com/photos/HE_MjmWh9eQ).
+- 04.webp Aves de corral: pollitos (unsplash.com/photos/jjmu_KnEbH4).
+- 05.webp Productos agroquímicos: tractor fumigando (unsplash.com/photos/hGzbN1vy_CA).
+- 06.webp Ferretería agrícola: herramientas de finca (unsplash.com/photos/IClZBVw5W5A).

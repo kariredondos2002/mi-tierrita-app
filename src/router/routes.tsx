@@ -1,3 +1,4 @@
+import { TitaScreen } from "@/screens/Tita/TitaScreen";
 import { lazy } from "react";
 import type React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -111,6 +112,7 @@ export const router = createBrowserRouter([
             ],
           },
           protectedRoute("/clientes", <CustomersScreen />),
+          protectedRoute("/tita", <TitaScreen />),
           protectedRoute("/proveedores", <SuppliersScreen />),
           {
             element: <RequireRole roles={rolesFor("/finanzas")} />,

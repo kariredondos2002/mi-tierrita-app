@@ -40,3 +40,33 @@ export const isContinuation = (prev: { type: string; createdAt: string; sender?:
 
 /** «últ. conexión hace 3 h» o «aún no se ha conectado». */
 export const lastSeenText = (iso: string | null | undefined): string => (iso ? `últ. conexión ${relative(iso)}` : "aún no se ha conectado");
+
+/** Texto corto de un mensaje para listas, citas y avisos. */
+export const previewOf = (m: { content: string; kind: "TEXT" | "AUDIO" | "FILE" }): string =>
+  m.content.trim() || (m.kind === "AUDIO" ? "🎤 Mensaje de audio" : m.kind === "FILE" ? "📎 Archivo adjunto" : "");
+
+export const formatBytes = (n: number): string => (n < 1024 ? `${n} B` : n < 1024 * 1024 ? `${(n / 1024).toFixed(0)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
+
+/** 83_000 ms → «1:23». */
+export const formatDuration = (ms: number): string => {
+  const s = Math.max(0, Math.round(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+/** Misma regla que el servidor: @usuario precedido de inicio o de un carácter que no sea palabra. */
+export const MENTION_RE = /(^|[^\w@])@([A-Za-z0-9_.-]{2,40})/g;
+
+export type Chunk = { text: string; mention?: string };
+/** Parte un texto en trozos normales y menciones (@usuario) para resaltarlas. */
+export const chunkMentions = (content: string): Chunk[] => {
+  const out: Chunk[] = [];
+  let last = 0;
+  for (const m of content.matchAll(MENTION_RE)) {
+    const start = (m.index ?? 0) + (m[1]?.length ?? 0);
+    if (start > last) out.push({ text: content.slice(last, start) });
+    out.push({ text: `@${m[2]}`, mention: (m[2] as string).toLowerCase() });
+    last = start + 1 + (m[2]?.length ?? 0);
+  }
+  if (last < content.length) out.push({ text: content.slice(last) });
+  return out;
+};

@@ -15,7 +15,9 @@ export type NavGroup = { title?: string; items: NavItem[] };
 
 const ALL: Role[] = ["ADMIN", "SALES", "WAREHOUSE"];
 
-const ICONS = {
+export const ICONS = {
+  /** Tita: su plantita en trazo (semilla con dos hojas), como su avatar; sin íconos de IA. */
+  tita: '<path d="M11 10 V6.2"/><path d="M11 7.6 C 8.3 7.8 6.4 6.2 6 3.4 C 8.8 3.3 10.7 4.9 11 7.6 Z"/><path d="M11 6.6 C 13.6 6.6 15.5 5 15.9 2.4 C 13.3 2.4 11.4 3.9 11 6.6 Z"/><ellipse cx="11" cy="14.6" rx="5.6" ry="5.2"/>',
   home: '<rect x="2.5" y="2.5" width="7" height="9" rx="1.5"/><rect x="12.5" y="2.5" width="7" height="5" rx="1.5"/><rect x="2.5" y="14.5" width="7" height="5" rx="1.5"/><rect x="12.5" y="10.5" width="7" height="9" rx="1.5"/>',
   inventory: '<path d="M3 7 L11 3 L19 7 L11 11 Z"/><path d="M3 7 V15 L11 19 V11"/><path d="M19 7 V15 L11 19"/>',
   batches: '<rect x="3.5" y="4.5" width="15" height="14" rx="2"/><line x1="3.5" y1="8.5" x2="18.5" y2="8.5"/><line x1="7.5" y1="2.5" x2="7.5" y2="6"/><line x1="14.5" y1="2.5" x2="14.5" y2="6"/><circle cx="11" cy="13.5" r="2.2"/>',
@@ -57,6 +59,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Comunicación",
     items: [
+      { path: "/tita", label: "Tita, asistente", icon: ICONS.tita, roles: ALL },
       { path: "/chat", label: "Chat del equipo", icon: ICONS.chat, roles: ALL, badge: "messages" },
       { path: "/contactos", label: "Contactos del sitio", icon: ICONS.contact, roles: ["ADMIN"], badge: "contact" },
     ],

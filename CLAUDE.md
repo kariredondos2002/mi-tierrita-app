@@ -83,6 +83,18 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
   el tema oscuro) y usa el mismo `BrandMark` y `photoUrl`.
 - `ErrorBoundary` envuelve el contenido del `AppShell`; `GlobalSearch` responde a Ctrl + K y `/`.
 
+## Chat v4.5 y tema (2026-10)
+
+- Chat: `useConversation` mezcla mensajes **sin duplicar** (id y `clientId`), envía de forma optimista (reloj → ✓ → ✓✓ → ✓✓ azul) y
+  reintenta sin duplicar. Piezas en `components/chat`: `MessageList` (acciones: citar, hilo, responder en privado, fijar),
+  `Composer` (adjuntos 6 MB, nota de voz con MediaRecorder, @menciones), `ThreadPanel`, `PinnedBar`, `ChatSearch`,
+  `ReceiptsModal` (quién recibió, vio o sigue pendiente; solo el autor), `Ticks`, `AttachmentView`. Los no leídos salen de
+  `GET /chat/unread` (`useUnreadSummary`), no de contadores locales. Estilos nuevos: `ChatPlus.module.css`.
+- Tema: `stores/theme.ts` (claro, oscuro o «sistema», que sigue al dispositivo en vivo); `index.html` lo aplica antes de pintar.
+  Un componente nuevo solo usa variables de `theme.css`; el texto sobre `--forest` va con `--on-forest` (nunca `#fff`).
+- Página pública: viene del repositorio de Matos (`screens/Landing`, medios en `public/media`); el formulario envía `message`,
+  `topic`, `phone`/`email` y el campo trampa `website`.
+
 ## Hooks disponibles (`@/hooks/<entidad>`)
 
 - session: `useSignin`, `useSignout`, `useMe`
@@ -95,7 +107,7 @@ Botones: `primary` 40px carbón (en la portada se vuelve verde lima), `secondary
 - sales: `useSales(query)`, `useSale(id)`, `useRegisterSale`, `useVoidSale`
 - audits: `useAudits(query)`
 - reports: `useSalesReport({from, to, groupBy})`, `useInventoryReport(days)`, `useReceivablesReport(overdueDays)`
-- chat: `useConversations`, `usePeople`, `useUnreadMessages`, `useConversation(target)`, `useUnreadInTitle(n)`
+- chat: `useConversations`, `usePeople`, `useUnreadSummary`, `useUnreadMessages`, `usePinned(scope)`, `useConversation(target)`, `useUnreadInTitle(n)`
 - notifications: `useNotifications`, `useMarkNotificationsRead` · search: `useGlobalSearch(q)` · contact: `useSendContact`, `useContactMessages`, `useMarkContactHandled` · users: `useUpdateProfile`
 - reports (v4.2): `useExportReport` ({report, format, filtros}), `useExportHistory(query)` · financial: `useExportScenario` · users: `useMyActivity`
 - financial: `useScenarios()`, `useScenario(id)`, `useCreateScenario`, `useCompareScenarios(ids)`, `useAmortization(id)`, `useSensitivity(id, variable, range?)`, `useBivariate(id, varX, varY)`, `useTornado(id)`

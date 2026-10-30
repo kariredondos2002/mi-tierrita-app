@@ -21,7 +21,7 @@
   --ground: #f4f7f5;
   --surface: #ffffff;
   --surface-2: #f8faf9;
-  --surface-3: #f0f4f1;
+  --surface-3: #f0f3f1;
   --segment-bg: #eef3ef;
   --line: #e8ede9;
   --line-soft: #f0f3f1;
@@ -66,7 +66,7 @@
   --bad-line: #fecaca;
   --bad-tag-bg: #fde8e7;
   --bad-tag-fg: #b8423c;
-  --accent: #c2410c;
+  --accent: #d4554f;
   /* barra lateral (clara) */
   --nav-ink: #47514b;
   --nav-muted: #6b746f;
@@ -151,9 +151,9 @@
   --on-forest: #0f1a13;
   --app-bg: #0f1512;
   --ground: #0f1512;
-  --surface: #1a221d;
+  --surface: #1b2420;
   --surface-2: #1f2923;
-  --surface-3: #243029;
+  --surface-3: #222d27;
   --segment-bg: #202a24;
   --line: #2a352e;
   --line-soft: #232d27;
@@ -191,7 +191,7 @@
   --bad-line: #5e2c2b;
   --bad-tag-bg: #3d1d1c;
   --bad-tag-fg: #f5a39e;
-  --accent: #f39a62;
+  --accent: #f19a90;
   --nav-ink: #c3ccc6;
   --nav-muted: #8f9993;
   --nav-exit: #9fa9a3;
@@ -228,9 +228,9 @@
     --on-forest: #0f1a13;
     --app-bg: #0f1512;
     --ground: #0f1512;
-    --surface: #1a221d;
+    --surface: #1b2420;
     --surface-2: #1f2923;
-    --surface-3: #243029;
+    --surface-3: #222d27;
     --segment-bg: #202a24;
     --line: #2a352e;
     --line-soft: #232d27;
@@ -268,7 +268,7 @@
     --bad-line: #5e2c2b;
     --bad-tag-bg: #3d1d1c;
     --bad-tag-fg: #f5a39e;
-    --accent: #f39a62;
+    --accent: #f19a90;
     --nav-ink: #c3ccc6;
     --nav-muted: #8f9993;
     --nav-exit: #9fa9a3;

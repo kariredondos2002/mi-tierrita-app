@@ -9,15 +9,13 @@ export type NavItem = {
   /** Roles que ven el módulo con candado (van a Acceso restringido), como Finanzas para la Secretaria. */
   lockedFor?: Role[];
   /** Clave de la insignia numérica del menú. */
-  badge?: "inventory" | "batches" | "customers" | "messages" | "contact";
+  badge?: "inventory" | "batches" | "customers" | "contact" | "chat";
 };
 export type NavGroup = { title?: string; items: NavItem[] };
 
 const ALL: Role[] = ["ADMIN", "SALES", "WAREHOUSE"];
 
 export const ICONS = {
-  /** Tita: su plantita en trazo (semilla con dos hojas), como su avatar; sin íconos de IA. */
-  tita: '<path d="M11 10 V6.2"/><path d="M11 7.6 C 8.3 7.8 6.4 6.2 6 3.4 C 8.8 3.3 10.7 4.9 11 7.6 Z"/><path d="M11 6.6 C 13.6 6.6 15.5 5 15.9 2.4 C 13.3 2.4 11.4 3.9 11 6.6 Z"/><ellipse cx="11" cy="14.6" rx="5.6" ry="5.2"/>',
   home: '<rect x="2.5" y="2.5" width="7" height="9" rx="1.5"/><rect x="12.5" y="2.5" width="7" height="5" rx="1.5"/><rect x="2.5" y="14.5" width="7" height="5" rx="1.5"/><rect x="12.5" y="10.5" width="7" height="9" rx="1.5"/>',
   inventory: '<path d="M3 7 L11 3 L19 7 L11 11 Z"/><path d="M3 7 V15 L11 19 V11"/><path d="M19 7 V15 L11 19"/>',
   batches: '<rect x="3.5" y="4.5" width="15" height="14" rx="2"/><line x1="3.5" y1="8.5" x2="18.5" y2="8.5"/><line x1="7.5" y1="2.5" x2="7.5" y2="6"/><line x1="14.5" y1="2.5" x2="14.5" y2="6"/><circle cx="11" cy="13.5" r="2.2"/>',
@@ -28,9 +26,21 @@ export const ICONS = {
   reports: '<path d="M5.5 2.5 h8 l4 4 v13 a1.5 1.5 0 0 1 -1.5 1.5 h-10.5 a1.5 1.5 0 0 1 -1.5 -1.5 v-15.5 a1.5 1.5 0 0 1 1.5 -1.5 z"/><line x1="8" y1="12" x2="14" y2="12"/><line x1="8" y1="15.5" x2="12" y2="15.5"/>',
   users: '<circle cx="11" cy="7.5" r="3.6"/><path d="M4 19 c0 -3.6 3.1 -5.6 7 -5.6 s7 2 7 5.6"/>',
   audits: '<path d="M4 5.5 h14"/><path d="M4 11 h14"/><path d="M4 16.5 h9"/><circle cx="17" cy="16.5" r="2"/>',
-  chat: '<path d="M3 4.5 h16 v10 h-9.5 l-4.5 3.8 v-3.8 h-2 z"/><line x1="7" y1="8.5" x2="15" y2="8.5"/><line x1="7" y1="11.5" x2="12.5" y2="11.5"/>',
-  contact: '<rect x="2.5" y="4.5" width="17" height="13" rx="2"/><path d="M3 6 L11 12 L19 6"/>',
-  profile: '<circle cx="11" cy="8" r="3.4"/><path d="M4.5 18.5 c0 -3.4 2.9 -5.2 6.5 -5.2 s6.5 1.8 6.5 5.2"/><circle cx="17" cy="5" r="2"/>',
+  chat: '<path d="M4 5.5 h14 a1.5 1.5 0 0 1 1.5 1.5 v8 a1.5 1.5 0 0 1 -1.5 1.5 h-8 l-4 3 v-3 h-2 a1.5 1.5 0 0 1 -1.5 -1.5 v-8 a1.5 1.5 0 0 1 1.5 -1.5 z"/><line x1="7" y1="9.5" x2="15" y2="9.5"/><line x1="7" y1="12.5" x2="12" y2="12.5"/>',
+  contact: '<rect x="2.5" y="5" width="17" height="12" rx="1.6"/><path d="M3 6 L11 12 L19 6"/>',
+  /** Tita: su plantita en trazo (semilla con dos hojas), como su avatar; sin íconos de IA. */
+  tita: '<path d="M11 10 V6.2"/><path d="M11 7.6 C 8.3 7.8 6.4 6.2 6 3.4 C 8.8 3.3 10.7 4.9 11 7.6 Z"/><path d="M11 6.6 C 13.6 6.6 15.5 5 15.9 2.4 C 13.3 2.4 11.4 3.9 11 6.6 Z"/><ellipse cx="11" cy="14.6" rx="5.6" ry="5.2"/>',
+  /** Alarmas: campana con badajo (trazo propio). */
+  alarms: '<path d="M11 3 a5 5 0 0 1 5 5 v3.4 l1.6 2.6 h-13.2 l1.6 -2.6 v-3.4 a5 5 0 0 1 5 -5 z"/><path d="M9 17 a2 2 0 0 0 4 0"/><path d="M4.2 6.2 a7.8 7.8 0 0 1 2 -2.6"/><path d="M17.8 6.2 a7.8 7.8 0 0 0 -2 -2.6"/>',
+  /** Calendario: hoja de mes con argollas y días en cuadrícula (trazo propio, distinto del de lotes). */
+  calendar: '<rect x="3" y="4.5" width="16" height="14.5" rx="2"/><line x1="3" y1="8.8" x2="19" y2="8.8"/><line x1="7.5" y1="2.5" x2="7.5" y2="6.2"/><line x1="14.5" y1="2.5" x2="14.5" y2="6.2"/><path d="M6.6 12.2 h1.6 M10.2 12.2 h1.6 M13.8 12.2 h1.6 M6.6 15.6 h1.6 M10.2 15.6 h1.6"/>',
+  library: '<path d="M3.5 4.5 h5 a2 2 0 0 1 2 2 v12 a1.5 1.5 0 0 0 -1.5 -1.5 h-5.5 z"/><path d="M18.5 4.5 h-5 a2 2 0 0 0 -2 2 v12 a1.5 1.5 0 0 1 1.5 -1.5 h5.5 z"/><line x1="6" y1="8" x2="8.5" y2="8"/><line x1="13.5" y1="8" x2="16" y2="8"/>',
+  /** Conteos: tablilla con dos casillas marcadas (trazo propio). */
+  stockCounts: '<rect x="4.5" y="4" width="13" height="15.5" rx="2"/><rect x="8" y="2.5" width="6" height="3" rx="1"/><path d="M7.4 10.4 l1.3 1.3 l2.4 -2.6"/><line x1="12.8" y1="10.6" x2="15" y2="10.6"/><path d="M7.4 14.9 l1.3 1.3 l2.4 -2.6"/><line x1="12.8" y1="15.1" x2="15" y2="15.1"/>',
+  /** Nómina: billete con su moneda al centro (trazo propio, distinto del de finanzas). */
+  payroll: '<rect x="2.5" y="5.5" width="17" height="11" rx="1.8"/><circle cx="11" cy="11" r="2.4"/><line x1="5.4" y1="8.6" x2="7" y2="8.6"/><line x1="15" y1="13.4" x2="16.6" y2="13.4"/>',
+  /** Pedidos: caja abierta con un reloj al lado (lo que se espera para una fecha; trazo propio). */
+  orders: '<path d="M2.5 8.5 h11 v9 a1.5 1.5 0 0 1 -1.5 1.5 h-8 a1.5 1.5 0 0 1 -1.5 -1.5 z"/><path d="M2.5 8.5 l2 -4.5 h7 l2 4.5"/><line x1="8" y1="4" x2="8" y2="8.5"/><circle cx="16.3" cy="15" r="3.7"/><path d="M16.3 13.1 v2.1 l1.4 .9"/>',
   signout: '<path d="M8.6 3.5 H5 a1.6 1.6 0 0 0 -1.6 1.6 v11.8 a1.6 1.6 0 0 0 1.6 1.6 h3.6"/><path d="M13.8 7.4 L17.4 11 L13.8 14.6"/><line x1="17.1" y1="11" x2="8.8" y2="11"/>',
 } as const;
 
@@ -38,34 +48,40 @@ export const NAV_ICONS = ICONS;
 
 /** Mapa de pantallas por rol (documento 07, sección 2). La misma lista alimenta el menú y las guardas. */
 export const NAV_GROUPS: NavGroup[] = [
-  { items: [{ path: "/", label: "Tablero gerencial", icon: ICONS.home, roles: ALL }] },
+  { items: [{ path: "/", label: "Inicio", icon: ICONS.home, roles: ALL }] },
   {
-    title: "Operación · ERP",
+    title: "Operación",
     items: [
       { path: "/inventario", label: "Inventario", icon: ICONS.inventory, roles: ALL, badge: "inventory" },
       { path: "/lotes", label: "Lotes y vencimientos", icon: ICONS.batches, roles: ["ADMIN", "WAREHOUSE"], badge: "batches" },
+      { path: "/conteos", label: "Conteos", icon: ICONS.stockCounts, roles: ["ADMIN", "WAREHOUSE"] },
       { path: "/ventas", label: "Ventas", icon: ICONS.sales, roles: ["ADMIN", "SALES"] },
       { path: "/clientes", label: "Clientes y cartera", icon: ICONS.customers, roles: ["ADMIN", "SALES"], badge: "customers" },
       { path: "/proveedores", label: "Proveedores", icon: ICONS.suppliers, roles: ["ADMIN", "WAREHOUSE"] },
+      { path: "/pedidos", label: "Pedidos", icon: ICONS.orders, roles: ALL },
+      { path: "/calendario", label: "Calendario", icon: ICONS.calendar, roles: ALL },
     ],
   },
   {
-    title: "Análisis y decisión",
+    title: "Gestión",
     items: [
-      { path: "/reportes", label: "Reportes gerenciales", icon: ICONS.reports, roles: ["ADMIN", "SALES"] },
-      { path: "/finanzas", label: "Evaluación financiera", icon: ICONS.finance, roles: ["ADMIN"], lockedFor: ["SALES"] },
+      { path: "/finanzas", label: "Finanzas y crédito", icon: ICONS.finance, roles: ["ADMIN"], lockedFor: ["SALES"] },
+      { path: "/reportes", label: "Reportes", icon: ICONS.reports, roles: ["ADMIN", "SALES"] },
+      { path: "/biblioteca", label: "Biblioteca", icon: ICONS.library, roles: ALL },
+      { path: "/nomina", label: "Nómina", icon: ICONS.payroll, roles: ["ADMIN"] },
     ],
   },
   {
     title: "Comunicación",
     items: [
       { path: "/tita", label: "Tita, asistente", icon: ICONS.tita, roles: ALL },
-      { path: "/chat", label: "Chat del equipo", icon: ICONS.chat, roles: ALL, badge: "messages" },
+      { path: "/chat", label: "Chat del equipo", icon: ICONS.chat, roles: ALL, badge: "chat" },
       { path: "/contactos", label: "Contactos del sitio", icon: ICONS.contact, roles: ["ADMIN"], badge: "contact" },
+      { path: "/alarmas", label: "Alarmas", icon: ICONS.alarms, roles: ALL },
     ],
   },
   {
-    title: "Administración",
+    title: "Sistema",
     items: [
       { path: "/usuarios", label: "Usuarios y roles", icon: ICONS.users, roles: ["ADMIN"] },
       { path: "/auditoria", label: "Auditoría", icon: ICONS.audits, roles: ["ADMIN"] },
@@ -73,10 +89,7 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-/** Rutas que no van en el menú pero tienen título y roles (se abren desde la barra superior). */
-export const EXTRA_ROUTES: NavItem[] = [{ path: "/perfil", label: "Mi perfil", icon: ICONS.profile, roles: ALL }];
-
-export const ALL_NAV_ITEMS: NavItem[] = [...NAV_GROUPS.flatMap((g) => g.items), ...EXTRA_ROUTES];
+export const ALL_NAV_ITEMS: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const findRoute = (pathname: string): NavItem | undefined =>
   ALL_NAV_ITEMS.find((i) => (i.path === "/" ? pathname === "/" : pathname === i.path || pathname.startsWith(`${i.path}/`)));

@@ -3,13 +3,16 @@ import { usersService } from "@/services/users";
 import { useSessionStore } from "@/stores/session";
 import type { UpdateProfileInput } from "@/types/api";
 
-/** Mi perfil: actualiza el nombre y lo refleja de inmediato en la sesión. */
-export const useUpdateProfile = () =>
-  useApiMutation(
-    async (input: UpdateProfileInput) => {
-      const user = await usersService.updateOwnProfile(input);
-      useSessionStore.getState().setUser(user);
+/** Mi perfil: guarda nombre, correo y teléfono propios y refresca el usuario de la sesión. */
+export const useUpdateProfile = () => {
+  const setUser = useSessionStore((s) => s.setUser);
+  const mutation = useApiMutation((input: UpdateProfileInput) => usersService.updateMe(input), { invalidate: [keys.session, keys.users], success: "Perfil actualizado.", notifyError: false });
+  return {
+    ...mutation,
+    mutateAsync: async (input: UpdateProfileInput) => {
+      const user = await mutation.mutateAsync(input);
+      setUser(user);
       return user;
     },
-    { success: "Perfil actualizado.", notifyError: false, invalidate: [keys.users] },
-  );
+  };
+};

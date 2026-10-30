@@ -1,11 +1,11 @@
-/* Inventario: aviso de consulta, fila de filtros, rejilla 1,7fr/1fr y estilos de tabla del lienzo. */
+/* Inventario: aviso de consulta, fila de filtros, rejilla 1,7fr/1fr y estilos de tabla. */
 .notice {
   background: var(--good-soft);
-  border: 1px solid color-mix(in srgb, var(--good-line) 55%, var(--surface));
-  border-radius: 9px;
+  border: 1px solid var(--good-line);
+  border-radius: var(--radius);
   padding: 10px 14px;
-  font-size: 12.5px;
-  color: var(--leaf);
+  font-size: 13px;
+  color: var(--forest);
 }
 .toolbar {
   display: flex;
@@ -21,33 +21,18 @@
   flex-wrap: wrap;
 }
 .search {
-  width: 260px;
+  width: 240px;
   max-width: 100%;
-  height: 38px;
-  font-size: 13px;
 }
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 330px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 12px;
   align-items: start;
 }
-@media (max-width: 1180px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-.productCell {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 200px;
-}
-.productLine {
-  font-size: 11.5px;
-  color: var(--muted);
-}
 .code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
   color: var(--ink-2);
   white-space: nowrap;
 }
@@ -57,35 +42,33 @@
 }
 .rowActions {
   display: inline-flex;
-  gap: 6px;
+  gap: 12px;
   justify-content: flex-end;
   white-space: nowrap;
 }
 .rowLink {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  border-radius: 7px;
-  padding: 4px 9px;
-  font-weight: 600;
-  font-size: 12px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
   color: var(--link);
   cursor: pointer;
+  text-underline-offset: 2px;
 }
 .rowLink:hover {
-  border-color: var(--leaf);
-  background: var(--sprout-soft);
+  text-decoration: underline;
 }
 .rowLinkDanger {
-  color: var(--bad-tag-fg);
+  color: var(--bad);
 }
 .note {
-  font-size: 12.5px;
-  color: var(--ink-2);
+  font-size: 13px;
+  color: var(--muted);
   border-top: 1px solid var(--line-soft);
   padding-top: 9px;
 }
 .tableNote {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
   padding-top: 9px;
 }
@@ -95,13 +78,18 @@
   gap: 14px;
 }
 .formError {
-  font-size: 12.5px;
-  color: var(--bad-tag-fg);
+  font-size: 13px;
+  color: var(--bad);
 }
 .section {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
 }
 .sectionHead {
   display: flex;
@@ -142,7 +130,7 @@
   gap: 8px;
   flex: 1;
   min-width: 0;
-  font-size: 13px;
+  font-size: 14px;
 }
 .catActions {
   display: flex;
@@ -162,4 +150,9 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Pestañas del detalle del producto (lotes, comentarios, historial). */
+.modalTabs {
+  margin-bottom: 14px;
 }

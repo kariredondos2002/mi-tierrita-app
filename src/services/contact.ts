@@ -1,13 +1,12 @@
 import { http } from "@/lib/http";
-import type { ContactInput, ContactMessage } from "@/types/api";
+import type { ContactMessage, ContactStatus, Page, PageQuery, SendContactInput } from "@/types/api";
 
 export const contactService = {
-  /** Pública: formulario de la página de inicio. */
-  send: async (input: ContactInput): Promise<void> => {
+  /** Público: formulario de la página pública. */
+  send: async (input: SendContactInput): Promise<void> => {
     await http.post("/contact", input);
   },
-  list: async (): Promise<ContactMessage[]> => (await http.get<{ items: ContactMessage[] }>("/contact")).data.items,
-  markHandled: async (id: number): Promise<void> => {
-    await http.post(`/contact/${id}/handled`);
-  },
+  list: async (query: PageQuery & { status?: ContactStatus }): Promise<Page<ContactMessage>> => (await http.get<Page<ContactMessage>>("/contact-messages", { params: query })).data,
+  setStatus: async (input: { id: number; status: ContactStatus }): Promise<ContactMessage> =>
+    (await http.patch<ContactMessage>(`/contact-messages/${input.id}`, { status: input.status })).data,
 };

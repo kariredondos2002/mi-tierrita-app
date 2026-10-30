@@ -1,14 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useSuppliers } from "@/hooks/suppliers";
 import { useExpiringBatches } from "@/hooks/batches";
+import { useAiStatus } from "@/hooks/ai";
 import { useSessionStore } from "@/stores/session";
-import { dateOnly, int } from "@/lib/format";
+import { int } from "@/lib/format";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Badge, Button, Card, Chips, DataTable, EmptyState, Input, Pagination, QueryState, StatCard, StatGrid, type Column } from "@/components/ui";
-import type { Page, ProductBatch, Supplier } from "@/types/api";
+import { Button, Chips, EmptyState, Input, Pagination, QueryState, ViewSwitch, useViewMode, type ViewMode } from "@/components/ui";
+import type { Supplier } from "@/types/api";
 import { SupplierFormModal } from "./SupplierFormModal";
 import { PurchaseModal } from "./PurchaseModal";
+import { InvoiceImportModal } from "./InvoiceImportModal";
+import { SupplierCounts } from "./SupplierCounts";
+import { SupplierCards } from "./SupplierCards";
+import { SupplierList } from "./SupplierList";
+import { SupplierTable } from "./SupplierTable";
+import { ExpiringPanel } from "./ExpiringPanel";
+import { useAiStore } from "@/stores/ai";
 import styles from "./SuppliersScreen.module.css";
 
 type ActiveFilter = "active" | "inactive" | "all";
@@ -19,6 +26,9 @@ const ACTIVE_OPTIONS: { value: ActiveFilter; label: string }[] = [
   { value: "all", label: "Todos" },
 ];
 
+/** Vista preferida del directorio (`mi-tierrita:proveedores-vista`); por defecto la tabla de siempre. */
+const VIEW_MODES: ViewMode[] = ["cards", "list", "table"];
+
 /** Ventana de vencimiento de los lotes recibidos que se muestran junto al directorio. */
 const EXPIRING_DAYS = 30;
 
@@ -27,25 +37,6 @@ const matches = (supplier: Supplier, term: string): boolean => {
   if (!t) return true;
   return [supplier.name, supplier.taxId ?? "", supplier.phone ?? ""].some((v) => v.toLowerCase().includes(t));
 };
-
-type CountQuery = { data: Page<unknown> | undefined; isPending: boolean; isError: boolean };
-
-/** Tarjeta de indicador ligada al `count` de un listado: carga y falla por su cuenta. */
-const CountStat = ({ query, label, hint, tone }: { query: CountQuery; label: string; hint?: string; tone?: (count: number) => "neutral" | "good" | "warn" | "bad" }) => {
-  if (query.isPending) return <StatCard label={label} value="…" hint="Cargando" />;
-  if (query.isError || query.data === undefined) return <StatCard label={label} value="—" hint="No disponible" />;
-  return <StatCard label={label} value={int(query.data.count)} hint={hint} tone={tone?.(query.data.count) ?? "neutral"} />;
-};
-
-const expiryTone = (batch: ProductBatch): "bad" | "warn" | "neutral" => (batch.expired ? "bad" : batch.daysToExpire <= 7 ? "warn" : "neutral");
-const expiryLabel = (batch: ProductBatch): string => (batch.expired ? "Vencido" : batch.daysToExpire === 0 ? "Hoy" : `${int(batch.daysToExpire)} días`);
-
-const batchColumns: Column<ProductBatch>[] = [
-  { key: "product", header: "Producto", render: (b) => <span className={styles.name}>{b.productName}</span> },
-  { key: "supplier", header: "Proveedor", align: "left", render: (b) => <span className={styles.secondary}>{b.supplierName ?? "Sin proveedor"}</span> },
-  { key: "units", header: "Unidades", align: "right", render: (b) => int(b.quantityRemaining) },
-  { key: "expires", header: "Vence", render: (b) => <Badge tone={expiryTone(b)}>{expiryLabel(b)}</Badge> },
-];
 
 /**
  * CU-12 Proveedores y CU-13 Registrar compra.
@@ -56,9 +47,14 @@ const batchColumns: Column<ProductBatch>[] = [
 export const SuppliersScreen = () => {
   const role = useSessionStore((s) => s.user?.role);
   const isAdmin = role === "ADMIN";
+  const ai = useAiStatus();
+  // «Leer factura» registra compras: solo para quienes pueden registrarlas y solo si el servidor tiene IA.
+  const canReadInvoice = ai.enabled && (role === "ADMIN" || role === "WAREHOUSE");
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<ActiveFilter>("active");
   const [search, setSearch] = useState("");
+  const [view, setView] = useViewMode("proveedores", VIEW_MODES, "table");
   const [form, setForm] = useState<{ open: boolean; supplier: Supplier | null }>({ open: false, supplier: null });
   const [purchase, setPurchase] = useState<{ open: boolean; supplier: Supplier | null }>({ open: false, supplier: null });
 
@@ -70,33 +66,13 @@ export const SuppliersScreen = () => {
 
   const openCreate = () => setForm({ open: true, supplier: null });
   const openPurchase = (supplier: Supplier | null) => setPurchase({ open: true, supplier });
-
-  const columns: Column<Supplier>[] = [
-    { key: "name", header: "Proveedor", render: (s) => <span className={styles.name}>{s.name}</span> },
-    { key: "taxId", header: "NIT", align: "left", render: (s) => (s.taxId ? <span className={styles.mono}>{s.taxId}</span> : "—") },
-    { key: "phone", header: "Teléfono", align: "left", render: (s) => <span className={styles.secondary}>{s.phone ?? "—"}</span> },
-    { key: "createdAt", header: "Desde", align: "left", render: (s) => <span className={styles.secondary}>{dateOnly(s.createdAt)}</span> },
-    { key: "active", header: "Estado", align: "left", render: (s) => <Badge tone={s.active ? "good" : "neutral"}>{s.active ? "Activo" : "Inactivo"}</Badge> },
-    {
-      key: "actions",
-      header: "",
-      align: "right",
-      render: (s) => (
-        <div className={styles.actions}>
-          {s.active ? (
-            <Button variant="secondary" size="sm" onClick={() => openPurchase(s)}>
-              Registrar compra
-            </Button>
-          ) : null}
-          {isAdmin ? (
-            <Button variant="ghost" size="sm" onClick={() => setForm({ open: true, supplier: s })}>
-              Editar
-            </Button>
-          ) : null}
-        </div>
-      ),
-    },
-  ];
+  // Borrador de compra del asistente: se toma una vez al entrar y abre la compra prellenada.
+  const [aiPurchase, setAiPurchase] = useState(() => useAiStore.getState().peekDraft("purchase"));
+  useEffect(() => {
+    if (!aiPurchase) return;
+    useAiStore.getState().clearDraft();
+    setPurchase({ open: true, supplier: null });
+  }, [aiPurchase]);
 
   const emptyText = isAdmin
     ? filter === "active"
@@ -107,18 +83,32 @@ export const SuppliersScreen = () => {
     : "El administrador aún no ha registrado proveedores.";
 
   const directory = (
-    <Card title="Directorio" subtitle={query.data ? `${int(query.data.count)} proveedores` : undefined}>
-      <div className={styles.toolbar}>
-        <Input className={styles.search} placeholder="Buscar por nombre, NIT o teléfono" aria-label="Buscar proveedor" value={search} onChange={(e) => setSearch(e.target.value)} />
-        <Chips
-          options={ACTIVE_OPTIONS}
-          value={filter}
-          onChange={(v) => {
-            setFilter(v);
-            setPage(1);
-          }}
-        />
-      </div>
+    <section className={styles.directory} aria-labelledby="suppliers-directory-title">
+      <header className={styles.head}>
+        <div className={styles.headTitle}>
+          <h2 id="suppliers-directory-title">Directorio</h2>
+          <span className={styles.headCount}>{query.data ? `${int(query.data.count)} ${query.data.count === 1 ? "proveedor" : "proveedores"}` : "…"}</span>
+        </div>
+        <div className={styles.toolbar}>
+          <div className={styles.search}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="6" cy="6" r="4.3" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M9.3 9.3 L12.5 12.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
+            <Input placeholder="Buscar por nombre, NIT o teléfono" aria-label="Buscar proveedor" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+          <Chips
+            options={ACTIVE_OPTIONS}
+            value={filter}
+            onChange={(v) => {
+              setFilter(v);
+              setPage(1);
+            }}
+          />
+          <ViewSwitch value={view} onChange={setView} modes={VIEW_MODES} ariaLabel="Vista de proveedores" />
+        </div>
+      </header>
+
       <QueryState
         query={query}
         isEmpty={(data) => data.items.length === 0}
@@ -126,21 +116,26 @@ export const SuppliersScreen = () => {
       >
         {(data) => {
           const rows = data.items.filter((s) => matches(s, search));
+          const viewProps = { suppliers: rows, canEdit: isAdmin, onPurchase: openPurchase, onEdit: (s: Supplier) => setForm({ open: true, supplier: s }) };
           return (
             <>
               {rows.length === 0 ? (
                 <EmptyState title="Sin coincidencias" text={`Ningún proveedor de esta página coincide con «${search.trim()}».`} />
               ) : (
-                <DataTable columns={columns} rows={rows} rowKey={(s) => s.id} />
+                view === "cards" ? (
+                  <SupplierCards {...viewProps} />
+                ) : view === "list" ? (
+                  <SupplierList {...viewProps} />
+                ) : (
+                  <SupplierTable {...viewProps} />
+                )
               )}
-              <div className={styles.pager}>
-                <Pagination page={data} onPage={setPage} />
-              </div>
+              <Pagination page={data} onPage={setPage} />
             </>
           );
         }}
       </QueryState>
-    </Card>
+    </section>
   );
 
   return (
@@ -149,12 +144,19 @@ export const SuppliersScreen = () => {
         title="Proveedores"
         subtitle={isAdmin ? "Directorio y compras: cada compra registrada crea un lote y sube el stock." : "Qué llega, cuándo y de quién."}
         actions={
-          isAdmin ? (
+          isAdmin || canReadInvoice ? (
             <>
-              <Button variant="secondary" onClick={openCreate}>
-                Nuevo proveedor
-              </Button>
-              <Button onClick={() => openPurchase(null)}>Registrar compra</Button>
+              {isAdmin ? (
+                <Button variant="secondary" onClick={openCreate}>
+                  Nuevo proveedor
+                </Button>
+              ) : null}
+              {canReadInvoice ? (
+                <Button variant="secondary" onClick={() => setInvoiceOpen(true)}>
+                  Leer factura
+                </Button>
+              ) : null}
+              {isAdmin ? <Button onClick={() => openPurchase(null)}>Registrar compra</Button> : null}
             </>
           ) : undefined
         }
@@ -162,36 +164,36 @@ export const SuppliersScreen = () => {
 
       {!isAdmin ? <div className={styles.info}>Consulta de proveedores y registro de recepciones. Los proveedores los crea el administrador.</div> : null}
 
-      <StatGrid>
-        <CountStat query={actives} label="Proveedores activos" hint="disponibles para registrar compras" />
-        <CountStat query={inactives} label="Proveedores inactivos" hint="sin compras nuevas" tone={(n) => (n > 0 ? "warn" : "neutral")} />
-        <CountStat query={all} label="Registrados" hint="en el directorio" />
-        <CountStat query={expiring} label="Lotes por vencer" hint={`recibidos, próximos ${int(EXPIRING_DAYS)} días`} tone={(n) => (n > 0 ? "warn" : "neutral")} />
-      </StatGrid>
+      <SupplierCounts
+        items={[
+          { query: actives, label: "Activos", hint: "disponibles para registrar compras" },
+          { query: inactives, label: "Inactivos", hint: "sin compras nuevas", warnWhenPositive: true },
+          { query: all, label: "Registrados", hint: "en el directorio" },
+          { query: expiring, label: "Lotes por vencer", hint: `recibidos, próximos ${int(EXPIRING_DAYS)} días`, warnWhenPositive: true },
+        ]}
+      />
 
       {isAdmin ? (
         <div className={styles.grid}>
           {directory}
-          <Card
-            title="Lotes por vencer"
-            subtitle={`Recibidos de proveedores · próximos ${int(EXPIRING_DAYS)} días`}
-            actions={
-              <Link to="/lotes" className={styles.cardLink}>
-                Ver lotes
-              </Link>
-            }
-          >
-            <QueryState query={expiring} isEmpty={(data) => data.items.length === 0} empty={<EmptyState title="Nada por vencer" text={`Ningún lote vence en los próximos ${int(EXPIRING_DAYS)} días.`} />}>
-              {(data) => <DataTable columns={batchColumns} rows={data.items} rowKey={(b) => b.id} />}
-            </QueryState>
-          </Card>
+          <ExpiringPanel days={EXPIRING_DAYS} query={expiring} />
         </div>
       ) : (
         directory
       )}
 
       {form.open ? <SupplierFormModal supplier={form.supplier} onClose={() => setForm({ open: false, supplier: null })} /> : null}
-      {purchase.open ? <PurchaseModal supplier={purchase.supplier} onClose={() => setPurchase({ open: false, supplier: null })} /> : null}
+      {invoiceOpen ? <InvoiceImportModal onClose={() => setInvoiceOpen(false)} /> : null}
+      {purchase.open ? (
+        <PurchaseModal
+          supplier={purchase.supplier}
+          draft={aiPurchase}
+          onClose={() => {
+            setPurchase({ open: false, supplier: null });
+            setAiPurchase(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 };

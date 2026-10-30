@@ -1,99 +1,74 @@
 .button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: 8px;
   height: 40px;
   padding: 0 18px;
-  border-radius: var(--radius-sm);
   border: 1px solid transparent;
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  cursor: pointer;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
   white-space: nowrap;
-  user-select: none;
-  transition:
-    background var(--t-base) var(--ease),
-    border-color var(--t-base) var(--ease),
-    box-shadow var(--t-base) var(--ease),
-    color var(--t-base) var(--ease),
-    transform var(--t-fast) var(--ease);
-}
-.button:focus-visible {
-  box-shadow: var(--focus-ring);
-}
-.button:active:not(:disabled) {
-  transform: translateY(1px);
+  cursor: pointer;
+  transition: background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease;
 }
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+}
+.loading:disabled {
+  opacity: 0.8;
+  cursor: progress;
 }
 .primary {
-  background: var(--forest);
-  color: var(--on-forest);
-  box-shadow: var(--inset-top), var(--elev-1);
+  background: var(--sprout);
+  color: var(--sprout-ink);
 }
 .primary:hover:not(:disabled) {
   background: var(--leaf);
-  color: var(--on-forest);
-  box-shadow: var(--inset-top), var(--elev-2);
-}
-.primary:active:not(:disabled) {
-  box-shadow: var(--elev-1);
 }
 .secondary {
   background: var(--surface);
-  color: var(--ink);
   border-color: var(--line-strong);
-  font-weight: 550;
-  padding: 0 16px;
-  box-shadow: var(--elev-1);
+  color: var(--ink);
 }
 .secondary:hover:not(:disabled) {
-  background: var(--surface-2);
-  border-color: var(--muted-2);
-  box-shadow: var(--elev-2);
+  background: var(--hover);
 }
 .ghost {
   background: transparent;
   color: var(--ink-2);
-  font-weight: 550;
 }
 .ghost:hover:not(:disabled) {
   background: var(--hover);
   color: var(--ink);
 }
 .danger {
-  background: var(--bad-tag-bg);
-  color: var(--bad-tag-fg);
+  background: var(--surface);
   border-color: var(--bad-line);
+  color: var(--bad);
 }
 .danger:hover:not(:disabled) {
-  background: var(--bad-line);
+  background: var(--bad-soft);
 }
 .accent {
-  background: var(--harvest);
-  color: var(--on-harvest);
-  box-shadow: var(--inset-top), var(--elev-1);
+  background: var(--forest);
+  color: var(--on-forest);
 }
 .accent:hover:not(:disabled) {
-  filter: brightness(1.05);
-  box-shadow: var(--inset-top), var(--elev-2);
+  background: var(--forest-fg);
 }
 .sm {
   height: 32px;
-  padding: 0 12px;
-  font-size: var(--text-sm);
-  border-radius: 8px;
+  padding: 0 13px;
+  font-size: 13px;
 }
 .lg {
-  height: 48px;
+  height: 46px;
   padding: 0 22px;
-  font-size: var(--text-lg);
+  font-size: 15px;
 }
 .block {
   width: 100%;

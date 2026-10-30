@@ -5,7 +5,6 @@ import { notify } from "@/stores/toasts";
 /** Claves de caché por entidad: invalidar la raíz refresca todos los listados de esa entidad. */
 export const keys = {
   session: ["session"] as const,
-  ai: ["ai"] as const,
   users: ["users"] as const,
   categories: ["categories"] as const,
   products: ["products"] as const,
@@ -16,9 +15,19 @@ export const keys = {
   audits: ["audits"] as const,
   reports: ["reports"] as const,
   financial: ["financial"] as const,
-  chat: ["chat"] as const,
-  notifications: ["notifications"] as const,
   contact: ["contact"] as const,
+  chat: ["chat"] as const,
+  ai: ["ai"] as const,
+  search: ["search"] as const,
+  comments: ["comments"] as const,
+  alarms: ["alarms"] as const,
+  notifications: ["notifications"] as const,
+  push: ["push"] as const,
+  library: ["library"] as const,
+  calendar: ["calendar"] as const,
+  orders: ["orders"] as const,
+  stockCounts: ["stockCounts"] as const,
+  payroll: ["payroll"] as const,
 };
 
 type MutationOptions<TData> = {
@@ -45,7 +54,9 @@ export const useApiMutation = <TVariables, TData>(fn: (variables: TVariables) =>
     },
     onSuccess: async (data) => {
       for (const key of options.invalidate ?? []) await queryClient.invalidateQueries({ queryKey: key });
-      if (options.success !== undefined) notify.success(typeof options.success === "function" ? options.success(data) : options.success);
+      // Un texto vacío no notifica (por ejemplo, cuando una pantalla registra varias operaciones y resume al final).
+      const text = options.success === undefined ? "" : typeof options.success === "function" ? options.success(data) : options.success;
+      if (text !== "") notify.success(text);
     },
     onError: (err) => {
       if (options.notifyError !== false) notify.error(err.message);

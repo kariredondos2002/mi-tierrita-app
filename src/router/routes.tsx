@@ -1,79 +1,35 @@
-import { TitaScreen } from "@/screens/Tita/TitaScreen";
-import { lazy } from "react";
 import type React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
-import { RedirectIfSession, RequireRole, RequireSession } from "./guards";
+import { lazy, Suspense } from "react";
+import { LandingFallback, LandingScreen, RedirectIfSession, RequireRole, RequireSession } from "./guards";
 import { rolesFor } from "./navigation";
 import { SigninScreen } from "@/screens/Signin/SigninScreen";
-const HomeScreen = lazy(() =>
-  import("@/screens/Home/HomeScreen").then((m) => ({ default: m.HomeScreen })),
-);
-const InventoryScreen = lazy(() =>
-  import("@/screens/Inventory/InventoryScreen").then((m) => ({
-    default: m.InventoryScreen,
-  })),
-);
-const BatchesScreen = lazy(() =>
-  import("@/screens/Batches/BatchesScreen").then((m) => ({
-    default: m.BatchesScreen,
-  })),
-);
-const SalesScreen = lazy(() =>
-  import("@/screens/Sales/SalesScreen").then((m) => ({
-    default: m.SalesScreen,
-  })),
-);
-const CustomersScreen = lazy(() =>
-  import("@/screens/Customers/CustomersScreen").then((m) => ({
-    default: m.CustomersScreen,
-  })),
-);
-const SuppliersScreen = lazy(() =>
-  import("@/screens/Suppliers/SuppliersScreen").then((m) => ({
-    default: m.SuppliersScreen,
-  })),
-);
-const FinanceScreen = lazy(() =>
-  import("@/screens/Finance/FinanceScreen").then((m) => ({
-    default: m.FinanceScreen,
-  })),
-);
-const ReportsScreen = lazy(() =>
-  import("@/screens/Reports/ReportsScreen").then((m) => ({
-    default: m.ReportsScreen,
-  })),
-);
-const UsersScreen = lazy(() =>
-  import("@/screens/Users/UsersScreen").then((m) => ({
-    default: m.UsersScreen,
-  })),
-);
-const AuditsScreen = lazy(() =>
-  import("@/screens/Audits/AuditsScreen").then((m) => ({
-    default: m.AuditsScreen,
-  })),
-);
+import { HomeScreen } from "@/screens/Home/HomeScreen";
+import { InventoryScreen } from "@/screens/Inventory/InventoryScreen";
+import { BatchesScreen } from "@/screens/Batches/BatchesScreen";
+import { SalesScreen } from "@/screens/Sales/SalesScreen";
+import { CustomersScreen } from "@/screens/Customers/CustomersScreen";
+import { SuppliersScreen } from "@/screens/Suppliers/SuppliersScreen";
+import { FinanceScreen } from "@/screens/Finance/FinanceScreen";
+import { ReportsScreen } from "@/screens/Reports/ReportsScreen";
+import { UsersScreen } from "@/screens/Users/UsersScreen";
+import { AuditsScreen } from "@/screens/Audits/AuditsScreen";
+import { ProfileScreen } from "@/screens/Profile/ProfileScreen";
+import { ChatScreen } from "@/screens/Chat/ChatScreen";
+import { TitaScreen } from "@/screens/Tita/TitaScreen";
+import { ContactsScreen } from "@/screens/Contacts/ContactsScreen";
+import { LibraryScreen } from "@/screens/Library/LibraryScreen";
+import { AlarmsScreen } from "@/screens/Alarms/AlarmsScreen";
+import { CalendarScreen } from "@/screens/Calendar/CalendarScreen";
+import { OrdersScreen } from "@/screens/Orders/OrdersScreen";
+import { PayrollScreen } from "@/screens/Payroll/PayrollScreen";
+import { StockCountsScreen } from "@/screens/StockCounts/StockCountsScreen";
+import { TitaManualScreen } from "@/screens/Help/TitaManualScreen";
 import { NotFoundScreen } from "@/screens/Restricted/RestrictedScreen";
-import { Suspense } from "react";
-const LandingScreen = lazy(() =>
-  import("@/screens/Landing/LandingScreen").then((m) => ({
-    default: m.LandingScreen,
-  })),
-);
-const ChatScreen = lazy(() =>
-  import("@/screens/Chat/ChatScreen").then((m) => ({ default: m.ChatScreen })),
-);
-const ProfileScreen = lazy(() =>
-  import("@/screens/Profile/ProfileScreen").then((m) => ({
-    default: m.ProfileScreen,
-  })),
-);
-const ContactsScreen = lazy(() =>
-  import("@/screens/Contacts/ContactsScreen").then((m) => ({
-    default: m.ContactsScreen,
-  })),
-);
+
+/** Verificación pública de documentos (QR de la portada de los reportes), en su propio paquete. */
+const VerifyScreen = lazy(() => import("@/screens/Verify/VerifyScreen").then((m) => ({ default: m.VerifyScreen })));
 
 /** Cada ruta declara qué roles pueden verla (documento 07, sección 5). */
 const protectedRoute = (path: string, element: React.ReactElement) => ({
@@ -82,12 +38,19 @@ const protectedRoute = (path: string, element: React.ReactElement) => ({
 });
 
 export const router = createBrowserRouter([
-  // Página pública: también se puede abrir con sesión desde /sitio
   {
     path: "/sitio",
     element: (
-      <Suspense fallback={null}>
+      <Suspense fallback={<LandingFallback />}>
         <LandingScreen />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/verificar/:folio",
+    element: (
+      <Suspense fallback={<LandingFallback />}>
+        <VerifyScreen />
       </Suspense>
     ),
   },
@@ -104,35 +67,28 @@ export const router = createBrowserRouter([
           protectedRoute("/", <HomeScreen />),
           protectedRoute("/inventario", <InventoryScreen />),
           protectedRoute("/lotes", <BatchesScreen />),
-          {
-            element: <RequireRole roles={rolesFor("/ventas")} />,
-            children: [
-              { path: "/ventas", element: <SalesScreen /> },
-              { path: "/ventas/:tab", element: <SalesScreen /> },
-            ],
-          },
+          { element: <RequireRole roles={rolesFor("/ventas")} />, children: [{ path: "/ventas", element: <SalesScreen /> }, { path: "/ventas/:tab", element: <SalesScreen /> }] },
           protectedRoute("/clientes", <CustomersScreen />),
-          protectedRoute("/tita", <TitaScreen />),
           protectedRoute("/proveedores", <SuppliersScreen />),
-          {
-            element: <RequireRole roles={rolesFor("/finanzas")} />,
-            children: [
-              { path: "/finanzas", element: <FinanceScreen /> },
-              { path: "/finanzas/:tab", element: <FinanceScreen /> },
-            ],
-          },
+          { element: <RequireRole roles={rolesFor("/finanzas")} />, children: [{ path: "/finanzas", element: <FinanceScreen /> }, { path: "/finanzas/:tab", element: <FinanceScreen /> }] },
           protectedRoute("/reportes", <ReportsScreen />),
+          protectedRoute("/biblioteca", <LibraryScreen />),
+          protectedRoute("/nomina", <PayrollScreen />),
+          protectedRoute("/tita", <TitaScreen />),
+          protectedRoute("/chat", <ChatScreen />),
+          protectedRoute("/contactos", <ContactsScreen />),
+          protectedRoute("/alarmas", <AlarmsScreen />),
+          protectedRoute("/pedidos", <OrdersScreen />),
+          protectedRoute("/calendario", <CalendarScreen />),
+          protectedRoute("/conteos", <StockCountsScreen />),
           protectedRoute("/usuarios", <UsersScreen />),
           protectedRoute("/auditoria", <AuditsScreen />),
-          {
-            element: <RequireRole roles={rolesFor("/chat")} />,
-            children: [
-              { path: "/chat", element: <ChatScreen /> },
-              { path: "/chat/:userId", element: <ChatScreen /> },
-            ],
-          },
-          protectedRoute("/contactos", <ContactsScreen />),
-          protectedRoute("/perfil", <ProfileScreen />),
+          // Mi perfil: cualquier rol, fuera del menú (se abre desde el usuario de la barra superior).
+          { path: "/perfil", element: <ProfileScreen /> },
+          { path: "/perfil/:tab", element: <ProfileScreen /> },
+          // Manual de Tita: cualquier rol, fuera del menú (se abre desde Tita).
+          { path: "/ayuda/tita", element: <TitaManualScreen /> },
+          { path: "/ayuda/tita/:rol", element: <TitaManualScreen /> },
           { path: "*", element: <NotFoundScreen /> },
         ],
       },

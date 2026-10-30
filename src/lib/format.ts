@@ -31,7 +31,7 @@ export const dateOnly = (iso: string | null | undefined): string => {
   if (y === undefined || m === undefined || d === undefined) return iso;
   return new Date(y, m - 1, d).toLocaleDateString("es-CO", { dateStyle: "medium" });
 };
-/** Fecha local (no UTC) en AAAA-MM-DD: en Colombia, después de las 7 p. m. la fecha UTC ya es mañana. */
+/** Fecha de hoy YYYY-MM-DD en la hora local del equipo (no en UTC: a las 8 p. m. en Colombia sigue siendo hoy). */
 export const todayIso = (): string => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -43,21 +43,20 @@ export const addDaysIso = (iso: string, days: number): string => {
 };
 export const longToday = (): string =>
   new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" }).replace(/^\w/, (c) => c.toUpperCase());
+/** Fecha YYYY-MM-DD como Date local al mediodía (sin corrimientos por zona horaria). */
+const localNoon = (iso: string): Date => {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1, 12);
+};
+const capitalize = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
+/** «Octubre de 2026» a partir de cualquier día del mes. */
+export const monthYear = (iso: string): string => capitalize(localNoon(iso).toLocaleDateString("es-CO", { month: "long", year: "numeric" }));
+/** «jueves, 29 de octubre de 2026» (rótulos accesibles de un día). */
+export const dayLong = (iso: string): string => localNoon(iso).toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+/** «Jueves, 29 de octubre» (encabezado de un día en una agenda). */
+export const dayHeading = (iso: string): string => capitalize(localNoon(iso).toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" }));
 export const greeting = (): string => {
   const h = new Date().getHours();
   return h < 12 ? "Buenos días" : h < 18 ? "Buenas tardes" : "Buenas noches";
-};
-/** "12 sep" para ejes de gráficas. */
-export const shortDate = (iso: string): string => {
-  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
-  if (y === undefined || m === undefined || d === undefined) return iso;
-  return new Date(y, m - 1, d).toLocaleDateString("es-CO", { day: "numeric", month: "short" }).replace(".", "");
-};
-/** Abreviado para ejes: 2,5 M · 850 mil. */
-export const moneyAxis = (value: number): string => {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 }).format(value / 1_000_000)} M`;
-  if (abs >= 1_000) return `${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(value / 1_000)} mil`;
-  return integer.format(value);
 };
 export const initials = (first: string, last: string): string => `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();

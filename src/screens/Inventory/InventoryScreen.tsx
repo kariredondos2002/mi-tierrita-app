@@ -1,7 +1,7 @@
-import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Badge, Button, Card, Checkbox, Chips, DataTable, EmptyState, Input, Modal, Pagination, QueryState, type Column } from "@/components/ui";
+import { Badge, Button, Card, Checkbox, Chips, DataTable, EmptyState, Input, Modal, Pagination, QueryState, ViewSwitch, useViewMode, type Column, type ViewMode } from "@/components/ui";
 import { useCategories } from "@/hooks/categories";
 import { useDeactivateProduct, useProducts } from "@/hooks/products";
 import { int, money } from "@/lib/format";
@@ -15,14 +15,16 @@ import { ProductsByLineCard } from "./ProductsByLineCard";
 import { ProductFormModal } from "./ProductFormModal";
 import { ProductBatchesModal } from "./ProductBatchesModal";
 import { CategoriesModal } from "./CategoriesModal";
+import { ProductMosaic } from "./ProductMosaic";
+import { ProductList } from "./ProductList";
+import { expiredUnits, stockStatus } from "./stockStatus";
 import styles from "./InventoryScreen.module.css";
 
 const PAGE_SIZE = 20;
-const LOW_STOCK = 5;
 
-/** Estado de existencias del lienzo: la API no guarda mínimos, así que Crítico = sin stock y Bajo = menos de 5 unidades. */
-const stockStatus = (p: Product): { tone: "bad" | "warn" | "good" | "neutral"; label: string } =>
-  !p.active ? { tone: "neutral", label: "Inactivo" } : p.stock === 0 ? { tone: "bad", label: "Crítico" } : p.stock < LOW_STOCK ? { tone: "warn", label: "Bajo" } : { tone: "good", label: "Normal" };
+/** Vista preferida (`mi-tierrita:inventario-vista`); los valores antiguos «table» y «mosaic» siguen valiendo. */
+const VIEW_MODES: ViewMode[] = ["cards", "list", "table"];
+const OPEN_HINT: Record<ViewMode, string> = { cards: "una tarjeta", list: "una fila", table: "una fila" };
 
 /** CU-05 / RF-02 Inventario: existencias por producto, lotes y mantenimiento del catálogo según el rol. */
 export const InventoryScreen = () => {
@@ -32,11 +34,17 @@ export const InventoryScreen = () => {
   const canEdit = role === "ADMIN" || role === "WAREHOUSE";
 
   const [page, setPage] = useState(1);
-  const [category, setCategory] = useState(0);
-  // ?buscar= llega desde la búsqueda global (Ctrl + K)
+  // `?categoria=<id>` filtra por esa categoría (enlaces desde la columna «Origen» del reporte de inventario).
   const [params] = useSearchParams();
-  const [search, setSearch] = useState(() => params.get("buscar") ?? "");
-  const [debounced, setDebounced] = useState(() => params.get("buscar") ?? "");
+  const categoryParam = Number(params.get("categoria"));
+  const [category, setCategory] = useState(() => (Number.isInteger(categoryParam) && categoryParam > 0 ? categoryParam : 0));
+  // `?buscar=<sku>`: la paleta (Ctrl+K) abre el inventario ya filtrado por el producto elegido.
+  const paramSearch = params.get("buscar") ?? "";
+  const [search, setSearch] = useState(paramSearch);
+  const [debounced, setDebounced] = useState(paramSearch.trim());
+  useEffect(() => {
+    if (paramSearch !== "") setSearch(paramSearch);
+  }, [paramSearch]);
   const [showInactive, setShowInactive] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -44,6 +52,7 @@ export const InventoryScreen = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [deactivating, setDeactivating] = useState<Product | null>(null);
+  const [view, setView] = useViewMode("inventario", VIEW_MODES, "table");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -81,19 +90,10 @@ export const InventoryScreen = () => {
   };
 
   const columns: Column<Product>[] = [
-    { key: "sku", header: "Código", mobile: false, render: (p) => <span className={styles.code}>{p.sku}</span> },
-    {
-      key: "name",
-      header: "Producto",
-      align: "left",
-      render: (p) => (
-        <span className={styles.productCell}>
-          <span className={styles.productName}>{p.name}</span>
-          <span className={styles.productLine}>{p.categoryName}</span>
-        </span>
-      ),
-    },
-    { key: "stock", header: "Stock", align: "right", render: (p) => int(p.stock) },
+    { key: "sku", header: "Código", render: (p) => <span className={styles.code}>{p.sku}</span> },
+    { key: "name", header: "Producto", align: "left", render: (p) => <span className={styles.productName}>{p.name}</span> },
+    { key: "category", header: "Línea", align: "left", render: (p) => p.categoryName },
+    { key: "stock", header: "Stock", align: "right", render: (p) => (expiredUnits(p) > 0 ? `${int(p.stock)} (${int(expiredUnits(p))} vencidas)` : int(p.stock)) },
     { key: "price", header: "Precio", align: "right", render: (p) => money(p.salePrice) },
     {
       key: "status",
@@ -174,7 +174,11 @@ export const InventoryScreen = () => {
       </div>
 
       <div className={styles.grid}>
-        <Card title="Existencias" subtitle={products.data ? `${int(products.data.count)} ${products.data.count === 1 ? "producto" : "productos"} · clic en una fila para ver sus lotes` : undefined}>
+        <Card
+          title="Existencias"
+          subtitle={products.data ? `${int(products.data.count)} ${products.data.count === 1 ? "producto" : "productos"} · clic en ${OPEN_HINT[view]} para ver sus lotes` : undefined}
+          actions={<ViewSwitch value={view} onChange={setView} modes={VIEW_MODES} ariaLabel="Vista de existencias" />}
+        >
           <QueryState
             query={products}
             isEmpty={(data) => data.items.length === 0}
@@ -206,7 +210,13 @@ export const InventoryScreen = () => {
           >
             {(data) => (
               <>
-                <DataTable columns={columns} rows={data.items} rowKey={(p) => p.id} onRowClick={setBatchesProduct} />
+                {view === "cards" ? (
+                  <ProductMosaic products={data.items} canEdit={canEdit} isAdmin={isAdmin} onOpen={setBatchesProduct} onEdit={openEdit} onDeactivate={setDeactivating} />
+                ) : view === "list" ? (
+                  <ProductList products={data.items} onOpen={setBatchesProduct} />
+                ) : (
+                  <DataTable columns={columns} rows={data.items} rowKey={(p) => p.id} onRowClick={setBatchesProduct} />
+                )}
                 <Pagination page={data} onPage={setPage} />
               </>
             )}

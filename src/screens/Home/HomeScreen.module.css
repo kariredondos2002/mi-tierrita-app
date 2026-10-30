@@ -1,97 +1,14 @@
-/* Inicio: rejillas, listas de pendientes y tarjeta de decisión, con las medidas del lienzo. */
+/* Inicio: rejillas, listas de pendientes, resumen de la portada y tarjeta de decisión. */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
-  gap: 18px;
-  align-items: stretch;
-}
-.grid3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  align-items: stretch;
-}
-@media (max-width: 1280px) {
-  .grid3 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.trendFoot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 22px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line-soft);
-  font-size: 12.5px;
-  color: var(--muted);
-}
-.trendFoot strong {
-  color: var(--ink);
-  font-weight: 700;
-}
-.cardLink {
-  font-size: 12.5px;
-  font-weight: 650;
-  text-decoration: none;
-}
-.debtors {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.debtorTop {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 13px;
-}
-.debtorName {
-  font-weight: 600;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.debtorBar {
-  height: 7px;
-  border-radius: 999px;
-  background: var(--surface-3);
-  margin: 6px 0 4px;
-  overflow: hidden;
-}
-.debtorBar span {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--chart-1);
-}
-.debtorBar .debtorWarn {
-  background: var(--harvest);
-}
-.debtorBar .debtorBad {
-  background: var(--bad);
-}
-.debtorMeta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.gridEven {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 12px;
   align-items: start;
 }
 .column {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
 }
 .strong {
@@ -100,46 +17,56 @@
 }
 .time {
   color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .note {
-  font-size: 12.5px;
-  color: var(--ink-2);
+  font-size: 13px;
+  color: var(--muted);
   border-top: 1px solid var(--line-soft);
-  padding-top: 9px;
-  margin-top: 4px;
+  padding-top: 10px;
+  margin-top: 6px;
 }
+
+/* ---------- lista de pendientes ---------- */
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 9px;
 }
 .listBoxed {
-  gap: 10px;
-  margin-top: 1px;
+  gap: 6px;
 }
 .item {
   display: flex;
   gap: 10px;
   align-items: center;
   text-decoration: none;
-  color: inherit;
-  font-size: 12.5px;
+  color: var(--ink);
+  font-size: 14px;
+  padding: 9px 8px;
+  margin: 0 -8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur) var(--ease-out);
 }
 .item:hover {
-  color: inherit;
+  color: var(--ink);
+  background: var(--hover);
+}
+.item:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 1px;
+}
+.list:not(.listBoxed) > li + li {
+  border-top: 1px solid var(--line-soft);
 }
 .itemBoxed {
-  gap: 11px;
-  background: var(--surface-2);
-  border-radius: 8px;
-  padding: 11px 13px;
-}
-.itemBoxed:hover {
-  background: var(--surface-3);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
 }
 .dot {
   width: 8px;
@@ -154,106 +81,385 @@
   background: var(--warn);
 }
 .dotNeutral {
-  background: var(--muted);
+  background: var(--muted-2);
 }
 .itemText {
   flex-grow: 1;
   min-width: 0;
 }
 .allGood {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--good);
 }
 .blockError {
-  font-size: 12.5px;
-  color: var(--bad-tag-fg);
+  font-size: 13px;
+  color: var(--bad);
   margin-top: 8px;
 }
-/* Tarjeta «Decisión abierta» (DSS): degradado verde bosque con textura de surcos. */
+
+/* ---------- tarjeta "Decisión abierta" ---------- */
 .decision {
-  position: relative;
   display: block;
   text-decoration: none;
-  color: inherit;
-  background:
-    linear-gradient(140deg, rgba(18, 19, 21, 0.9), rgba(18, 19, 21, 0.7)), url("/img/amanecer-pradera.webp") center / cover;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 20px 22px;
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  --decision-label: rgba(255, 255, 255, 0.62);
-  --decision-text: rgba(255, 255, 255, 0.8);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
 }
-.decision:hover {
-  color: inherit;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-pop);
+.decisionLink {
+  transition: border-color var(--dur) var(--ease-out);
 }
-.decision::after {
-  content: "";
-  position: absolute;
-  right: -40px;
-  top: -40px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(159, 212, 180, 0.35), transparent 70%);
+.decisionLink:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.decisionLink:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+}
+.decisionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 .decisionLabel {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--lime);
+  font-size: 13px;
+  color: var(--muted);
+}
+.verdict {
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.verdictGood {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.verdictBad {
+  background: var(--bad-tag-bg);
+  color: var(--bad-tag-fg);
 }
 .decisionTitle {
-  font-family: var(--font-heading);
-  font-size: 25px;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
   margin-top: 6px;
 }
 .decisionText {
-  font-size: 12.5px;
-  color: var(--decision-text);
-  margin-top: 8px;
-  line-height: 1.55;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.decisionCta {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--link);
 }
 .decisionMetrics {
   display: flex;
-  gap: 22px;
-  margin-top: 14px;
+  gap: 32px;
+  margin: 14px 0 0;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--line-soft);
+}
+.decisionMetrics dd {
+  margin: 0;
 }
 .metricLabel {
-  display: block;
-  font-size: 11px;
-  color: var(--decision-label);
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 2px;
 }
 .metricValue {
   font-size: 18px;
-  font-weight: 750;
-  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
 }
 .metricGood {
-  color: var(--lime);
+  color: var(--good);
+}
+.metricBad {
+  color: var(--bad);
 }
 
-@media (max-width: 980px) {
-  .grid,
-  .grid3,
-  .gridEven {
+/* ---------- resumen de pendientes en la portada ---------- */
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+.statusTop {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.statusCount {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.statusLabel {
+  font-size: 13px;
+  color: var(--muted);
+}
+.statusClear {
+  font-size: 13px;
+  color: var(--good);
+}
+.statusList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.statusList > li + li {
+  border-top: 1px solid var(--line-soft);
+}
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 0;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease-out);
+}
+.statusItem:hover {
+  color: var(--ink);
+}
+.statusItem:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.statusMore {
+  align-self: flex-start;
+  margin-top: auto;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--link);
+}
+.statusMore:hover {
+  text-decoration: underline;
+}
+.statusMore:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 1000px) {
+  .grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* carrusel de accesos visuales */
-.carouselWrap {
+/* ---------- rejilla del tablero (tres columnas, como en la referencia) ---------- */
+.dash {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.dash > * {
   min-width: 0;
+}
+.span2 {
+  grid-column: span 2;
+  display: flex;
+}
+.span2 > * {
+  flex: 1;
+}
+@media (max-width: 1100px) {
+  .dash {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .dash {
+    grid-template-columns: 1fr;
+  }
+  .span2 {
+    grid-column: auto;
+  }
+}
+
+/* ---------- tarjeta destacada con degradado (pendientes) ---------- */
+.spot {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--sprout) 45%, transparent), transparent 60%),
+    linear-gradient(150deg, color-mix(in srgb, var(--sprout) 30%, var(--surface)) 0%, var(--sprout-soft) 55%, var(--surface) 100%);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.spotEyebrow {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--forest);
+}
+.spotTitle {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.spotText {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.spotList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.spotItem {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--ink);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color var(--dur) ease;
+}
+.spotItem:hover {
+  background: var(--surface);
+}
+.spotTag {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.spotBtn {
+  margin-top: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--shadow-ink) 35%, transparent);
+}
+
+/* ---------- actividad ---------- */
+.cardLink {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--forest);
+  text-decoration: none;
+}
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.activityRow {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+}
+.avA {
+  background: var(--sprout);
+}
+.avB {
+  background: var(--forest);
+}
+.avC {
+  background: var(--warn);
+}
+.avD {
+  background: var(--ink-2);
+}
+.activityText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.activityText strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activityText small {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.activityAmount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--good);
+  font-variant-numeric: tabular-nums;
+}
+.amountCredit {
+  color: var(--warn);
+}
+.amountVoid {
+  color: var(--muted);
 }

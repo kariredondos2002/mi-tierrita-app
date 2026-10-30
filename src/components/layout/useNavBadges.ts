@@ -5,9 +5,9 @@ import { reportsService } from "@/services/reports";
 import { batchesService } from "@/services/batches";
 import { productsService } from "@/services/products";
 import { customersService } from "@/services/customers";
+import { contactService } from "@/services/contact";
+import { useChatTeam } from "@/hooks/chat";
 import type { NavItem } from "@/router/navigation";
-import { useUnreadMessages } from "@/hooks/chat";
-import { useContactMessages } from "@/hooks/contact";
 
 /**
  * Insignias del menú (como en el lienzo: Inventario 6, Lotes 3, Clientes 2).
@@ -47,12 +47,19 @@ export const useNavBadges = (): Partial<Record<NonNullable<NavItem["badge"]>, nu
     staleTime: 60_000,
   });
 
-  const messages = useUnreadMessages(role !== undefined);
-  const contact = useContactMessages(isAdmin);
+  const contact = useQuery({
+    queryKey: [...keys.contact, { status: "NEW", limit: 1 }],
+    queryFn: () => contactService.list({ status: "NEW", limit: 1 }),
+    enabled: isAdmin,
+    staleTime: 60_000,
+  });
+
+  // Mensajes sin leer del chat (se refresca con los avisos en vivo); la consulta periódica mantiene a la persona "en línea".
+  const chat = useChatTeam(30_000, { enabled: role !== undefined });
 
   return {
-    messages: messages.data,
-    contact: contact.data?.filter((c) => !c.handled).length,
+    chat: chat.data?.unreadTotal,
+    contact: contact.data?.count,
     inventory: isAdmin ? inventory.data?.outOfStock : products.data?.items.filter((p) => p.stock === 0).length,
     batches: batches.data?.count,
     customers: isAdmin ? receivables.data?.overdueCustomers : withBalance.data?.count,

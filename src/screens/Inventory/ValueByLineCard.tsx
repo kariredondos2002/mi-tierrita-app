@@ -1,5 +1,5 @@
 import { Card, EmptyState, ErrorState, Loading } from "@/components/ui";
-import { HBarChart } from "@/components/charts";
+import { VBarChart } from "@/components/charts";
 import { useInventoryReport } from "@/hooks/reports";
 import { int, money, moneyCompact } from "@/lib/format";
 import styles from "./InventoryScreen.module.css";
@@ -21,7 +21,7 @@ export const ValueByLineCard = () => {
           const top = rows[0]!;
           return (
             <>
-              <HBarChart stacked data={rows.slice(0, 6).map((c) => ({ label: c.categoryName, value: c.costValue }))} format={moneyCompact} />
+              <VBarChart data={rows.slice(0, 6).map((c) => ({ label: c.categoryName, value: c.costValue }))} format={moneyCompact} />
               <p className={styles.note}>
                 {top.categoryName} es la línea con más capital en bodega: {money(top.costValue)} en {int(top.products)} {top.products === 1 ? "producto" : "productos"} y {int(top.units)} unidades.
               </p>

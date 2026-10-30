@@ -1,0 +1,168 @@
+/* Estante FEFO: rejilla plana de casillas por lote coloreadas por tramo de vencimiento, leyenda y detalle. */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* Tramos */
+.sExpired {
+  --cell-bg: var(--bad-tag-bg);
+  --cell-line: var(--bad-line);
+  --cell-fg: var(--bad-tag-fg);
+  --swatch: var(--bad);
+}
+.sWeek {
+  --cell-bg: var(--bad-soft);
+  --cell-line: var(--bad-line);
+  --cell-fg: var(--bad);
+  --swatch: var(--bad-line);
+}
+.sMonth {
+  --cell-bg: var(--warn-soft);
+  --cell-line: var(--warn-line);
+  --cell-fg: var(--warn-tag-fg);
+  --swatch: var(--warn);
+}
+.sLater {
+  --cell-bg: var(--good-soft);
+  --cell-line: var(--good-line);
+  --cell-fg: var(--forest);
+  --swatch: var(--good);
+}
+
+.cell,
+.empty {
+  height: 34px;
+  border-radius: var(--radius-sm);
+}
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--cell-bg);
+  border: 1px solid var(--cell-line);
+  color: var(--cell-fg);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+  cursor: default;
+  outline: none;
+  transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+.cell:hover,
+.cellActive {
+  border-color: var(--cell-fg);
+}
+.cell:focus-visible {
+  box-shadow: 0 0 0 2px var(--sprout);
+}
+.empty {
+  border: 1px dashed var(--line);
+}
+.more {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Leyenda y detalle */
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.legendItem:last-child {
+  border-bottom: none;
+}
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--swatch);
+  flex-shrink: 0;
+}
+.legendLabel {
+  flex: 1;
+}
+.legendValue {
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.detail {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.detailLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.detailProduct {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.detailRows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.detailRows dt {
+  color: var(--muted);
+}
+.detailRows dd {
+  margin: 0;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}

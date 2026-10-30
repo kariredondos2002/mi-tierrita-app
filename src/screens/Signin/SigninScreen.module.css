@@ -1,239 +1,272 @@
+/*
+ * Iniciar sesión con el lenguaje de la app (Clerio en verde pastel): panel redondeado con la franja verde, la marca, el
+ * abanico de vidrio y lo que hace el sistema a la izquierda; formulario limpio sobre blanco a la derecha.
+ */
 .page {
   min-height: 100vh;
-  display: flex;
-  background: var(--ground);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
 }
-.hero {
+
+/* ---------- panel verde ---------- */
+.panel {
   position: relative;
-  width: min(52vw, 760px);
-  flex-shrink: 0;
-  background-color: var(--app-bg);
-  color: #ffffff;
-  padding: 44px 56px;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  isolation: isolate;
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 40px 44px;
+  border-radius: var(--radius-panel);
+  color: var(--on-band);
   background:
-    linear-gradient(90deg, rgba(18, 19, 21, 0.82) 0%, rgba(18, 19, 21, 0.5) 60%, rgba(18, 19, 21, 0.2) 100%),
-    linear-gradient(0deg, rgba(18, 19, 21, 0.7), transparent 45%);
+    radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--white) 22%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
 }
 .brand {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.brandName {
-  font-family: var(--font-heading);
-  font-size: 38px;
-  font-weight: 700;
-  line-height: 1;
-  color: #ffffff;
-  letter-spacing: -0.015em;
-}
-.brandSub {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.78);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-.heroBody {
-  position: relative;
-  margin-top: auto;
-  margin-bottom: auto;
-  padding-top: 40px;
-  max-width: 560px;
-}
-.heroBody h1 {
-  color: #ffffff;
-  font-size: clamp(48px, 5.2vw, 76px);
-  line-height: 0.98;
-  letter-spacing: 0.01em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
-}
-.heroBody h1 span {
-  color: var(--lime);
-}
-.script {
-  font-family: var(--font-script);
-  font-size: 22px;
-  line-height: 1.35;
-  color: #ffffff;
-  margin-top: 18px;
-  max-width: 440px;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
-}
-.features {
-  list-style: none;
-  padding: 0;
-  margin: 26px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
-}
-.features li {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.features b {
-  display: inline-grid;
-  place-items: center;
-  min-width: 48px;
-  height: 26px;
-  border-radius: 4px;
+.brandName {
   font-family: var(--font-heading);
-  font-weight: 700;
   font-size: 17px;
-  letter-spacing: -0.015em;
-  background: var(--lime);
-  color: #121315;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
-.heroFoot {
-  position: relative;
-  margin-top: auto;
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.72);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.brandSub {
+  font-size: 13px;
+  color: var(--on-band-muted);
 }
+/* El abanico asoma detrás del titular, como en el Inicio. */
+.fan {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: -1;
+  transform: translate(-50%, -50%) scale(1.25);
+}
+.pitchBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.pitch {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(36px, 4.2vw, 64px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+.features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.features li {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--band-glass-line);
+  background: var(--band-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 500;
+}
+.credit,
+.creditMobile {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--on-band-muted);
+}
+.creditMobile {
+  display: none;
+  max-width: 400px;
+  margin-top: 28px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---------- formulario ---------- */
 .formSide {
   position: relative;
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 72px 32px 40px;
 }
-.form {
-  width: 420px;
-  max-width: 100%;
+.back {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--dur) ease, color var(--dur) ease;
+}
+.back:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.back:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+}
+.card {
+  width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 34px 34px 28px;
-  box-shadow: var(--shadow-card);
 }
-.formHead h2 {
-  font-family: var(--font-heading);
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-}
-.formHead p {
-  color: var(--ink-2);
-  margin-top: 6px;
-}
-.passwordWrap {
+.head {
   display: flex;
-  align-items: center;
-  height: 46px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  overflow: hidden;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
 }
-.passwordWrap:focus-within {
-  border-color: var(--leaf);
-  box-shadow: 0 0 0 4px var(--sprout-soft);
-}
-.passwordWrapError {
-  border-color: var(--bad);
-}
-.passwordWrap input {
-  flex-grow: 1;
-  height: 100%;
-  border: none;
-  background: transparent;
-  padding: 0 13px;
-  font-size: 14px;
-  min-width: 0;
-  outline: none;
-}
-.eye {
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-2);
-}
-.input {
-  height: 46px;
-  font-size: 14px;
-}
-.help {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.6;
-  text-align: center;
-}
-
-@media (max-width: 960px) {
-  .page {
-    flex-direction: column;
-  }
-  .hero {
-    width: auto;
-    min-height: 420px;
-    padding: 26px 22px 30px;
-  }
-  .heroBody {
-    padding-top: 30px;
-  }
-  .heroBody h1 {
-    font-size: 46px;
-  }
-  .script {
-    font-size: 19px;
-  }
-  .heroFoot,
-  .features {
-    display: none;
-  }
-  .formSide {
-    padding: 20px 16px 40px;
-  }
-  .form {
-    padding: 26px 20px;
-  }
-}
-.backSite {
-  position: absolute;
-  top: 26px;
-  right: 32px;
+.eyebrow {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sprout-soft);
+  color: var(--forest);
   font-size: 13px;
   font-weight: 600;
-  color: var(--link);
-  text-decoration: none;
 }
-.backSite:hover {
-  text-decoration: underline;
+.title {
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 3vw, 44px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--ink);
 }
-@media (max-width: 960px) {
-  .backSite {
+.lead {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+.alert:empty {
+  display: none;
+}
+/* Campos un poco más altos que en la app: es la única tarea de la pantalla. */
+.card input {
+  height: 48px;
+  font-size: 15px;
+}
+
+/* contraseña: el botón de mostrar queda fuera de la etiqueta, encima del campo */
+.passwordWrap {
+  position: relative;
+}
+.passwordWrap .passwordInput {
+  padding-right: 48px;
+}
+.eye {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--dur) ease, background-color var(--dur) ease;
+}
+.eye:hover {
+  color: var(--ink);
+  background: var(--hover);
+}
+.eye:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 1px;
+  color: var(--ink);
+}
+.caps {
+  margin: -10px 0 0;
+  font-size: 12.5px;
+  color: var(--warn);
+}
+.help {
+  margin: 4px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---------- pantallas angostas: el panel se vuelve una franja arriba ---------- */
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    padding: 12px;
+  }
+  .panel {
+    gap: 18px;
+    padding: 22px 22px 26px;
+  }
+  .fan {
+    top: auto;
+    bottom: -150px;
+    left: auto;
+    right: -140px;
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  .pitch {
+    font-size: clamp(30px, 8vw, 40px);
+  }
+  /* En el teléfono el panel es solo marca y titular: el formulario debe quedar a la vista sin desplazar. */
+  .features,
+  .credit {
+    display: none;
+  }
+  .creditMobile {
+    display: block;
+  }
+  .formSide {
+    justify-content: flex-start;
+    padding: 28px 8px 32px;
+  }
+  .formSide {
+    padding-top: 20px;
+  }
+  .back {
     position: static;
-    align-self: flex-start;
-    margin-bottom: 14px;
+    align-self: flex-end;
+    height: 36px;
+    margin-bottom: 8px;
+    font-size: 13px;
   }
 }

@@ -1,0 +1,227 @@
+/* Historial de ventas: tarjeta blanca con las ventas agrupadas por día, una fila por venta. */
+.wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-width: 0;
+  overflow: hidden;
+}
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.lead {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.emptyActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pager {
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.pager:empty {
+  display: none;
+}
+
+/* ---------- días ---------- */
+.days {
+  display: flex;
+  flex-direction: column;
+}
+.dayHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.day + .day .dayHead {
+  border-top: 1px solid var(--line);
+}
+.dayName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dayName::first-letter {
+  text-transform: uppercase;
+}
+.dayTag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--sprout-soft);
+  color: var(--forest-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------- filas ---------- */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.item + .item {
+  border-top: 1px solid var(--line-soft);
+}
+.ticket {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto auto 16px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  transition: background var(--dur) ease;
+}
+.ticket:hover {
+  background: var(--hover);
+}
+.ticket:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: -2px;
+}
+.time {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.invoice {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.customer {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.by {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.pay {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.payCash {
+  background: var(--good-soft);
+  color: var(--good);
+  border: 1px solid var(--good-line);
+}
+.payCredit {
+  background: var(--warn-tag-bg);
+  color: var(--warn-tag-fg);
+  border: 1px solid var(--warn-line);
+}
+.amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  min-width: 96px;
+}
+.amount strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stateOk,
+.stateVoid {
+  font-size: 12.5px;
+}
+.stateOk {
+  color: var(--muted);
+}
+.stateVoid {
+  color: var(--bad);
+}
+.chevron {
+  display: flex;
+  color: var(--muted-2);
+  transition: color var(--dur) ease;
+}
+.ticket:hover .chevron {
+  color: var(--ink);
+}
+
+/* Anulada: texto atenuado y total tachado. */
+.voided .customer {
+  color: var(--ink-2);
+}
+.voided .amount strong {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--bad);
+}
+
+@media (max-width: 640px) {
+  .ticket {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time body amount"
+      "time pay amount";
+    gap: 4px 12px;
+  }
+  .time {
+    grid-area: time;
+  }
+  .body {
+    grid-area: body;
+  }
+  .pay {
+    grid-area: pay;
+    justify-self: start;
+  }
+  .amount {
+    grid-area: amount;
+    min-width: 0;
+  }
+  .chevron {
+    display: none;
+  }
+}

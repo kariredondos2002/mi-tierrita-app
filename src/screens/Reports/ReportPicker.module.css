@@ -1,0 +1,57 @@
+/* Tarjeta seleccionable de reporte: superficie blanca; la seleccionada lleva borde y fondo verde suave. */
+.picker {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 14px 16px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
+}
+@media (hover: hover) {
+  .picker:hover {
+    border-color: var(--line-strong);
+    background: var(--hover);
+  }
+}
+.picker:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+}
+.selected,
+.selected:hover {
+  border-color: var(--sprout);
+  background: var(--sprout-soft);
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.check {
+  flex-shrink: 0;
+  color: var(--sprout);
+}
+.text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.foot {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}

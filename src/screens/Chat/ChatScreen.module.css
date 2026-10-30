@@ -1,0 +1,168 @@
+/* Chat: tres paneles blancos (conversaciones, conversación activa y equipo / hilo / fijados) con borde fino. */
+.layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 240px;
+  gap: 12px;
+  align-items: start;
+}
+.withPanel {
+  grid-template-columns: 250px minmax(0, 1fr) 360px;
+}
+
+.room {
+  display: flex;
+  flex-direction: column;
+  height: max(460px, calc(100vh - 300px));
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.roomHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.roomTitle {
+  flex: 1;
+  min-width: 0;
+}
+/* "Atrás" solo existe en pantallas angostas, donde la sala tapa la bandeja. */
+.back {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--forest);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.back:hover {
+  background: var(--hover);
+}
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.headBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.roomTitle h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.roomTitle span {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hash {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--sprout-soft);
+  color: var(--forest);
+  font-weight: 600;
+}
+/* Estado de la conexión en vivo. */
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--warn);
+}
+.live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.liveOn {
+  color: var(--good);
+}
+
+.deleteQuote {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 160px;
+  overflow: auto;
+}
+
+@media (max-width: 1180px) {
+  .layout,
+  .withPanel {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .layout,
+  .withPanel {
+    grid-template-columns: 1fr;
+  }
+  .live {
+    display: none;
+  }
+  .headBtn span {
+    display: none;
+  }
+  .headBtn {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .roomHead {
+    gap: 8px;
+    padding: 10px 10px 10px 6px;
+  }
+  .back {
+    display: inline-flex;
+  }
+  /* Sin conversación abierta solo se ve la bandeja; con una abierta, la sala (montada en body con un portal) tapa toda
+     la pantalla, barra del armazón incluida; los paneles laterales y los modales viven dentro de ella. */
+  .room {
+    display: none;
+  }
+  .room.roomFull {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .roomOpen > :first-child {
+    display: none;
+  }
+}

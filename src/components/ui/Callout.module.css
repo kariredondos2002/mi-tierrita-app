@@ -1,23 +1,23 @@
 .callout {
-  border-radius: var(--radius-panel);
-  padding: 18px 24px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  padding: 16px 18px;
   border: 1px solid var(--line);
-  box-shadow: var(--elev-1);
   display: flex;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
-  flex-wrap: wrap;
 }
 .good {
-  background: linear-gradient(120deg, var(--good-soft), var(--surface) 140%);
+  background: var(--good-soft);
   border-color: var(--good-line);
 }
 .warn {
-  background: linear-gradient(120deg, var(--warn-soft), var(--surface) 140%);
+  background: var(--warn-soft);
   border-color: var(--warn-line);
 }
 .bad {
-  background: linear-gradient(120deg, var(--bad-soft), var(--surface) 140%);
+  background: var(--bad-soft);
   border-color: var(--bad-line);
 }
 .neutral {
@@ -28,18 +28,42 @@
   flex-direction: column;
   gap: 4px;
   flex: 1;
-  min-width: 220px;
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--ink-2);
 }
 .title {
   font-family: var(--font-heading);
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1.15;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
   letter-spacing: -0.015em;
   color: var(--ink);
 }
 .mark {
   flex-shrink: 0;
+  animation: markIn 0.7s var(--ease-spring) backwards;
+}
+.check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: draw 0.8s var(--ease-out) 0.35s backwards;
+}
+@keyframes markIn {
+  from {
+    transform: scale(0.4) rotate(-30deg);
+    opacity: 0;
+  }
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }

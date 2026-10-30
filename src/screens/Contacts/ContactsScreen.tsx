@@ -1,49 +1,132 @@
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Badge, Button, Card, EmptyState, QueryState } from "@/components/ui";
-import { useContactMessages, useMarkContactHandled } from "@/hooks/contact";
-import { dateTime } from "@/lib/format";
+import { Badge, Button, Chips, EmptyState, Pagination, QueryState } from "@/components/ui";
+import { useContactMessages, useSetContactStatus } from "@/hooks/contact";
+import { useAiStatus } from "@/hooks/ai";
+import { useSessionStore } from "@/stores/session";
+import { AiDraftModal } from "@/components/ai/AiDraftModal";
+import { dateTime, int } from "@/lib/format";
+import type { ContactMessage, ContactStatus } from "@/types/api";
 import styles from "./ContactsScreen.module.css";
 
-/** Bandeja de los mensajes que llegan por el formulario de la página pública (solo ADMIN). */
+type Filter = "open" | ContactStatus;
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "NEW", label: "Por atender" },
+  { value: "open", label: "Todos" },
+  { value: "READ", label: "Atendidos" },
+  { value: "ARCHIVED", label: "Archivados" },
+];
+const STATUS: Record<ContactStatus, { label: string; tone: "warn" | "good" | "neutral" }> = {
+  NEW: { label: "Por atender", tone: "warn" },
+  READ: { label: "Atendido", tone: "good" },
+  ARCHIVED: { label: "Archivado", tone: "neutral" },
+};
+
+/** Enlace para responder por WhatsApp (Colombia por defecto si el número no trae indicativo). */
+const whatsappUrl = (phone: string, name: string): string => {
+  const digits = phone.replace(/\D/g, "");
+  const full = digits.length === 10 ? `57${digits}` : digits;
+  return `https://wa.me/${full}?text=${encodeURIComponent(`Hola ${name}, le escribimos de Agropecuaria Mi Tierrita sobre su mensaje.`)}`;
+};
+
+const Item = ({ m }: { m: ContactMessage }) => {
+  const setStatus = useSetContactStatus();
+  const role = useSessionStore((s) => s.user?.role);
+  const ai = useAiStatus();
+  const [draftOpen, setDraftOpen] = useState(false);
+  const canDraft = ai.enabled && role === "ADMIN";
+  const st = STATUS[m.status];
+  return (
+    <article className={[styles.item, m.status === "NEW" ? styles.isNew : ""].join(" ")}>
+      <header className={styles.itemHead}>
+        <strong className={styles.name}>{m.name}</strong>
+        <Badge tone={st.tone}>{st.label}</Badge>
+        {m.topic ? <span className={styles.topic}>{m.topic}</span> : null}
+        <time className={styles.date} dateTime={m.createdAt}>
+          {dateTime(m.createdAt)}
+        </time>
+      </header>
+      <p className={styles.body}>{m.body}</p>
+      <footer className={styles.itemFoot}>
+        <div className={styles.channels}>
+          {m.email ? <a href={`mailto:${m.email}`}>{m.email}</a> : null}
+          {m.phone ? (
+            <a href={whatsappUrl(m.phone, m.name)} target="_blank" rel="noreferrer">
+              {m.phone} · WhatsApp
+            </a>
+          ) : null}
+        </div>
+        <div className={styles.actions}>
+          {canDraft ? (
+            <Button size="sm" variant="secondary" onClick={() => setDraftOpen(true)}>
+              Sugerir respuesta
+            </Button>
+          ) : null}
+          {m.status === "NEW" ? (
+            <Button size="sm" variant="secondary" loading={setStatus.isPending} onClick={() => setStatus.mutate({ id: m.id, status: "READ" })}>
+              Marcar atendido
+            </Button>
+          ) : null}
+          {m.status !== "ARCHIVED" ? (
+            <Button size="sm" variant="ghost" disabled={setStatus.isPending} onClick={() => setStatus.mutate({ id: m.id, status: "ARCHIVED" })}>
+              Archivar
+            </Button>
+          ) : (
+            <Button size="sm" variant="ghost" disabled={setStatus.isPending} onClick={() => setStatus.mutate({ id: m.id, status: "NEW" })}>
+              Volver a por atender
+            </Button>
+          )}
+        </div>
+      </footer>
+      {canDraft ? (
+        <AiDraftModal
+          open={draftOpen}
+          onClose={() => setDraftOpen(false)}
+          title="Respuesta sugerida"
+          description={`Para ${m.name}${m.topic ? ` · ${m.topic}` : ""}`}
+          request={{ kind: "contact_reply", contactId: m.id }}
+        />
+      ) : null}
+    </article>
+  );
+};
+
+/** Contactos del sitio (prototipo 12): mensajes que dejan clientes y visitantes en el formulario de la página pública. */
 export const ContactsScreen = () => {
-  const list = useContactMessages();
-  const handle = useMarkContactHandled();
-  const pending = list.data?.filter((c) => !c.handled).length ?? 0;
+  const [filter, setFilter] = useState<Filter>("NEW");
+  const [page, setPage] = useState(1);
+  const query = useContactMessages({ page, limit: 10, ...(filter === "open" ? {} : { status: filter }) });
+  const pending = useContactMessages({ status: "NEW", limit: 1 });
+  const subtitle =
+    pending.data === undefined ? "Mensajes que dejan clientes y visitantes en el formulario de la página pública." : `Mensajes del formulario de la página pública · ${int(pending.data.count)} por atender.`;
+
   return (
     <>
-      <PageHeader
-        eyebrow="Página pública"
-        title="Contactos del sitio"
-        subtitle={`Mensajes que dejaron clientes y visitantes en el formulario de inicio${pending ? ` · ${pending} por atender` : ""}.`}
-      />
-      <Card flush>
-        <QueryState query={list} isEmpty={(d) => d.length === 0} empty={<EmptyState title="Sin mensajes por ahora" text="Cuando alguien escriba desde la página de inicio, aparecerá aquí y le llegará un aviso a la campana." />}>
-          {(items) => (
-              <ul className={styles.list}>
-                {items.map((c) => (
-                  <li key={c.id} className={[styles.item, c.handled ? styles.done : ""].join(" ")}>
-                    <div className={styles.head}>
-                      <strong>{c.name}</strong>
-                      {c.topic ? <Badge tone="neutral">{c.topic}</Badge> : null}
-                      <Badge tone={c.handled ? "neutral" : "warn"}>{c.handled ? "Atendido" : "Por atender"}</Badge>
-                      <time>{dateTime(c.createdAt)}</time>
-                    </div>
-                    <p className={styles.msg}>{c.message}</p>
-                    <div className={styles.foot}>
-                      {c.email ? <a href={`mailto:${c.email}?subject=${encodeURIComponent("Agropecuaria Mi Tierrita")}`}>{c.email}</a> : null}
-                      {c.phone ? <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a> : null}
-                      {!c.handled ? (
-                        <Button size="sm" variant="secondary" loading={handle.isPending && handle.variables === c.id} onClick={() => handle.mutate(c.id)}>
-                          Marcar atendido
-                        </Button>
-                      ) : null}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-          )}
-        </QueryState>
-      </Card>
+      <PageHeader title="Contactos del sitio" subtitle={subtitle} />
+      <div className={styles.bar}>
+        <Chips
+          options={FILTERS}
+          value={filter}
+          onChange={(v) => {
+            setFilter(v);
+            setPage(1);
+          }}
+        />
+      </div>
+      <QueryState
+        query={query}
+        isEmpty={(p) => p.items.length === 0}
+        empty={<EmptyState title={filter === "NEW" ? "Nada por atender" : "Sin mensajes"} text="Cuando alguien escriba desde la página pública, su mensaje llegará aquí." />}
+      >
+        {(p) => (
+          <div className={styles.list}>
+            {p.items.map((m) => (
+              <Item key={m.id} m={m} />
+            ))}
+            <Pagination page={p} onPage={setPage} />
+          </div>
+        )}
+      </QueryState>
     </>
   );
 };

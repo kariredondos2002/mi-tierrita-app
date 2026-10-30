@@ -1,219 +1,419 @@
-import { useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Modal } from "@/components/ui";
-import { Conversation } from "@/components/chat/Conversation";
-import { MembersPanel } from "@/components/chat/MembersPanel";
-import { PersonAvatar } from "@/components/chat/PersonAvatar";
-import { ChatSearch } from "@/components/chat/ChatSearch";
-import { lastSeenText, previewOf, relative } from "@/components/chat/chatFormat";
-import { useConversations, usePeople, useUnreadSummary } from "@/hooks/chat";
-import { useRealtimeStore, useSocketEvent } from "@/realtime/socket";
+import { Button, Modal } from "@/components/ui";
+import { useChatMessages, useChatPins, useChatTeam, useDeleteChatMessage, useEditChatMessage, usePinChatMessage, type ChatItem } from "@/hooks/chat";
+import { int } from "@/lib/format";
+import { useChatLiveStore } from "@/stores/chatLive";
 import { ROLE_LABELS, useSessionStore } from "@/stores/session";
-import type { ChatMessage } from "@/types/api";
-import { useQueryClient } from "@tanstack/react-query";
-import { keys } from "@/hooks/shared";
-import styles from "@/components/chat/Chat.module.css";
+import type { ChatMember, ChatMessage } from "@/types/api";
+import { Avatar } from "./Avatar";
+import { Composer, type MentionCandidate } from "./Composer";
+import { ConversationList } from "./ConversationList";
+import { InfoPanel } from "./InfoPanel";
+import type { MessageActions } from "./MessageItem";
+import { MessageList } from "./MessageList";
+import { PinnedBar } from "./PinnedBar";
+import { PinsPanel } from "./PinsPanel";
+import { ReceiptsModal } from "./ReceiptsModal";
+import { SearchPanel } from "./SearchPanel";
+import { TeamPanel } from "./TeamPanel";
+import { ThreadPanel } from "./ThreadPanel";
+import { bodyOrFiles, sinceLabel } from "./chatFormat";
+import styles from "./ChatScreen.module.css";
+
+const HeadIcon = ({ d }: { d: string }) => (
+  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+    <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const HEAD_ICONS = {
+  back: "M12 4 6 10l6 6",
+  search: "M9 15.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM13.8 13.8 17.5 17.5",
+  pin: "M12.5 3 17 7.5l-2.6.9-3.3 3.3.3 3.3-1.3 1.3-6-6 1.3-1.3 3.3.3 3.3-3.3zM6.5 13.5 3 17",
+  info: "M10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 9v4.5M10 6.5v.3",
+};
+
+const positive = (raw: string | null): number | null => {
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 0 ? n : null;
+};
+
+const NARROW = "(max-width: 900px)";
+
+/** true en pantallas angostas (bajo 900 px), donde la bandeja y la sala se turnan la pantalla. */
+const useNarrow = (): boolean => {
+  const [narrow, setNarrow] = useState(() => window.matchMedia(NARROW).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(NARROW);
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return narrow;
+};
+
+/** Permiso de notificaciones del navegador ("default" = aún no se ha preguntado). */
+const notificationPermission = (): NotificationPermission | "unsupported" => ("Notification" in window ? Notification.permission : "unsupported");
 
 /**
- * Chat del equipo (v4, adaptado del chat de SoftUnity): canal #general para todos y
- * conversaciones privadas 1 a 1. Rutas: /chat, /chat/general y /chat/:userId.
+ * Chat del equipo (administración, secretaría y bodega): canal general y privados en vivo, con chulitos de enviado,
+ * entregado, visto y reproducido (y el detalle por persona), respuestas citando, hilos, respuestas por privado,
+ * fijados, menciones, adjuntos y notas de voz, búsqueda por texto y día, información de la conversación y avisos de
+ * lo que falta por leer. URL: `?con=<persona>&hilo=<mensaje>&m=<mensaje a mostrar>`. Bajo 900 px la bandeja y la sala
+ * se turnan la pantalla completa (`roomOpen`): la sala se monta en `document.body` con un portal porque el `main` del
+ * armazón (`view-transition-name`) es un contexto de apilamiento y desde dentro nada taparía la barra; los paneles
+ * laterales y los modales van entonces dentro de la sala.
  */
 export const ChatScreen = () => {
-  const { userId: param } = useParams();
-  const withThread = param !== undefined;
-  const otherId = param !== undefined && param !== "general" ? Number(param) : null;
-  const me = useSessionStore((s) => s.user!);
-  const status = useRealtimeStore((s) => s.status);
-  const online = useRealtimeStore((s) => s.online);
-  const conversations = useConversations();
-  const people = usePeople();
-  const navigate = useNavigate();
-  const [filter, setFilter] = useState("");
-  const [picker, setPicker] = useState(false);
-  const [membersOpen, setMembersOpen] = useState(() => window.matchMedia?.("(min-width: 1280px)").matches ?? false);
-  const [searching, setSearching] = useState(false);
-  const [threadOpen, setThreadOpen] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission | "unsupported">(typeof Notification === "undefined" ? "unsupported" : Notification.permission);
-  const unread = useUnreadSummary();
-  const queryClient = useQueryClient();
-  const generalUnread = otherId === null && withThread ? 0 : (unread.data?.general ?? 0);
-  const mentions = unread.data?.mentions ?? 0;
+  const me = useSessionStore((s) => s.user);
+  const live = useChatLiveStore((s) => s.live);
+  const setViewing = useChatLiveStore((s) => s.setViewing);
+  const [params, setParams] = useSearchParams();
+  const team = useChatTeam(30_000);
+  const members = useMemo(() => team.data?.members ?? [], [team.data]);
 
-  // Mensaje nuevo en el general: se actualizan los contadores del servidor (la fuente de verdad de los no leídos).
-  useSocketEvent<ChatMessage>("chat:mensaje", (m) => {
-    if (m.sender.id !== me.id) void queryClient.invalidateQueries({ queryKey: [...keys.chat, "unread"] });
-  });
+  const rawPeer = positive(params.get("con"));
+  const peer: ChatMember | null = members.find((m) => m.id === rawPeer) ?? null;
+  // Mientras llega el equipo se respeta el id de la URL para no cargar dos veces.
+  const peerId = rawPeer !== null && (peer !== null || team.isPending) ? rawPeer : null;
+  const threadId = positive(params.get("hilo"));
+  const focusParam = positive(params.get("m"));
+  const general = peerId === null;
+
+  // Mensaje al que hay que llevar la vista: en el hilo si viene con `hilo`, si no en la conversación.
+  const [mainFocus, setMainFocus] = useState<number | null>(null);
+  const threadFocus = threadId !== null ? focusParam : null;
   useEffect(() => {
-    setSearching(false);
-  }, [param]);
+    if (focusParam !== null && threadId === null) setMainFocus(focusParam);
+    if (focusParam !== null) setRoomOpen(true);
+  }, [focusParam, threadId]);
 
-  const isOnline = (id: number) => online.some((p) => p.id === id);
-  const other = useMemo(
-    () => (otherId === null ? null : (people.data?.find((p) => p.id === otherId) ?? conversations.data?.find((c) => c.person.id === otherId)?.person ?? null)),
-    [otherId, people.data, conversations.data],
+  const main = useChatMessages({ peerId, threadRootId: null }, { active: true, around: threadId === null ? (focusParam ?? undefined) : (threadId ?? undefined), enabled: !team.isPending || rawPeer === null });
+  const pins = useChatPins(peerId);
+  const pin = usePinChatMessage();
+  const editMsg = useEditChatMessage();
+  const deleteMsg = useDeleteChatMessage();
+  const [toDelete, setToDelete] = useState<ChatMessage | null>(null);
+  const narrow = useNarrow();
+  const [side, setSide] = useState<"team" | "pins" | "search" | "info">("team");
+  // En pantallas angostas: la sala ocupa toda la pantalla cuando hay una conversación abierta; si no, la bandeja.
+  const [roomOpen, setRoomOpen] = useState(() => params.has("con") || params.has("m") || params.has("hilo"));
+  const [replyTo, setReplyTo] = useState<{ key: string; message: ChatMessage } | null>(null);
+  const [info, setInfo] = useState<ChatMessage | null>(null);
+  const [permission, setPermission] = useState(notificationPermission);
+  const convKey = `${peerId ?? "general"}`;
+
+  useEffect(() => {
+    setViewing({ peerId, threadRootId: threadId });
+    return () => setViewing(null);
+  }, [peerId, threadId, setViewing]);
+  useEffect(() => setSide("team"), [peerId]);
+
+  const navigate = useCallback(
+    (next: { con?: number | null; hilo?: number | null; m?: number | null }) => {
+      const p: Record<string, string> = {};
+      const con = next.con === undefined ? peerId : next.con;
+      const hilo = next.hilo === undefined ? threadId : next.hilo;
+      if (con !== null) p["con"] = String(con);
+      if (hilo !== null) p["hilo"] = String(hilo);
+      if (next.m) p["m"] = String(next.m);
+      setParams(p);
+    },
+    [peerId, threadId, setParams],
   );
-  const otherLastSeen = otherId !== null ? people.data?.find((p) => p.id === otherId)?.lastSeenAt ?? null : null;
+  const open = (id: number | null) => {
+    navigate({ con: id, hilo: null });
+    setRoomOpen(true);
+  };
+  /**
+   * Lleva la vista a un mensaje de esta conversación dejando `?m=` en la URL (y lo carga si hace falta). En pantallas
+   * angostas cierra el panel lateral, que de otro modo taparía el mensaje.
+   */
+  const goToMessage = useCallback(
+    (id: number) => {
+      navigate({ m: id });
+      void main.jumpTo(id);
+      setRoomOpen(true);
+      if (narrow) setSide("team");
+    },
+    [navigate, main, narrow],
+  );
+  const clearFocusParam = useCallback(() => {
+    if (params.has("m")) {
+      const p = new URLSearchParams(params);
+      p.delete("m");
+      setParams(p, { replace: true });
+    }
+  }, [params, setParams]);
+  const onMainFocused = useCallback(() => {
+    setMainFocus(null);
+    clearFocusParam();
+  }, [clearFocusParam]);
 
-  const q = filter.trim().toLowerCase();
-  const matches = (text: string) => !q || text.toLowerCase().includes(q);
-  const convs = (conversations.data ?? []).filter((c) => matches(c.person.name));
+  /** Lleva la conversación principal a un mensaje (lo carga si hace falta). */
+  const focusMain = useCallback(
+    (id: number) => {
+      void main.jumpTo(id).then(() => setMainFocus(id));
+    },
+    [main],
+  );
 
-  const head =
-    otherId === null
-      ? { name: "#general", text: `Canal de todo el equipo · ${online.length} en línea` }
-      : {
-          name: other?.name ?? "Conversación privada",
-          text: other ? (isOnline(other.id) ? `${ROLE_LABELS[other.role]} · en línea` : `${ROLE_LABELS[other.role]} · ${lastSeenText(otherLastSeen)}`) : "",
-        };
+  const canPinHere = general ? me?.role === "ADMIN" : true;
+  const memberIds = useMemo(() => new Set(members.map((m) => m.id)), [members]);
+
+  const common = useCallback(
+    (m: ChatMessage, inThread: boolean): Pick<MessageActions, "onPrivateReply" | "onPin" | "onInfo" | "onEdit" | "onDelete"> => ({
+      // Responder por privado: solo a mensajes de otra persona (activa) en el canal general.
+      onPrivateReply:
+        general && m.userId !== me?.id && memberIds.has(m.userId)
+          ? (msg) => {
+              setReplyTo({ key: String(msg.userId), message: msg });
+              navigate({ con: msg.userId, hilo: null });
+            }
+          : undefined,
+      onPin: canPinHere && !inThread && m.threadRootId === null ? (msg, pinned) => pin.mutate({ id: msg.id, pinned }) : undefined,
+      onInfo: setInfo,
+      // Editar: solo lo propio. Eliminar: lo propio y, en #general, la administración también.
+      onEdit:
+        m.userId === me?.id
+          ? async (msg, body) => {
+              try {
+                main.replace(await editMsg.mutateAsync({ id: msg.id, body }));
+                return true;
+              } catch {
+                return false;
+              }
+            }
+          : undefined,
+      onDelete: m.userId === me?.id || (general && me?.role === "ADMIN") ? setToDelete : undefined,
+    }),
+    [general, me?.id, me?.role, memberIds, navigate, canPinHere, pin, editMsg, main],
+  );
+
+  const mainActions = (m: ChatItem): MessageActions => ({
+    ...common(m, false),
+    onReply: (msg) => setReplyTo({ key: convKey, message: msg }),
+    onThread: (msg) => navigate({ hilo: msg.id }),
+    onQuote: (id, inThread) => (inThread ? navigate({ hilo: null, m: id }) : focusMain(id)),
+    onRetry: main.retry,
+    onDiscard: main.discard,
+  });
+
+  // Personas a las que se puede mencionar: todo el equipo en #general, solo la otra persona en un privado.
+  const candidates: MentionCandidate[] = general ? members : peer ? [peer] : [];
+  const where = peer ? `${peer.firstName}` : "#general";
+  const reply = replyTo?.key === convKey ? replyTo.message : null;
+  const pinList = pins.data?.items ?? [];
+
+  const openResult = (m: ChatMessage) => {
+    const con = m.recipientId === null ? null : m.userId === me?.id ? m.recipientId : m.userId;
+    if (m.threadRootId !== null) navigate({ con, hilo: m.threadRootId, m: m.id });
+    else if (con === peerId) {
+      navigate({ con, hilo: threadId });
+      focusMain(m.id);
+    } else navigate({ con, hilo: null, m: m.id });
+    setRoomOpen(true);
+  };
+  const toggleSide = (which: "pins" | "search" | "info") => setSide(side === which ? "team" : which);
+
+  const askPermission = () => {
+    void Notification.requestPermission().then(setPermission);
+  };
+
+  const panel =
+    threadId !== null ? (
+      <ThreadPanel
+        key={`${convKey}-${threadId}`}
+        peerId={peerId}
+        rootId={threadId}
+        where={peer ? `Privado con ${peer.firstName}` : "#general"}
+        focusId={threadFocus}
+        onFocused={clearFocusParam}
+        meId={me?.id}
+        myUsername={me?.username}
+        candidates={candidates}
+        common={common}
+        onQuoteOutside={focusMain}
+        onClose={() => navigate({ hilo: null })}
+      />
+    ) : side === "pins" ? (
+      <PinsPanel
+        pins={pins}
+        where={peer ? `Privado con ${peer.firstName}` : "#general"}
+        canUnpin={canPinHere}
+        onOpen={(m) => focusMain(m.id)}
+        onUnpin={(m) => pin.mutate({ id: m.id, pinned: false })}
+        onClose={() => setSide("team")}
+      />
+    ) : side === "search" ? (
+      <SearchPanel
+        key={convKey}
+        peerId={peerId}
+        where={peer ? `Privado con ${peer.firstName}` : "#general"}
+        meId={me?.id}
+        onOpen={(m) => (m.threadRootId !== null ? navigate({ hilo: m.threadRootId, m: m.id }) : goToMessage(m.id))}
+        onClose={() => setSide("team")}
+      />
+    ) : side === "info" ? (
+      <InfoPanel
+        key={convKey}
+        peerId={peerId}
+        peer={peer}
+        me={me}
+        members={members}
+        where={peer ? `Privado con ${peer.firstName}` : "#general"}
+        pins={pins}
+        canUnpin={canPinHere}
+        onOpenMessage={goToMessage}
+        onOpenPin={(m) => goToMessage(m.id)}
+        onUnpin={(m) => pin.mutate({ id: m.id, pinned: false })}
+        onOpenPerson={open}
+        onClose={() => setSide("team")}
+      />
+    ) : (
+      <TeamPanel me={me} members={members} onOpen={open} />
+    );
+
+  const room = (
+    <section className={[styles.room, narrow && roomOpen ? styles.roomFull : ""].join(" ")} aria-label={peer ? `Conversación con ${peer.firstName} ${peer.lastName}` : "Canal general"}>
+      <header className={styles.roomHead}>
+        <button type="button" className={styles.back} onClick={() => setRoomOpen(false)} aria-label="Atrás, a la bandeja" title="Atrás">
+          <HeadIcon d={HEAD_ICONS.back} />
+          <span>Atrás</span>
+        </button>
+        {peer ? (
+          <Avatar first={peer.firstName} last={peer.lastName} online={peer.online} />
+        ) : (
+          <span className={styles.hash} aria-hidden="true">
+            #
+          </span>
+        )}
+        <div className={styles.roomTitle}>
+          <h2>{peer ? `${peer.firstName} ${peer.lastName}` : "general"}</h2>
+          <span>
+            {peer
+              ? `${ROLE_LABELS[peer.role]} · ${peer.online ? "En línea" : sinceLabel(peer.lastSeenAt)} · solo ustedes dos ven esta conversación`
+              : `Canal de todo el equipo · ${int(team.data?.onlineCount ?? 1)} en línea`}
+          </span>
+        </div>
+        <span className={[styles.live, live ? styles.liveOn : ""].join(" ")} title={live ? "Los mensajes llegan al instante" : "Reconectando; mientras tanto se consulta cada pocos segundos"}>
+          {live ? "En vivo" : "Reconectando…"}
+        </span>
+        <div className={styles.headActions}>
+          <Button variant="ghost" size="sm" className={styles.headBtn} onClick={() => toggleSide("search")} aria-pressed={side === "search"} aria-label="Buscar mensajes" title="Buscar mensajes">
+            <HeadIcon d={HEAD_ICONS.search} />
+            <span>Buscar mensajes</span>
+          </Button>
+          <Button variant="ghost" size="sm" className={styles.headBtn} onClick={() => toggleSide("pins")} aria-pressed={side === "pins"} aria-label="Mensajes fijados" title="Mensajes fijados">
+            <HeadIcon d={HEAD_ICONS.pin} />
+            <span>Fijados{pinList.length > 0 ? ` · ${int(pinList.length)}` : ""}</span>
+          </Button>
+          <Button variant="ghost" size="sm" className={styles.headBtn} onClick={() => toggleSide("info")} aria-pressed={side === "info"} aria-label="Información de la conversación" title="Información de la conversación">
+            <HeadIcon d={HEAD_ICONS.info} />
+            <span>Info</span>
+          </Button>
+        </div>
+      </header>
+
+      <PinnedBar pins={pinList} onOpen={(m) => goToMessage(m.id)} onShowAll={() => setSide("pins")} />
+
+      <MessageList
+        key={`lista-${convKey}`}
+        items={main.items}
+        status={main.status}
+        hasMoreBefore={main.hasMoreBefore}
+        hasMoreAfter={main.hasMoreAfter}
+        loadingOlder={main.loadingOlder}
+        firstUnreadId={main.firstUnreadId}
+        onLoadOlder={() => void main.loadOlder()}
+        onJumpLatest={() => void main.jumpToLatest()}
+        focusId={mainFocus}
+        onFocused={onMainFocused}
+        meId={me?.id}
+        myUsername={me?.username}
+        general={general}
+        actionsFor={mainActions}
+        label={peer ? `Mensajes con ${peer.firstName}` : "Mensajes de #general"}
+        empty={{
+          title: peer ? `Aún no le ha escrito a ${peer.firstName}` : "Aún no hay mensajes",
+          text: peer ? "Lo que escriba aquí solo lo verán ustedes dos." : "Escriba el primero: un aviso, una pregunta o un pendiente para el equipo.",
+        }}
+      />
+
+      <Composer
+        key={`caja-${convKey}`}
+        scopeKey={convKey}
+        label={`Mensaje para ${where}`}
+        placeholder={`Escriba un mensaje para ${where}`}
+        candidates={candidates}
+        allowEveryone={general}
+        replyTo={reply}
+        privateReply={reply !== null && reply.recipientId === null && !general}
+        onCancelReply={() => setReplyTo(null)}
+        onSend={main.send}
+      />
+      {narrow && side !== "team" ? panel : null}
+      {/* Dentro de la sala: en pantallas angostas la sala es el contexto de apilamiento que tapa al armazón. */}
+      <ReceiptsModal message={info} onClose={() => setInfo(null)} />
+      <Modal
+        open={toDelete !== null}
+        title="¿Eliminar este mensaje?"
+        description={
+          toDelete && toDelete.userId !== me?.id
+            ? `Se eliminará para todo el equipo el mensaje de ${toDelete.firstName}. En su lugar quedará «Se eliminó este mensaje».`
+            : "Se eliminará para todos, con sus archivos. En su lugar quedará «Se eliminó este mensaje»."
+        }
+        onClose={() => setToDelete(null)}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setToDelete(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              loading={deleteMsg.isPending}
+              onClick={() => {
+                if (!toDelete) return;
+                deleteMsg.mutate(toDelete.id, {
+                  onSuccess: (m) => {
+                    main.replace(m);
+                    setToDelete(null);
+                  },
+                });
+              }}
+            >
+              Eliminar para todos
+            </Button>
+          </>
+        }
+      >
+        {toDelete ? <blockquote className={styles.deleteQuote}>{bodyOrFiles(toDelete)}</blockquote> : null}
+      </Modal>
+    </section>
+  );
 
   return (
     <>
       <PageHeader
-        eyebrow="Comunicación del equipo"
-        title="Chat Mi Tierrita"
-        subtitle="Caja, bodega y administración coordinados en tiempo real: canal general, mensajes privados y avisos del negocio."
+        title="Chat del equipo"
+        subtitle="Administración, secretaría y bodega en un solo lugar: canal general, privados, hilos y avisos importantes fijados."
+        actions={
+          permission === "default" ? (
+            <Button variant="secondary" size="sm" onClick={askPermission}>
+              Activar avisos del navegador
+            </Button>
+          ) : undefined
+        }
       />
-      <div className={[styles.page, withThread ? styles.withThread : ""].join(" ")}>
-        <aside className={styles.side} aria-label="Conversaciones">
-          <div className={styles.sideHead}>
-            <div className={styles.sideTitle}>
-              <h2>Mensajes</h2>
-              <button type="button" className={styles.newBtn} onClick={() => setPicker(true)}>
-                + Privado
-              </button>
-            </div>
-            <label className={styles.search}>
-              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="9" cy="9" r="5.8" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M13.5 13.5 L17 17" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-              <span className="sr-only">Buscar conversación</span>
-              <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Buscar conversación" />
-            </label>
-          </div>
-          <nav className={styles.convList}>
-            <p className={styles.sectionLabel}>Canales</p>
-            {matches("general") ? (
-              <NavLink to="/chat/general" className={() => [styles.conv, otherId === null && withThread ? styles.convActive : "", generalUnread ? styles.convUnread : ""].join(" ")}>
-                <span className={styles.hash}>#</span>
-                <span className={styles.convText}>
-                  <span>general</span>
-                  <small>Todo el equipo · {online.length} en línea</small>
-                </span>
-                {mentions > 0 ? <span className={styles.unreadBadge} title="Menciones sin leer">@{mentions}</span> : null}
-                {generalUnread > 0 ? <span className={styles.unreadBadge}>{generalUnread}</span> : null}
-              </NavLink>
-            ) : null}
-            <p className={styles.sectionLabel}>Mensajes privados</p>
-            {convs.length === 0 ? <p className={styles.sideEmpty}>{q ? "Ninguna conversación coincide." : "Aún no tiene conversaciones privadas."}</p> : null}
-            {convs.map((c) => (
-              <NavLink
-                key={c.person.id}
-                to={`/chat/${c.person.id}`}
-                className={() => [styles.conv, otherId === c.person.id ? styles.convActive : "", c.unread ? styles.convUnread : ""].join(" ")}
-              >
-                <PersonAvatar name={c.person.name} role={c.person.role} online={isOnline(c.person.id)} size={34} />
-                <span className={styles.convText}>
-                  <span>{c.person.name}</span>
-                  <small>
-                    {c.lastMessage.senderId === me.id ? "Usted: " : ""}
-                    {previewOf(c.lastMessage)} · {relative(c.lastMessage.createdAt)}
-                  </small>
-                </span>
-                {c.unread > 0 ? <span className={styles.unreadBadge}>{c.unread}</span> : null}
-              </NavLink>
-            ))}
-          </nav>
-          {permission === "default" ? (
-            <button type="button" className={styles.newBtn} style={{ margin: "8px 12px 12px" }} onClick={() => void Notification.requestPermission().then(setPermission)}>
-              🔔 Activar avisos del navegador
-            </button>
-          ) : null}
-        </aside>
 
-        <section className={styles.thread}>
-          <header className={styles.threadHead}>
-            <button type="button" className={styles.back} onClick={() => navigate("/chat")} aria-label="Volver a las conversaciones">
-              ←
-            </button>
-            {otherId === null ? <span className={styles.hash}>#</span> : <PersonAvatar name={other?.name ?? "?"} role={other?.role} online={other ? isOnline(other.id) : undefined} />}
-            <div className={styles.channel}>
-              <h3>{head.name}</h3>
-              <p>{head.text}</p>
-            </div>
-            <button type="button" className={styles.membersBtn} aria-pressed={searching} onClick={() => setSearching((v) => !v)} title="Buscar mensajes">
-              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="9" cy="9" r="5.8" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M13.5 13.5 L17 17" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-              <span className="sr-only">Buscar mensajes</span>
-            </button>
-            {otherId === null ? (
-              <button type="button" className={styles.membersBtn} aria-pressed={membersOpen} onClick={() => setMembersOpen((v) => !v)}>
-                <span className={styles.onlineDot} aria-hidden="true" /> {online.length}
-                <span className="sr-only"> en línea; mostrar el equipo</span>
-              </button>
-            ) : null}
-          </header>
-          {status === "reconnecting" ? (
-            <div className={styles.banner} role="alert">
-              Se perdió la conexión con el servidor. Reintentando… Los mensajes se envían por el respaldo mientras vuelve.
-            </div>
-          ) : null}
-          <div className={styles.body}>
-            <Conversation
-              key={otherId ?? "general"}
-              target={otherId === null ? { kind: "general" } : { kind: "private", userId: otherId }}
-              channelName={head.name}
-              channelText={otherId === null ? "El canal de todo el equipo de la agropecuaria." : "Conversación privada: solo ustedes dos la ven."}
-              onThreadChange={setThreadOpen}
-              placeholder={otherId === null ? "Escriba un mensaje para #general" : `Mensaje para ${other?.name.split(" ")[0] ?? ""}`}
-            />
-            {searching ? (
-              <ChatSearch
-                me={me.id}
-                scope={otherId ?? "general"}
-                scopeLabel={head.name}
-                onClose={() => setSearching(false)}
-                onPick={(m) => {
-                  setSearching(false);
-                  const to = m.recipientId === null ? "/chat/general" : `/chat/${m.sender.id === me.id ? m.recipientId : m.sender.id}`;
-                  navigate(to, { state: { focus: m.id }, replace: false });
-                }}
-              />
-            ) : otherId === null && !threadOpen ? (
-              <MembersPanel online={online} people={people.data ?? []} me={me.id} open={membersOpen} onClose={() => setMembersOpen(false)} />
-            ) : null}
-          </div>
-        </section>
+      <div className={[styles.layout, threadId !== null || side !== "team" ? styles.withPanel : "", roomOpen ? styles.roomOpen : ""].join(" ")}>
+        <ConversationList team={team.data} loading={team.isPending} meId={me?.id} peerId={peerId} onOpen={open} onOpenResult={openResult} />
+
+        {narrow && roomOpen ? createPortal(room, document.body) : room}
+        {!narrow || side === "team" ? panel : null}
       </div>
-
-      <Modal open={picker} title="Nuevo mensaje privado" description="Elija con quién quiere conversar." onClose={() => setPicker(false)}>
-        <div className={styles.picker}>
-          {(people.data ?? [])
-            .filter((p) => p.id !== me.id)
-            .map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={styles.pickerItem}
-                onClick={() => {
-                  setPicker(false);
-                  navigate(`/chat/${p.id}`);
-                }}
-              >
-                <PersonAvatar name={p.name} role={p.role} online={isOnline(p.id)} size={34} />
-                <span className={styles.memberText}>
-                  <span>{p.name}</span>
-                  <small>
-                    {ROLE_LABELS[p.role]} · {isOnline(p.id) ? "en línea" : lastSeenText(p.lastSeenAt)}
-                  </small>
-                </span>
-              </button>
-            ))}
-        </div>
-      </Modal>
     </>
   );
 };

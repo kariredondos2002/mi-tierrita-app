@@ -3,23 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#0d261c" />
-    <meta name="description" content="Mi Tierrita SIG: sistema de información gerencial y de apoyo a la decisión de Agropecuaria Mi Tierrita (Sahagún, Córdoba)." />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#eef7f1" />
     <link rel="icon" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>Mi Tierrita SIG</title>
-    <!-- Aplica el tema antes de pintar para evitar el destello blanco en modo oscuro. -->
-    <script>
-      (function () {
-        try {
-          var raw = localStorage.getItem("mi-tierrita-theme");
-          var mode = raw ? (JSON.parse(raw).state || {}).mode : "system";
-          var dark = mode === "dark" || ((mode === "system" || !mode) && window.matchMedia("(prefers-color-scheme: dark)").matches);
-          document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-        } catch (e) {}
-      })();
-    </script>
-    <style>html[data-theme="dark"] body { background: #0b0c0d; }</style>
   </head>
   <body>
     <div id="root"></div>

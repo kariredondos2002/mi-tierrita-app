@@ -1,0 +1,153 @@
+/* Filtros del historial: una franja blanca con atajos de período y controles compactos. */
+.bar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label,
+.bar label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.presets {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--segment-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.preset {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur) ease, background var(--dur) ease;
+}
+.preset:hover {
+  color: var(--ink);
+}
+.preset:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 1px;
+}
+.presetOn,
+.presetOn:hover {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.divider {
+  align-self: stretch;
+  width: 1px;
+  background: var(--line);
+}
+.fields {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  flex: 1;
+  min-width: 0;
+}
+.fields > div {
+  gap: 6px;
+  flex: 1 1 120px;
+  min-width: 120px;
+  max-width: 220px;
+}
+.range {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.range > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 140px;
+}
+.arrow {
+  color: var(--muted-2);
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+.bar input,
+.bar select {
+  height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.bar select {
+  padding-right: 26px;
+}
+.clear {
+  border: none;
+  background: transparent;
+  color: var(--link);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  height: 34px;
+  padding: 0 4px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur) ease;
+}
+.clear:hover {
+  color: var(--forest);
+  text-decoration: underline;
+}
+.clear:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 1px;
+}
+
+@media (max-width: 720px) {
+  .divider {
+    display: none;
+  }
+  .fields {
+    flex-basis: 100%;
+  }
+  .fields > div {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .range {
+    flex: 1 1 100% !important;
+  }
+  .range > div {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+  .range input {
+    width: 100%;
+    min-width: 0;
+  }
+}

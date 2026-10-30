@@ -1,0 +1,30 @@
+/* Historial: lista de ventas a la izquierda y cierre del período a la derecha. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  grid-template-areas: "timeline ledger";
+  gap: 16px;
+  align-items: start;
+}
+.timeline {
+  grid-area: timeline;
+  min-width: 0;
+}
+.ledger {
+  grid-area: ledger;
+  position: sticky;
+  top: 76px;
+  min-width: 0;
+}
+
+@media (max-width: 1080px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "ledger"
+      "timeline";
+  }
+  .ledger {
+    position: static;
+  }
+}

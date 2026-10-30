@@ -1,89 +1,100 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: var(--scrim);
-  backdrop-filter: blur(4px);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4);
-  z-index: 50;
-  animation: fadeIn var(--t-base) var(--ease) both;
+  padding: 16px;
+  z-index: 80;
+  animation: fade 0.35s ease backwards;
 }
 .dialog {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 28px;
   box-shadow: var(--shadow-panel);
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
   max-height: calc(100vh - 32px);
   overflow: auto;
-  padding: var(--space-6) 28px;
+  padding: 26px 28px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  animation: popIn 0.24s var(--ease) both;
+  gap: 18px;
+  animation: dialogIn 0.6s var(--ease-out) backwards;
 }
 .wide {
-  max-width: 860px;
+  max-width: 880px;
 }
-.xl {
-  max-width: min(1080px, 100%);
-}
-.dialog:focus {
-  outline: none;
+/* Durante un morfismo compartido la transición de vista anima el diálogo; se suprime su entrada propia. */
+.morph {
+  animation: none;
 }
 .head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
 }
 .head h2 {
-  font-size: var(--text-xl);
-  letter-spacing: -0.016em;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.035em;
 }
 .desc {
   color: var(--ink-2);
   font-size: 13px;
-  margin-top: var(--space-1);
+  margin-top: 6px;
 }
 .close {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  font-size: 20px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
   cursor: pointer;
-  color: var(--muted);
-  line-height: 1;
-  transition: background var(--t-fast), color var(--t-fast);
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.45s var(--ease-spring), background 0.25s ease, color 0.25s ease;
 }
 .close:hover {
-  background: var(--hover);
-  color: var(--ink);
+  transform: rotate(90deg);
+  background: var(--ink);
+  color: var(--surface);
 }
 .footer {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--line-soft);
+  padding-top: 4px;
 }
-@keyframes fadeIn {
+/* En pantallas angostas los botones del pie se reparten el ancho y bajan de línea en vez de cortarse. */
+@media (max-width: 480px) {
+  .footer > * {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+@keyframes fade {
   from {
     opacity: 0;
   }
 }
-@keyframes popIn {
+@keyframes dialogIn {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: translateY(24px) scale(0.97);
+    filter: blur(6px);
   }
+}
+/* El diálogo recibe el foco al abrir solo para que el lector lo anuncie; el contorno lo llevan sus controles. */
+.dialog:focus {
+  outline: none;
 }

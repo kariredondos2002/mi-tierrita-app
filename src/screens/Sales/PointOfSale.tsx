@@ -1,5 +1,7 @@
-import { useState, type ReactNode } from "react";
-import { useProducts } from "@/hooks/products";
+import { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAiStore } from "@/stores/ai";
+import { useProducts, useProductsByIds } from "@/hooks/products";
 import { useCustomerBalance, useCustomers } from "@/hooks/customers";
 import { useRegisterSale } from "@/hooks/sales";
 import { PageHeader } from "@/components/layout/AppShell";
@@ -8,6 +10,7 @@ import { int, money } from "@/lib/format";
 import type { ApiError } from "@/lib/errors";
 import type { PaymentType, Product, SaleDetail, SaleLine } from "@/types/api";
 import { useDebounced } from "./useDebounced";
+import { SaleSuccess } from "./SaleSuccess";
 import styles from "./SalesScreen.module.css";
 
 type CartLine = { product: Product; quantity: number };
@@ -30,6 +33,9 @@ const errorDetails = (err: ApiError, cart: CartLine[]): string | null => {
 };
 
 /** Etiqueta de disponibilidad del lienzo: "bajo" en rojo junto a la cantidad. */
+/** Lo que se puede vender hoy: FEFO no toma lotes vencidos aunque sigan sumando en `stock`. */
+const sellable = (p: Product): number => p.availableStock ?? p.stock;
+
 const stockTag = (stock: number) => (stock <= 0 ? <Badge tone="bad">sin stock</Badge> : stock < 5 ? <Badge tone="bad">bajo</Badge> : null);
 
 const SearchIcon = () => (
@@ -53,6 +59,30 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
   const balance = useCustomerBalance(customerId);
   const registerSale = useRegisterSale();
 
+  // Borrador de venta del asistente: se toma una vez al entrar; cuando llegan los productos se arma el carrito.
+  // La venta queda marcada como sugerida en la auditoría solo si se confirma sin vaciar el carrito.
+  const [aiDraft] = useState(() => useAiStore.getState().peekDraft("sale"));
+  useEffect(() => {
+    if (aiDraft) useAiStore.getState().clearDraft();
+  }, [aiDraft]);
+  const [fromAi, setFromAi] = useState(false);
+  // Venta preparada desde Pedidos para cobrar un encargo: no la sugirió Tita (no se marca como IA) y al terminar ofrece volver al pedido.
+  const [orderLink, setOrderLink] = useState<number | null>(aiDraft?.orderId ?? null);
+  const navigate = useNavigate();
+  const draftProducts = useProductsByIds(aiDraft?.lines.map((l) => l.productId) ?? []);
+  useEffect(() => {
+    if (!aiDraft || !draftProducts.ready) return;
+    const lines = aiDraft.lines.flatMap((l) => {
+      const product = draftProducts.products.find((p) => p.id === l.productId);
+      return product ? [{ product, quantity: Math.max(1, Math.min(l.quantity, sellable(product))) }] : [];
+    });
+    setCart(lines);
+    setCustomerId(aiDraft.customerId);
+    setPaymentType(aiDraft.paymentType);
+    setFromAi(lines.length > 0 && aiDraft.orderId === undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiDraft, draftProducts.ready]);
+
   /** Única suma del cliente: vista previa estimada del carrito (el total real lo devuelve la API). */
   const estimated = cart.reduce((sum, l) => sum + l.quantity * l.product.salePrice, 0);
   const creditNeedsCustomer = paymentType === "CREDIT" && customerId === null;
@@ -64,12 +94,12 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
     setCart((prev) => {
       const existing = prev.find((l) => l.product.id === product.id);
       if (!existing) return [...prev, { product, quantity: 1 }];
-      return prev.map((l) => (l.product.id === product.id ? { ...l, quantity: Math.min(l.quantity + 1, product.stock) } : l));
+      return prev.map((l) => (l.product.id === product.id ? { ...l, quantity: Math.min(l.quantity + 1, sellable(product)) } : l));
     });
   };
   const setQuantity = (productId: number, raw: string) => {
     const value = Math.floor(Number(raw));
-    setCart((prev) => prev.map((l) => (l.product.id === productId ? { ...l, quantity: Number.isFinite(value) && value > 0 ? Math.min(value, l.product.stock) : 1 } : l)));
+    setCart((prev) => prev.map((l) => (l.product.id === productId ? { ...l, quantity: Number.isFinite(value) && value > 0 ? Math.min(value, sellable(l.product)) : 1 } : l)));
   };
   const removeLine = (productId: number) => setCart((prev) => prev.filter((l) => l.product.id !== productId));
 
@@ -82,17 +112,18 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
 
   const confirm = async () => {
     const input = { paymentType, lines: cart.map((l) => ({ productId: l.product.id, quantity: l.quantity })), ...(customerId !== null ? { customerId } : {}) };
-    await registerSale.mutateAsync(input).then(
+    await registerSale.mutateAsync({ ...input, aiSuggested: fromAi }).then(
       (sale) => {
         setResult(sale);
         setCart([]);
+        setFromAi(false);
       },
       () => undefined,
     );
   };
 
   const resultColumns: Column<Product>[] = [
-    { key: "sku", header: "Código", mobile: false, render: (p) => <span className={styles.mono}>{p.sku}</span> },
+    { key: "sku", header: "Código", render: (p) => <span className={styles.mono}>{p.sku}</span> },
     { key: "name", header: "Producto", render: (p) => p.name },
     {
       key: "stock",
@@ -100,8 +131,9 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
       align: "right",
       render: (p) => (
         <span className={styles.stockCell}>
-          {int(p.stock)}
-          {stockTag(p.stock)}
+          {int(sellable(p))}
+          {stockTag(sellable(p))}
+          {p.stock > sellable(p) ? <Badge tone="warn">{`${int(p.stock - sellable(p))} vencidas`}</Badge> : null}
         </span>
       ),
     },
@@ -114,7 +146,7 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
       render: (p) => {
         const inCart = cart.find((l) => l.product.id === p.id);
         return (
-          <Button variant="secondary" size="sm" className={styles.addBtn} disabled={p.stock <= 0 || (inCart !== undefined && inCart.quantity >= p.stock)} onClick={() => addToCart(p)}>
+          <Button variant="secondary" size="sm" className={styles.addBtn} disabled={sellable(p) <= 0 || (inCart !== undefined && inCart.quantity >= sellable(p))} onClick={() => addToCart(p)}>
             Agregar
           </Button>
         );
@@ -122,36 +154,8 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
     },
   ];
 
-  const cartColumns: Column<CartLine>[] = [
-    { key: "name", header: "Producto", render: (l) => l.product.name },
-    {
-      key: "qty",
-      header: "Cant.",
-      align: "right",
-      width: "90px",
-      render: (l) => (
-        <div className={styles.qty}>
-          <Input type="number" min={1} max={l.product.stock} step={1} value={l.quantity} aria-label={`Cantidad de ${l.product.name}`} onChange={(e) => setQuantity(l.product.id, e.target.value)} />
-        </div>
-      ),
-    },
-    { key: "price", header: "Precio", align: "right", render: (l) => money(l.product.salePrice) },
-    { key: "subtotal", header: "Subtotal", align: "right", render: (l) => money(l.quantity * l.product.salePrice) },
-    {
-      key: "remove",
-      header: "",
-      align: "right",
-      width: "1%",
-      render: (l) => (
-        <Button variant="ghost" size="sm" onClick={() => removeLine(l.product.id)} aria-label={`Quitar ${l.product.name}`}>
-          Quitar
-        </Button>
-      ),
-    },
-  ];
-
   const lineColumns: Column<SaleLine>[] = [
-    { key: "sku", header: "Código", mobile: false, render: (l) => <span className={styles.mono}>{l.sku}</span> },
+    { key: "sku", header: "Código", render: (l) => <span className={styles.mono}>{l.sku}</span> },
     { key: "name", header: "Producto", render: (l) => l.productName },
     { key: "qty", header: "Cant.", align: "right", render: (l) => int(l.quantity) },
     { key: "price", header: "Precio", align: "right", render: (l) => money(l.unitPrice) },
@@ -161,9 +165,23 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
   const resultsCount = products.data ? (products.data.count === 1 ? "1 resultado" : `${int(products.data.count)} resultados`) : null;
   const errorText = registerSale.error ? errorDetails(registerSale.error, cart) : null;
 
+  const units = cart.reduce((n, l) => n + l.quantity, 0);
+
   return (
     <>
       <PageHeader title="Punto de venta" subtitle="Los productos descuentan del inventario al confirmar." actions={tabs} />
+      {orderLink !== null && cart.length > 0 && result === null ? (
+        <Callout tone="good" title={`Venta del pedido #${orderLink}`}>
+          Revise productos, cantidades y forma de pago antes de confirmar.
+          {aiDraft && aiDraft.warnings.length > 0 ? ` ${aiDraft.warnings.join(" ")}` : ""}
+        </Callout>
+      ) : null}
+      {fromAi && cart.length > 0 ? (
+        <Callout tone="good" title="Venta preparada por Tita">
+          Revise productos, cantidades, cliente y forma de pago antes de confirmar.
+          {aiDraft && aiDraft.warnings.length > 0 ? ` Atención: ${aiDraft.warnings.join(" ")}` : ""}
+        </Callout>
+      ) : null}
 
       <div className={styles.layout}>
         <div className={styles.column}>
@@ -176,7 +194,7 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
             {resultsCount ? <span className={styles.searchCount}>{resultsCount}</span> : null}
           </div>
 
-          <Card title="Catálogo" subtitle="Toque «Agregar» para sumar el producto al carrito" className={styles.results}>
+          <Card title="Productos" subtitle="Agregue los productos de la venta" flush>
             <QueryState
               query={products}
               isEmpty={(page) => page.items.length === 0}
@@ -185,12 +203,40 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
               {(page) => <DataTable columns={resultColumns} rows={page.items} rowKey={(p) => p.id} />}
             </QueryState>
           </Card>
-
         </div>
 
-        <div className={[styles.column, styles.sideColumn].join(" ")}>
-          <Card title="Cliente">
-            <div className={styles.customerFields}>
+        <aside className={[styles.column, styles.sideColumn].join(" ")} aria-label="Resumen de la venta">
+          <section className={styles.ticket} aria-labelledby="pos-cart-title">
+            <header className={styles.ticketHead}>
+              <h2 id="pos-cart-title">Carrito</h2>
+              <span className={styles.ticketCount}>{cart.length === 0 ? "Sin productos" : `${int(cart.length)} ${cart.length === 1 ? "producto" : "productos"} · ${int(units)} uds.`}</span>
+            </header>
+
+            {cart.length === 0 ? (
+              <p className={styles.cartEmpty}>Busque un producto y agréguelo para empezar la venta.</p>
+            ) : (
+              <ul className={styles.cartList}>
+                {cart.map((l) => (
+                  <li key={l.product.id} className={styles.cartLine}>
+                    <div className={styles.cartInfo}>
+                      <span className={styles.cartName}>{l.product.name}</span>
+                      <span className={styles.cartPrice}>{money(l.product.salePrice)} c/u</span>
+                    </div>
+                    <div className={styles.qty}>
+                      <Input type="number" min={1} max={sellable(l.product)} step={1} value={l.quantity} aria-label={`Cantidad de ${l.product.name}`} onChange={(e) => setQuantity(l.product.id, e.target.value)} />
+                    </div>
+                    <span className={styles.cartSubtotal}>{money(l.quantity * l.product.salePrice)}</span>
+                    <button type="button" className={styles.removeBtn} onClick={() => removeLine(l.product.id)} aria-label={`Quitar ${l.product.name}`}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className={styles.ticketSection}>
               <Field label="Cliente" htmlFor="pos-customer">
                 {customers.isPending ? (
                   <Loading inline text="Cargando clientes…" />
@@ -247,43 +293,35 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
                 </Select>
               </Field>
             </div>
-          </Card>
 
-          <Card title="Carrito" subtitle={cart.length === 0 ? "Sin productos" : `${int(cart.length)} ${cart.length === 1 ? "producto" : "productos"}`} className={styles.grow}>
-            {cart.length === 0 ? (
-              <EmptyState title="El carrito está vacío" text="Busque un producto a la izquierda y agréguelo para empezar la venta." />
-            ) : (
-              <DataTable columns={cartColumns} rows={cart} rowKey={(l) => l.product.id} />
-            )}
-          </Card>
-
-          <div className={styles.summary}>
-            <div className={styles.summaryRow}>
-              <span>Subtotal</span>
-              <span>{money(estimated)}</span>
-            </div>
-            <div className={styles.summaryRow}>
-              <span>Forma de pago</span>
-              <span>{PAYMENT_LABELS[paymentType]}</span>
-            </div>
-            <div className={styles.summaryTotal}>
-              <span>Total</span>
-              <strong>{money(estimated)}</strong>
-            </div>
-            {registerSale.error ? (
-              <div className={styles.summaryError}>
+            <div className={styles.ticketSection}>
+              <div className={styles.summaryRow}>
+                <span>Subtotal</span>
+                <span>{money(estimated)}</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>Forma de pago</span>
+                <span>{PAYMENT_LABELS[paymentType]}</span>
+              </div>
+              <div className={styles.summaryTotal}>
+                <span>
+                  Total <span className={styles.estimated}>estimado</span>
+                </span>
+                <strong>{money(estimated)}</strong>
+              </div>
+              {registerSale.error ? (
                 <Callout tone="bad">
                   <strong>{registerSale.error.message}</strong>
                   {errorText ? <span className={styles.errorDetails}>{errorText}</span> : null}
                 </Callout>
-              </div>
-            ) : null}
-            <Button variant="accent" size="lg" block className={styles.confirmBtn} loading={registerSale.isPending} disabled={!canConfirm} onClick={confirm}>
-              Confirmar venta
-            </Button>
-            <div className={styles.summaryNote}>Total estimado: el definitivo lo calcula el servidor al confirmar.</div>
-          </div>
-        </div>
+              ) : null}
+              <Button variant="primary" size="lg" block loading={registerSale.isPending} disabled={!canConfirm} onClick={confirm}>
+                Confirmar venta
+              </Button>
+              <p className={styles.summaryNote}>Total estimado: el definitivo lo calcula el servidor al confirmar.</p>
+            </div>
+          </section>
+        </aside>
       </div>
 
       <Modal
@@ -293,28 +331,44 @@ export const PointOfSale = ({ tabs }: { tabs: ReactNode }) => {
         onClose={() => setResult(null)}
         wide
         footer={
-          <Button onClick={() => setResult(null)} autoFocus>
-            Nueva venta
-          </Button>
+          <>
+            {orderLink !== null && result ? (
+              <Button variant="secondary" onClick={() => navigate(`/pedidos?tipo=cliente&pedido=${orderLink}&venta=${result.id}`)}>
+                Volver al pedido
+              </Button>
+            ) : null}
+            <Button
+              onClick={() => {
+                setResult(null);
+                setOrderLink(null);
+              }}
+              autoFocus
+            >
+              Nueva venta
+            </Button>
+          </>
         }
       >
         {result ? (
           <div className={styles.section}>
-            <div className={styles.factGrid}>
+            <SaleSuccess invoice={result.invoiceNumber} total={money(result.total)} />
+            <dl className={styles.factGrid}>
               <div className={styles.fact}>
-                <span className={styles.factLabel}>Cliente</span>
-                <span className={styles.factValue}>{result.customerName ?? "Consumidor final"}</span>
+                <dt>Cliente</dt>
+                <dd>{result.customerName ?? "Consumidor final"}</dd>
               </div>
               <div className={styles.fact}>
-                <span className={styles.factLabel}>Forma de pago</span>
-                <span className={styles.factValue}>{PAYMENT_LABELS[result.paymentType]}</span>
+                <dt>Forma de pago</dt>
+                <dd>{PAYMENT_LABELS[result.paymentType]}</dd>
               </div>
               <div className={styles.fact}>
-                <span className={styles.factLabel}>Registró</span>
-                <span className={styles.factValue}>{result.username}</span>
+                <dt>Registró</dt>
+                <dd>{result.username}</dd>
               </div>
+            </dl>
+            <div className={styles.receiptTable}>
+              <DataTable columns={lineColumns} rows={result.lines} rowKey={(l) => l.id} />
             </div>
-            <DataTable columns={lineColumns} rows={result.lines} rowKey={(l) => l.id} />
             <div className={styles.total}>
               <span>Total</span>
               <strong>{money(result.total)}</strong>

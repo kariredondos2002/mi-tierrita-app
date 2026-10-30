@@ -1,0 +1,114 @@
+.hero {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  min-height: 270px;
+  padding: 0 4px 14px;
+}
+/* Abanico de vidrio al centro de la franja, por detrás del texto; asoma detrás de las tarjetas. */
+.fan {
+  position: absolute;
+  left: 61%;
+  bottom: -70px;
+  transform: translateX(-50%) scale(1.12);
+  transform-origin: 50% 100%;
+  z-index: -1;
+}
+.main,
+.side {
+  position: relative;
+  z-index: 1;
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.info {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.info li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13.5px;
+  color: var(--muted);
+  box-shadow: 0 8px 20px -14px color-mix(in srgb, var(--shadow-ink) 45%, transparent);
+}
+.info b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.info .good {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--good-soft);
+  color: var(--good);
+}
+@media (max-width: 1100px) {
+  .fan {
+    display: none;
+  }
+  /* Sin el abanico no hace falta la altura que lo aloja. */
+  .hero {
+    min-height: 0;
+    padding-top: 28px;
+  }
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+/* Con el abanico a la vista, el texto no pasa por debajo de él: un saludo largo baja de línea en vez de quedar tapado. */
+@media (min-width: 1101px) {
+  .main {
+    max-width: calc(61% - 250px);
+  }
+}
+.eyebrow {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--on-band-muted);
+}
+.title {
+  font-size: clamp(40px, 4.8vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--on-band);
+}
+.subtitle {
+  font-size: 15px;
+  color: var(--on-band-muted);
+}
+/* Sobre la franja: botón primario blanco y secundario de vidrio (variables del kit redefinidas). */
+.actions {
+  --sprout: var(--band-pill);
+  --sprout-ink: var(--band-pill-ink);
+  --leaf: var(--band-leaf);
+  --surface: var(--band-glass);
+  --line-strong: var(--band-glass-line);
+  --ink: var(--on-band);
+  --hover: color-mix(in srgb, var(--white) 30%, transparent);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

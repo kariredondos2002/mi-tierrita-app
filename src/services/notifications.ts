@@ -1,7 +1,7 @@
 import { http } from "@/lib/http";
-import type { NotificationList } from "@/types/api";
+import type { DueNotices } from "@/types/api";
 
 export const notificationsService = {
-  list: async (): Promise<NotificationList> => (await http.get<NotificationList>("/notifications")).data,
-  markRead: async (ids?: number[]): Promise<number> => (await http.post<{ updated: number }>("/notifications/read", ids ? { ids } : {})).data.updated,
+  /** Avisos de vencimiento del rol, calculados en el servidor. */
+  due: async (): Promise<DueNotices> => (await http.get<DueNotices>("/notifications/due")).data,
 };

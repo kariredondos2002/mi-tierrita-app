@@ -1,0 +1,128 @@
+/* Cierre del período: tarjeta blanca con el total vendido, el desglose y el gráfico de ventas por día. */
+.band {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.range {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.heroLabel {
+  font-size: 13px;
+  color: var(--muted);
+}
+.heroValue {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.heroHint {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.cell + .cell {
+  border-left: 1px solid var(--line);
+}
+.cell dt {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.cell dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cellWarn dd {
+  color: var(--warn);
+}
+.cellHint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chartHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.chartTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.chartHint {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.chartEmpty,
+.chartNote {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.chartEmpty {
+  padding: 24px 12px;
+  text-align: center;
+  background: var(--surface-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}

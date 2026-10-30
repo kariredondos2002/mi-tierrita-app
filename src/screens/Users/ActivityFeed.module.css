@@ -1,0 +1,99 @@
+/* Actividad reciente: tarjeta blanca con una fila por escritura. */
+.feed {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.headText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+}
+.link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--link);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.link:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.item:first-child {
+  border-top: none;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+}
+.body {
+  min-width: 0;
+}
+.sentence {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.user {
+  font-weight: 600;
+  color: var(--ink);
+}
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

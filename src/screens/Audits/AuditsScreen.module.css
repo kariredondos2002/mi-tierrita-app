@@ -1,48 +1,137 @@
-/* Auditoría: sin lienzo propio; sigue la tarjeta «Registro de actividad» de Usuarios.dc.html ampliada. */
+/* Auditoría: barra de filtros blanca y bitácora de escrituras agrupada por día. */
 .page {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-.card {
-  border-radius: 10px;
-}
-.filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  align-items: end;
-}
-.filterActions {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-.date {
-  white-space: nowrap;
-  color: var(--ink-2);
-}
-.user {
-  font-weight: 600;
-  color: var(--ink);
-}
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
-  color: var(--ink);
-  word-break: break-all;
-}
-.pager {
-  padding-top: 8px;
+  gap: 16px;
 }
 
-/* v4.2: detalle legible de reportes e inicios de sesión */
-.resourceCell {
+/* Barra de filtros */
+.filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.filterUser {
+  flex: 0 1 220px;
+  min-width: 180px;
+}
+.filterGrow {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.filterDate {
+  flex: 0 1 160px;
+  min-width: 140px;
+}
+.filterClear {
+  flex: none;
+}
+.mono.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* Bitácora */
+.log {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.headText {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
-.detail {
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.subtitle {
+  font-size: 13px;
   color: var(--muted);
-  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.headSide {
+  display: flex;
+  align-items: center;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.kCreate {
+  --k: var(--good);
+}
+.kUpdate {
+  --k: var(--warn);
+}
+.kRemove {
+  --k: var(--bad);
+}
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.legendDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--k);
+}
+.legendMethod {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.pageTag {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.screen {
+  min-height: 160px;
+}
+.pager {
+  padding: 0 16px 14px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .filterUser,
+  .filterGrow,
+  .filterDate {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
 }

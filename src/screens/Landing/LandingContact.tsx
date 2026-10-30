@@ -27,7 +27,7 @@ export const LandingContact = () => {
     try {
       await send.mutateAsync({
         name: form.name.trim(),
-        message: form.body.trim(),
+        body: form.body.trim(),
         topic: form.topic,
         ...(form.phone.trim() ? { phone: form.phone.trim() } : {}),
         ...(form.email.trim() ? { email: form.email.trim() } : {}),

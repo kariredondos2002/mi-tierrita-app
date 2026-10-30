@@ -1,0 +1,24 @@
+/* Monograma del cliente: círculo suave con las iniciales. */
+.mono {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--forest-fg);
+  background: var(--sprout-soft);
+  border: 1px solid var(--good-line);
+}
+.lg {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+}
+.muted {
+  color: var(--muted);
+  background: var(--surface-3);
+  border-color: var(--line);
+}

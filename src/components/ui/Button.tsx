@@ -9,17 +9,17 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 };
 
+/** Botón del kit: primario verde, secundario con borde, fantasma, peligro y acento. */
 export const Button = ({ variant = "primary", size = "md", block = false, loading = false, className, children, disabled, type = "button", ...rest }: Props) => (
   <button
     type={type}
-    data-variant={variant}
-    className={[styles.button, styles[variant], size !== "md" ? styles[size] : "", block ? styles.block : "", className ?? ""].join(" ")}
+    className={[styles.button, styles[variant], size !== "md" ? styles[size] : "", block ? styles.block : "", loading ? styles.loading : "", className ?? ""].join(" ")}
     disabled={disabled || loading}
     {...rest}
   >
     {loading ? (
       <>
-        <span className={styles.spinner} aria-hidden="true" />
+        <span className={styles.spinner} aria-hidden="true" data-motion />
         Procesando…
       </>
     ) : (

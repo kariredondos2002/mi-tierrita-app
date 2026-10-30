@@ -1,14 +1,18 @@
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useAiStore } from "@/stores/ai";
 import { useSessionStore } from "@/stores/session";
-import { useCustomers } from "@/hooks/customers";
+import { useCustomer, useCustomers } from "@/hooks/customers";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Badge, Button, Card, Chips, DataTable, EmptyState, Input, Pagination, QueryState, type Column } from "@/components/ui";
-import { int, money } from "@/lib/format";
-import type { Customer, CustomerQuery } from "@/types/api";
-import { AdminStats } from "./AdminStats";
-import { SalesStats } from "./SalesStats";
+import { Button, Chips, EmptyState, Input, Pagination, QueryState, ViewSwitch, useViewMode, type ViewMode } from "@/components/ui";
+import { int } from "@/lib/format";
+import type { Customer, CustomerQuery, ReceivableRow } from "@/types/api";
+import { AdminCartera } from "./AdminCartera";
+import { SalesCartera } from "./SalesCartera";
 import { AdminReceivables } from "./AdminReceivables";
+import { CustomerLedger } from "./CustomerLedger";
+import { CustomerCards } from "./CustomerCards";
+import { CustomerTable } from "./CustomerTable";
 import { CustomerDetailModal } from "./CustomerDetailModal";
 import { CustomerFormModal } from "./CustomerFormModal";
 import { PaymentModal } from "./PaymentModal";
@@ -22,16 +26,16 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: "inactive", label: "Inactivos" },
 ];
 
-/** Etiqueta de estado del lienzo: Vencida (reporte, solo ADMIN), Excedió cupo, Con saldo o Al día. */
-const statusTag = (c: Customer, overdueIds: Set<number> | undefined) => {
-  if (!c.active) return <Badge tone="neutral">Inactivo</Badge>;
-  if (overdueIds?.has(c.id)) return <Badge tone="bad">Vencida</Badge>;
-  if (c.availableCredit < 0) return <Badge tone="bad">Excedió cupo</Badge>;
-  if (c.balance > 0) return <Badge tone="warn">Con saldo</Badge>;
-  return <Badge tone="good">Al día</Badge>;
+const TITLES: Record<Filter, string> = {
+  all: "Clientes",
+  balance: "Clientes con crédito",
+  inactive: "Clientes inactivos",
 };
 
-/** Clientes y cartera (CU-12): cupos, saldos, abonos y edición; lienzos "Clientes" (ADMIN) y "SecClientes" (SALES). */
+/** Vista preferida del libro (`mi-tierrita:clientes-vista`); por defecto la lista de cartera de siempre. */
+const VIEW_MODES: ViewMode[] = ["cards", "list", "table"];
+
+/** Clientes y cartera (CU-12): libro de cartera con cupo usado y abono rápido, y tarjeta lateral con las cifras de cartera. */
 export const CustomersScreen = () => {
   const user = useSessionStore((s) => s.user);
   const isAdmin = user?.role === "ADMIN";
@@ -39,10 +43,31 @@ export const CustomersScreen = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search.trim());
   const [filter, setFilter] = useState<Filter>("all");
+  const [view, setView] = useViewMode("clientes", VIEW_MODES, "list");
   const [page, setPage] = useState(1);
-  const [params] = useSearchParams();
-  const [selectedId, setSelectedId] = useState<number | null>(() => (Number(params.get("cliente")) > 0 ? Number(params.get("cliente")) : null));
-  const [paymentOpen, setPaymentOpen] = useState(false);
+  // `?c=<id>` abre la ficha de ese cliente (enlaces desde la columna «Origen» del reporte de cartera).
+  // También lo usa la paleta (Ctrl+K): si cambia el parámetro con la pantalla abierta, se abre la nueva ficha.
+  const [params, setParams] = useSearchParams();
+  const customerParam = Number(params.get("c"));
+  const paramId = Number.isInteger(customerParam) && customerParam > 0 ? customerParam : null;
+  const [selectedId, setSelectedId] = useState<number | null>(paramId);
+  useEffect(() => {
+    if (paramId !== null) setSelectedId(paramId);
+  }, [paramId]);
+  const closeDetail = () => {
+    setSelectedId(null);
+    if (params.has("c")) setParams({}, { replace: true });
+  };
+  const [payment, setPayment] = useState<{ open: boolean; customer: Customer | null; amount?: number; aiSuggested?: boolean }>({ open: false, customer: null });
+  // Borrador de abono del asistente: se toma una sola vez al entrar y abre el abono prellenado cuando llega el cliente.
+  const [aiPayment] = useState(() => useAiStore.getState().peekDraft("payment"));
+  useEffect(() => {
+    if (aiPayment) useAiStore.getState().clearDraft();
+  }, [aiPayment]);
+  const aiCustomer = useCustomer(aiPayment?.customerId ?? null);
+  useEffect(() => {
+    if (aiPayment && aiCustomer.data) setPayment({ open: true, customer: aiCustomer.data, amount: aiPayment.amount, aiSuggested: true });
+  }, [aiPayment, aiCustomer.data]);
   const [form, setForm] = useState<{ open: boolean; customer: Customer | null }>({ open: false, customer: null });
 
   const query: CustomerQuery = { page, limit: 20 };
@@ -53,28 +78,26 @@ export const CustomersScreen = () => {
 
   const filtered = debouncedSearch !== "" || filter !== "all";
   const openNew = () => setForm({ open: true, customer: null });
+  const openPayment = (customer: Customer | null) => setPayment({ open: true, customer });
   const clearFilters = () => {
     setSearch("");
     setFilter("all");
     setPage(1);
   };
 
-  const columns = (overdueIds: Set<number> | undefined): Column<Customer>[] => [
-    { key: "name", header: "Cliente", render: (c) => <span className={styles.strong}>{c.name}</span> },
-    { key: "document", header: "Documento", render: (c) => <span className={styles.mono}>{c.documentId}</span> },
-    { key: "limit", header: "Cupo autorizado", align: "right", render: (c) => money(c.creditLimit) },
-    { key: "balance", header: "Saldo", align: "right", render: (c) => money(c.balance) },
-    { key: "available", header: "Disponible", align: "right", render: (c) => <span className={c.availableCredit < 0 ? styles.negative : ""}>{money(c.availableCredit)}</span> },
-    { key: "status", header: "Estado", align: "right", render: (c) => statusTag(c, overdueIds) },
-  ];
-
-  const table = (overdueIds: Set<number> | undefined) => (
-    <Card
-      title={filter === "balance" ? "Clientes con crédito" : filter === "inactive" ? "Clientes inactivos" : "Clientes"}
-      subtitle={customers.data ? `${int(customers.data.count)} ${customers.data.count === 1 ? "registro" : "registros"}` : undefined}
-      actions={
+  const book = (receivables: Map<number, ReceivableRow> | undefined) => (
+    <section className={styles.book} aria-labelledby="customers-book-title">
+      <header className={styles.bookHead}>
+        <div className={styles.bookTitle}>
+          <h2 id="customers-book-title">{TITLES[filter]}</h2>
+          <span className={styles.count}>{customers.data ? `${int(customers.data.count)} ${customers.data.count === 1 ? "registro" : "registros"}` : "Cargando…"}</span>
+        </div>
         <div className={styles.toolbar}>
           <div className={styles.search}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="6" cy="6" r="4.3" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M9.3 9.3 L12.5 12.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
             <Input
               type="search"
               placeholder="Buscar por nombre o documento"
@@ -94,9 +117,19 @@ export const CustomersScreen = () => {
               setPage(1);
             }}
           />
+          <ViewSwitch value={view} onChange={setView} modes={VIEW_MODES} ariaLabel="Vista de clientes" />
         </div>
-      }
-    >
+      </header>
+
+      {view === "list" ? (
+        <div className={styles.legend} aria-hidden="true">
+          <span>Cliente</span>
+          <span>Saldo frente al cupo</span>
+          <span className={styles.legendRight}>Disponible</span>
+          <span className={styles.legendRight}>Estado</span>
+        </div>
+      ) : null}
+
       <QueryState
         query={customers}
         isEmpty={(p) => p.items.length === 0}
@@ -126,15 +159,20 @@ export const CustomersScreen = () => {
       >
         {(p) => (
           <>
-            <DataTable columns={columns(overdueIds)} rows={p.items} rowKey={(c) => c.id} onRowClick={(c) => setSelectedId(c.id)} />
-            <Pagination page={p} onPage={setPage} />
-            {isAdmin ? (
-              <div className={styles.cardNote}>Vender no es cobrar. Si la empresa asume la cuota del crédito bancario, la liquidez para pagarla depende de que esta cartera se mantenga sana.</div>
-            ) : null}
+            {view === "cards" ? (
+              <CustomerCards customers={p.items} receivables={receivables} onOpen={setSelectedId} onPay={openPayment} />
+            ) : view === "table" ? (
+              <CustomerTable customers={p.items} receivables={receivables} onOpen={setSelectedId} onPay={openPayment} />
+            ) : (
+              <CustomerLedger customers={p.items} receivables={receivables} onOpen={setSelectedId} onPay={openPayment} />
+            )}
+            <div className={styles.pager}>
+              <Pagination page={p} onPage={setPage} />
+            </div>
           </>
         )}
       </QueryState>
-    </Card>
+    </section>
   );
 
   return (
@@ -145,7 +183,7 @@ export const CustomersScreen = () => {
         actions={
           isAdmin ? (
             <>
-              <Button variant="secondary" onClick={() => setPaymentOpen(true)}>
+              <Button variant="secondary" onClick={() => openPayment(null)}>
                 Registrar abono
               </Button>
               <Button onClick={openNew}>Nuevo cliente</Button>
@@ -155,20 +193,25 @@ export const CustomersScreen = () => {
               <Button variant="secondary" onClick={openNew}>
                 Nuevo cliente
               </Button>
-              <Button onClick={() => setPaymentOpen(true)}>Registrar abono</Button>
+              <Button onClick={() => openPayment(null)}>Registrar abono</Button>
             </>
           )
         }
       />
 
-      {isAdmin ? null : <div className={styles.banner}>Puede registrar abonos y consultar el estado de cada cliente. Cambiar un cupo de crédito lo autoriza el administrador.</div>}
+      <div className={styles.layout}>
+        {isAdmin ? <AdminReceivables>{(receivables) => book(receivables)}</AdminReceivables> : book(undefined)}
+        {isAdmin ? <AdminCartera onOpen={setSelectedId} /> : <SalesCartera />}
+      </div>
 
-      {isAdmin ? <AdminStats /> : <SalesStats />}
-
-      {isAdmin ? <AdminReceivables>{(overdueIds) => table(overdueIds)}</AdminReceivables> : table(undefined)}
-
-      <CustomerDetailModal customerId={form.open ? null : selectedId} onClose={() => setSelectedId(null)} onEdit={(c) => setForm({ open: true, customer: c })} />
-      <PaymentModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
+      <CustomerDetailModal customerId={form.open ? null : selectedId} onClose={closeDetail} onEdit={(c) => setForm({ open: true, customer: c })} />
+      <PaymentModal
+        open={payment.open}
+        customer={payment.customer}
+        initialAmount={payment.amount}
+        aiSuggested={payment.aiSuggested}
+        onClose={() => setPayment({ open: false, customer: null })}
+      />
       {form.open ? <CustomerFormModal key={form.customer?.id ?? "new"} customer={form.customer} onClose={() => setForm({ open: false, customer: null })} /> : null}
     </div>
   );

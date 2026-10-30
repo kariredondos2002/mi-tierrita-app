@@ -1,37 +1,29 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { useIsFetching } from "@tanstack/react-query";
 import { useSessionStore, ROLE_LABELS } from "@/stores/session";
-import { useUiStore } from "@/stores/ui";
-import { useThemeStore } from "@/stores/theme";
-import { useSignout } from "@/hooks/session";
+import { useMe, useSignout } from "@/hooks/session";
 import { NAV_GROUPS, NAV_ICONS, findRoute, isLockedFor, isVisibleFor } from "@/router/navigation";
-import { initials } from "@/lib/format";
-import { PhotoBackdrop, Toasts } from "@/components/ui";
+import { Toasts, UserAvatar } from "@/components/ui";
 import { useNavBadges } from "./useNavBadges";
-import { AnimatedOutlet } from "./AnimatedOutlet";
-import { NotificationBell } from "./NotificationBell";
-import { ConnectionStatus } from "./ConnectionStatus";
-import { GlobalSearch } from "./GlobalSearch";
-import { RealtimeBridge } from "@/realtime/RealtimeBridge";
-import { ErrorBoundary } from "@/components/system/ErrorBoundary";
-import { useNotifications } from "@/hooks/notifications";
-import { useUnreadInTitle } from "@/hooks/chat";
+import { NotificationsMenu } from "./NotificationsMenu";
+import { CommandPalette } from "./CommandPalette";
+import { TitaPanel } from "@/components/ai/TitaPanel";
+import { TitaLauncher } from "@/components/ai/TitaLauncher";
+import { PersonPopover } from "@/components/people/PersonPopover";
+import { TitaAvatar } from "@/components/ai/TitaAvatar";
+import { useAiStatus } from "@/hooks/ai";
+import { useChatRealtime } from "@/hooks/chat";
+import { useAiStore } from "@/stores/ai";
 import styles from "./AppShell.module.css";
 
-/** Marca del lienzo: hoja sobre cuadrado verde claro. */
-export const BrandMark = ({ size = 38 }: { size?: number }) => (
+/** Marca: hoja blanca sobre cuadrado verde. */
+export const BrandMark = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 44 44" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <defs>
-      <linearGradient id="bm-bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#3DFB93" />
-        <stop offset="1" stopColor="#0FD068" />
-      </linearGradient>
-    </defs>
-    <rect x="1.5" y="1.5" width="41" height="41" rx="9" fill="url(#bm-bg)" />
-    <path d="M9 33.5 C 15 30.5 29 30.5 35 33.5" stroke="#121315" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
-    <path d="M22 32 L22 18.5" stroke="#121315" strokeWidth="2.6" strokeLinecap="round" />
-    <path d="M22 26 C 16 26 12.5 22 12.5 16 C 18.5 16 22 20 22 26 Z" fill="#121315" />
-    <path d="M22 22 C 28 22 31.5 18 31.5 12 C 25.5 12 22 16 22 22 Z" fill="#2F3A13" />
+    <rect x="1.5" y="1.5" width="41" height="41" rx="11" fill="var(--sprout)" />
+    <path d="M22 35 L22 18.5" stroke="var(--sprout-ink)" strokeWidth="2.6" strokeLinecap="round" />
+    <path d="M22 26.5 C 16 26.5 12.5 22.5 12.5 16.5 C 18.5 16.5 22 20.5 22 26.5 Z" fill="var(--sprout-ink)" />
+    <path d="M22 22.5 C 28 22.5 31.5 18.5 31.5 12.5 C 25.5 12.5 22 16.5 22 22.5 Z" fill="var(--sprout-ink)" opacity="0.7" />
   </svg>
 );
 
@@ -39,215 +31,239 @@ const NavIcon = ({ paths }: { paths: string }) => <svg className={styles.icon} v
 
 const Lock = () => (
   <svg className={styles.lock} width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-    <rect x="2.4" y="5.2" width="7.2" height="5.4" rx="1.2" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="2.4" y="5.2" width="7.2" height="5.4" rx="1.2" stroke="currentColor" strokeWidth="1" />
     <path d="M4.2 5.2 V3.8 a1.8 1.8 0 0 1 3.6 0 V5.2" stroke="currentColor" strokeWidth="1.1" />
   </svg>
 );
 
-const Chevron = () => (
-  <svg className={styles.chevron} width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path d="M6 3.5 L10.5 8 L6 12.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+/** Secciones que van en la píldora central; el resto queda en "Más". Rótulos cortos para que quepan. */
+const PRIMARY: Record<string, string> = {
+  "/": "Inicio",
+  "/inventario": "Inventario",
+  "/lotes": "Lotes",
+  "/ventas": "Ventas",
+  "/clientes": "Clientes",
+  "/finanzas": "Finanzas",
+  "/reportes": "Reportes",
+};
 
-const groupOf = (pathname: string) => NAV_GROUPS.find((g) => g.items.some((i) => (i.path === "/" ? pathname === "/" : pathname.startsWith(i.path))))?.title ?? (pathname === "/perfil" ? "Su cuenta" : "Inicio");
-
-/** Barra lateral, barra superior y panel de contenido, fieles al lienzo de diseño. */
+/**
+ * Armazón de la app (estilo de las referencias Clerio / Pay Key): sin menú lateral. Barra superior con la marca, la
+ * navegación en una píldora central con íconos (las secciones secundarias en "Más"), búsqueda, notificaciones y
+ * usuario. En pantallas angostas la navegación completa se abre en un menú desplegable.
+ */
 export const AppShell = () => {
   const user = useSessionStore((s) => s.user);
-  const navOpen = useUiStore((s) => s.navOpen);
-  const toggleNav = useUiStore((s) => s.toggleNav);
+  // Datos frescos del usuario (foto incluida); mientras llegan, los de la sesión guardada.
+  const me = useMe();
   const signout = useSignout();
   const location = useLocation();
-  const navigate = useNavigate();
   const badges = useNavBadges();
-  const notifications = useNotifications();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const themeMode = useThemeStore((s) => s.mode);
-  const setThemeMode = useThemeStore((s) => s.setMode);
-  const isDark = themeMode === "dark" || (themeMode === "system" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+  const fetching = useIsFetching();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const ai = useAiStatus();
+  const aiOpen = useAiStore((s) => s.open);
+  const setAiOpen = useAiStore((s) => s.setOpen);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const aiEnabledRef = useRef(false);
+  aiEnabledRef.current = ai.enabled;
   const current = findRoute(location.pathname);
+  const pageKey = current?.path ?? location.pathname;
+  // Chat en vivo para toda la app: contadores, avisos y notificaciones de mensajes nuevos.
+  useChatRealtime();
+  const chatUnread = badges.chat ?? 0;
+  // Mensajes sin leer también en el título de la pestaña: "(3) Mi Tierrita".
+  useEffect(() => {
+    const base = document.title.replace(/^\(\d+\) /, "");
+    document.title = chatUnread > 0 ? `(${chatUnread}) ${base}` : base;
+  }, [chatUnread, location.pathname]);
 
-  useUnreadInTitle((badges.messages ?? 0) + (notifications.data?.unread ?? 0));
-  useEffect(() => setMobileOpen(false), [location.pathname]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j" && aiEnabledRef.current) {
+        e.preventDefault();
+        useAiStore.getState().setOpen(!useAiStore.getState().open);
+      }
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  // La cabecera alta (como en la referencia) se compacta al bajar.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => {
+    setMenuOpen(false);
+    setMoreOpen(false);
+  }, [location.pathname]);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!moreRef.current?.contains(e.target as Node)) setMoreOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [moreOpen]);
 
   if (!user) return null;
 
+  // Tita solo aparece en el menú si el servidor tiene IA configurada.
+  const visible = NAV_GROUPS.flatMap((g) =>
+    g.items.filter((i) => isVisibleFor(i, user.role) && (i.path !== "/tita" || ai.enabled)).map((i) => ({ ...i, group: g.title ?? "General" })),
+  );
+  const primary = visible.filter((i) => PRIMARY[i.path]);
+  const secondary = visible.filter((i) => !PRIMARY[i.path]);
+  const secondaryActive = secondary.some((i) => location.pathname === i.path || location.pathname.startsWith(`${i.path}/`));
+  const secondaryCount = secondary.reduce((n, i) => n + (i.badge ? (badges[i.badge] ?? 0) : 0), 0);
+
+  const link = (item: (typeof visible)[number], variant: "pill" | "menu") => {
+    const locked = isLockedFor(item, user.role);
+    const count = item.badge ? badges[item.badge] : undefined;
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        viewTransition
+        end={item.path === "/"}
+        title={item.label}
+        aria-label={locked ? `${item.label} (acceso restringido)` : item.label}
+        className={({ isActive }) => [variant === "pill" ? styles.tab : styles.menuItem, isActive ? styles.active : "", locked ? styles.locked : ""].join(" ")}
+      >
+        <NavIcon paths={item.icon} />
+        <span className={variant === "pill" ? styles.tip : styles.label}>{variant === "pill" ? (PRIMARY[item.path] ?? item.label) : item.label}</span>
+        {locked ? <Lock /> : count !== undefined && count > 0 ? <span className={styles.badge}>{count}</span> : null}
+      </NavLink>
+    );
+  };
+
   return (
     <div className={styles.shell}>
-      <a href="#contenido" className={styles.skip}>
-        Saltar al contenido
-      </a>
-      <nav className={[styles.nav, navOpen ? "" : styles.rail, mobileOpen ? styles.navMobileOpen : ""].join(" ")} aria-label="Menú principal">
-        <div className={styles.brand}>
+      <div className={[styles.progress, fetching > 0 ? styles.progressOn : ""].join(" ")} aria-hidden="true" />
+      <header className={[styles.topbar, scrolled ? styles.compact : ""].join(" ")}>
+        <Link to="/" className={styles.brand} aria-label="Mi Tierrita, inicio">
           <BrandMark />
-          <div className={styles.brandText}>
-            <div className={styles.brandName}>Mi Tierrita</div>
-            <div className={styles.brandSub}>SIG · Agropecuaria</div>
-          </div>
-        </div>
-        <div className={styles.list}>
-          {NAV_GROUPS.map((group) => {
-            const items = group.items.filter((i) => isVisibleFor(i, user.role));
-            if (items.length === 0) return null;
-            return (
-              <div key={group.title ?? "main"} style={{ display: "contents" }}>
-                {group.title ? <div className={styles.cat}>{group.title}</div> : null}
-                {items.map((item) => {
-                  const locked = isLockedFor(item, user.role);
-                  const count = item.badge ? badges[item.badge] : undefined;
-                  return (
-                    <NavLink
-                      key={item.path}
-                      to={item.path}
-                      end={item.path === "/"}
-                      aria-label={item.label}
-                      title={navOpen ? undefined : item.label}
-                      className={({ isActive }) => [styles.item, isActive ? styles.active : "", locked ? styles.locked : ""].join(" ")}
-                    >
-                      <NavIcon paths={item.icon} />
-                      <span className={styles.label}>{item.label}</span>
-                      {locked ? <Lock /> : count !== undefined && count > 0 ? <span className={styles.badge}>{count}</span> : null}
-                    </NavLink>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-        <div className={styles.exitWrap}>
-          <div className={styles.navUser}>
-            <div className={styles.navAvatar}>{initials(user.firstName, user.lastName)}</div>
-            <div className={styles.navUserText}>
-              <div className={styles.navUserName}>
-                {user.firstName} {user.lastName}
-              </div>
-              <div className={styles.navUserRole}>{ROLE_LABELS[user.role]}</div>
-            </div>
-          </div>
-          <button type="button" className={[styles.item, styles.exit].join(" ")} onClick={() => signout.mutate(undefined)} aria-label="Cerrar sesión" title="Cerrar sesión">
-            <NavIcon paths={NAV_ICONS.signout} />
-            <span className={styles.label}>Cerrar sesión</span>
-          </button>
-        </div>
-      </nav>
+          <span className={styles.brandText}>
+            <span className={styles.brandName}>Mi Tierrita</span>
+            <span className={styles.brandSub}>Agropecuaria</span>
+          </span>
+        </Link>
 
-      <div className={styles.panel}>
-        <header className={styles.topbar}>
-          <button
-            type="button"
-            className={[styles.iconBtn, styles.toggle].join(" ")}
-            onClick={() => (window.innerWidth <= 900 ? setMobileOpen((v) => !v) : toggleNav())}
-            aria-label={navOpen ? "Ocultar el menú lateral" : "Mostrar el menú lateral"}
-          >
-            <svg width="20" height="20" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-              <rect x="2.5" y="3.5" width="17" height="15" rx="2.6" stroke="currentColor" strokeWidth="1.6" />
-              <line x1="8.6" y1="3.5" x2="8.6" y2="18.5" stroke="currentColor" strokeWidth="1.6" />
+        <nav className={styles.pill} aria-label="Menú principal">
+          {primary.map((item) => link(item, "pill"))}
+          {secondary.length > 0 ? (
+            <div ref={moreRef} className={styles.moreWrap}>
+              <button
+                type="button"
+                className={[styles.tab, secondaryActive ? styles.active : ""].join(" ")}
+                aria-expanded={moreOpen}
+                aria-label="Más secciones"
+                title="Más secciones"
+                aria-haspopup="menu"
+                onClick={() => setMoreOpen((v) => !v)}
+              >
+                <svg className={styles.icon} viewBox="0 0 22 22" aria-hidden="true">
+                  <circle cx="5.5" cy="11" r="1.4" fill="currentColor" stroke="none" />
+                  <circle cx="11" cy="11" r="1.4" fill="currentColor" stroke="none" />
+                  <circle cx="16.5" cy="11" r="1.4" fill="currentColor" stroke="none" />
+                </svg>
+                <span className={styles.tip}>Más</span>
+                {secondaryCount > 0 ? <span className={styles.badge}>{secondaryCount}</span> : null}
+              </button>
+              {moreOpen ? (
+                <div className={styles.dropdown}>
+                  {secondary.map((item) => link(item, "menu"))}
+                  <span className={styles.sep} aria-hidden="true" />
+                  <button type="button" className={styles.menuItem} onClick={() => signout.mutate(undefined)}>
+                    <NavIcon paths={NAV_ICONS.signout} />
+                    <span className={styles.label}>Cerrar sesión</span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </nav>
+
+        <div className={styles.tools}>
+          <button type="button" className={styles.iconBtn} onClick={() => setPaletteOpen(true)} aria-label="Buscar un módulo (Ctrl+K)" title="Buscar (Ctrl+K)">
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M13.5 13.5 L17.5 17.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             </svg>
           </button>
-          <nav className={styles.crumbs} aria-label="Ruta de navegación">
-            <a href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }}>Mi Tierrita</a>
-            {location.pathname !== "/" ? (
-              <>
-                <Chevron />
-                <span className={styles.crumbGroup}>{groupOf(location.pathname)}</span>
-              </>
-            ) : null}
-            <Chevron />
-            <strong aria-current="page">{current?.label ?? "Tablero gerencial"}</strong>
-            <span id="crumb-slot" style={{ display: "contents" }} />
-          </nav>
-          <GlobalSearch />
-          <ConnectionStatus />
-          <button
-            type="button"
-            className={styles.iconBtn}
-            aria-label={isDark ? "Usar tema claro" : "Usar tema oscuro"}
-            title={isDark ? "Tema claro" : "Tema oscuro"}
-            onClick={() => setThemeMode(isDark ? "light" : "dark")}
-          >
-            {isDark ? (
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="10" cy="10" r="3.6" stroke="currentColor" strokeWidth="1.6" />
-                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a7 7 0 1 0 8.8 8.8z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              </svg>
-            )}
+          {ai.enabled ? (
+            <button type="button" className={styles.askBtn} onClick={() => setAiOpen(!aiOpen)} aria-expanded={aiOpen} title="Preguntarle a Tita (Ctrl+J)">
+              <TitaAvatar size={30} />
+              <span>Tita</span>
+            </button>
+          ) : null}
+          <NotificationsMenu />
+          <Link to="/perfil" className={styles.user} title={`${user.firstName} ${user.lastName} · ${ROLE_LABELS[user.role]}`}>
+            <UserAvatar user={me.data ?? user} size={42} className={styles.avatar} />
+          </Link>
+          <button type="button" className={[styles.iconBtn, styles.menuBtn].join(" ")} aria-expanded={menuOpen} aria-label="Abrir el menú" onClick={() => setMenuOpen((v) => !v)}>
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
           </button>
-          <NotificationBell />
-          <NavLink to="/perfil" className={styles.user} title="Mi perfil">
-            <div className={styles.avatar}>{initials(user.firstName, user.lastName)}</div>
-            <div className={styles.userText}>
-              <div className={styles.userName}>
-                {user.firstName} {user.lastName}
-              </div>
-              <div className={styles.userRole}>{ROLE_LABELS[user.role]}</div>
-            </div>
-          </NavLink>
-        </header>
-        <ErrorBoundary resetKey={location.pathname}>
-          <AnimatedOutlet className={styles.content} />
-        </ErrorBoundary>
-        <footer className={styles.footer}>
-          <div className={styles.footBrand}>
-            <BrandMark size={34} />
-            <div>
-              <div className={styles.footName}>Mi Tierrita</div>
-              <div className={styles.footSub}>Agropecuaria · Sahagún, Córdoba</div>
-            </div>
-          </div>
-          <p className={styles.footScript}>Información que siembra mejores decisiones</p>
-          <div className={styles.footMeta}>
-            <span>© {new Date().getFullYear()} Mi Tierrita SIG · Universidad de Cartagena</span>
-            <span>Fotografías: Unsplash · Ilustraciones: unDraw</span>
-          </div>
-        </footer>
-      </div>
+        </div>
+      </header>
+
+      {/* Menú completo para pantallas angostas. */}
+      {menuOpen ? (
+        <>
+          <div className={styles.scrim} onClick={() => setMenuOpen(false)} aria-hidden="true" />
+          <nav className={styles.sheet} aria-label="Menú">
+            {NAV_GROUPS.map((g) => {
+              const items = visible.filter((i) => i.group === (g.title ?? "General"));
+              if (items.length === 0) return null;
+              return (
+                <div key={g.title ?? "General"} className={styles.sheetGroup}>
+                  {g.title ? <span className={styles.sheetTitle}>{g.title}</span> : null}
+                  {items.map((item) => link(item, "menu"))}
+                </div>
+              );
+            })}
+            <button type="button" className={styles.menuItem} onClick={() => signout.mutate(undefined)}>
+              <NavIcon paths={NAV_ICONS.signout} />
+              <span className={styles.label}>Cerrar sesión</span>
+            </button>
+          </nav>
+        </>
+      ) : null}
+
+      <main className={styles.content} key={pageKey}>
+        <Outlet />
+      </main>
       <Toasts />
-      <RealtimeBridge />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} role={user.role} />
+      {ai.enabled ? <TitaPanel /> : null}
+      {ai.enabled ? <TitaLauncher /> : null}
+      <PersonPopover />
     </div>
   );
 };
 
-/** Fotografía de cabecera de cada módulo (Unsplash, licencia libre; créditos en /public/img/CREDITOS.txt). */
-const PHOTOS_BY_ROUTE: Record<string, string[]> = {
-  "": ["tablero-ganado", "amanecer-pradera", "valle-cordoba"],
-  inventario: ["bodega-estibas", "estibas-bultos", "bodega-sacos"],
-  lotes: ["bodega-sacos", "bodega-estibas", "manos-granos"],
-  ventas: ["manos-granos", "clientes-finca", "alimentando-vaca"],
-  clientes: ["clientes-finca", "vaca-campo", "manos-tierra"],
-  proveedores: ["estibas-bultos", "bodega-sacos", "hero-tractor"],
-  finanzas: ["finanzas-escritorio", "valle-cordoba", "tablero-ganado"],
-  reportes: ["valle-cordoba", "finanzas-escritorio", "amanecer-pradera"],
-  usuarios: ["manos-tierra", "clientes-finca"],
-  auditoria: ["manos-tierra", "bodega-estibas"],
-  chat: ["clientes-finca", "vaca-campo"],
-  contactos: ["valle-cordoba", "amanecer-pradera"],
-  perfil: ["amanecer-pradera", "valle-cordoba"],
-};
-export const photoUrl = (name: string) => `${import.meta.env.BASE_URL}img/${name}.webp`;
-
-/**
- * Encabezado de página al estilo editorial agrotecnológico: fotografía de campo a todo el ancho con velo oscuro,
- * antetítulo manuscrito, título condensado en mayúscula, subtítulo y acciones. Las fotos dependen del módulo: se funden
- * entre sí y se mueven despacio (zoom suave); `photo` fija una sola.
- */
-export const PageHeader = ({ title, subtitle, actions, eyebrow, photo }: { title: string; subtitle?: string; actions?: ReactNode; eyebrow?: string; photo?: string }) => {
-  const location = useLocation();
-  const key = location.pathname.split("/")[1] ?? "";
-  const names = photo ? [photo] : (PHOTOS_BY_ROUTE[key] ?? ["amanecer-pradera", "valle-cordoba"]);
-  return (
-    <div className={styles.pageHead}>
-      <PhotoBackdrop images={names.map(photoUrl)} />
-      <div className={styles.pageHeadText}>
-        {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
-        <h1>{title}</h1>
-        {subtitle ? <div className={styles.pageSub}>{subtitle}</div> : null}
-      </div>
-      {actions ? <div className={styles.pageActions}>{actions}</div> : null}
+/** Encabezado de página: título grande y liviano sobre el degradado, subtítulo y acciones en píldora. */
+export const PageHeader = ({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) => (
+  <div className={styles.pageHead}>
+    <div className={styles.pageHeadText}>
+      <h1 className={styles.pageTitle}>{title.replace(/\*/g, "")}</h1>
+      {subtitle ? <p className={styles.pageSub}>{subtitle}</p> : null}
     </div>
-  );
-};
+    {actions ? <div className={styles.pageActions}>{actions}</div> : null}
+  </div>
+);

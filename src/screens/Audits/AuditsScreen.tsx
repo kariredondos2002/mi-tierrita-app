@@ -1,11 +1,13 @@
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAudits } from "@/hooks/audits";
 import { useUsers } from "@/hooks/users";
-import { dateTime, int } from "@/lib/format";
+import { int } from "@/lib/format";
 import { PageHeader } from "@/components/layout/AppShell";
-import { Button, Card, DataTable, EmptyState, Field, Input, Pagination, QueryState, Select, type Column } from "@/components/ui";
-import type { Audit, AuditQuery } from "@/types/api";
-import { AuditMethodBadge } from "./AuditMethodBadge";
+import { Button, EmptyState, Field, Input, Pagination, QueryState, Select } from "@/components/ui";
+import type { AuditQuery } from "@/types/api";
+import { METHOD_LEGEND } from "./auditMethod";
+import { AuditTimeline } from "./AuditTimeline";
 import styles from "./AuditsScreen.module.css";
 
 const PAGE_SIZE = 25;
@@ -19,39 +21,14 @@ const useDebounced = <T,>(value: T, ms: number): T => {
   return debounced;
 };
 
-/** Mismas columnas que la tarjeta «Registro de actividad» de Usuarios y roles. */
-const columns: Column<Audit>[] = [
-  { key: "createdAt", header: "Fecha y hora", width: "180px", render: (a) => <span className={styles.date}>{dateTime(a.createdAt)}</span> },
-  { key: "username", header: "Usuario", align: "left", width: "160px", render: (a) => <span className={styles.user}>{a.username}</span> },
-  {
-    key: "resource",
-    header: "Recurso y detalle",
-    align: "left",
-    render: (a) => (
-      <span className={styles.resourceCell}>
-        <span className={styles.mono}>{a.resource}</span>
-        {a.detail ? <small className={styles.detail}>{a.detail}</small> : null}
-      </span>
-    ),
-  },
-  { key: "method", header: "Acción", align: "left", width: "110px", render: (a) => <AuditMethodBadge method={a.method} /> },
-];
+const KIND_CLASS = { create: styles.kCreate, update: styles.kUpdate, remove: styles.kRemove };
 
-/** Tipos de acción: escrituras (middleware) y, desde la v4.2, reportes generados e inicios de sesión. */
-const METHOD_OPTIONS = [
-  { value: "", label: "Todas" },
-  { value: "POST", label: "Altas (POST)" },
-  { value: "PUT", label: "Cambios (PUT)" },
-  { value: "DELETE", label: "Borrados (DELETE)" },
-  { value: "EXPORT", label: "Reportes generados" },
-  { value: "SIGNIN", label: "Inicios de sesión" },
-];
-
-/** CU-18 Auditoría: escrituras, reportes generados e inicios de sesión (solo ADMIN). */
+/** CU-18 Auditoría de escrituras (solo ADMIN): barra de filtros y bitácora agrupada por día. */
 export const AuditsScreen = () => {
   const [page, setPage] = useState(1);
-  const [userId, setUserId] = useState("");
-  const [method, setMethod] = useState("");
+  // «Ver actividad» desde la ficha de persona llega con ?userId=.
+  const [params] = useSearchParams();
+  const [userId, setUserId] = useState(() => (/^\d+$/.test(params.get("userId") ?? "") ? (params.get("userId") as string) : ""));
   const [resource, setResource] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -63,17 +40,15 @@ export const AuditsScreen = () => {
     page,
     limit: PAGE_SIZE,
     ...(userId ? { userId: Number(userId) } : {}),
-    ...(method ? { method } : {}),
     ...(debouncedResource ? { resource: debouncedResource } : {}),
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
   };
   const query = useAudits(filters);
-  const hasFilters = Boolean(userId || method || resource || from || to);
+  const hasFilters = Boolean(userId || resource || from || to);
 
   const clear = () => {
     setUserId("");
-    setMethod("");
     setResource("");
     setFrom("");
     setTo("");
@@ -82,10 +57,10 @@ export const AuditsScreen = () => {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="Auditoría" subtitle="Quién hizo qué y cuándo: escrituras, reportes generados (PDF y Excel) e inicios de sesión." />
+      <PageHeader title="Auditoría" subtitle="Registro de escrituras: quién hizo qué, cuándo y sobre qué recurso." />
 
-      <Card title="Filtros" subtitle="Por usuario, tipo de acción, recurso o rango de fechas" className={styles.card}>
-        <div className={styles.filters}>
+      <div className={styles.filters} role="search" aria-label="Filtros de la auditoría">
+        <div className={styles.filterUser}>
           <Field label="Usuario" htmlFor="audit-user">
             <Select
               id="audit-user"
@@ -103,26 +78,13 @@ export const AuditsScreen = () => {
               ))}
             </Select>
           </Field>
-          <Field label="Acción" htmlFor="audit-method">
-            <Select
-              id="audit-method"
-              value={method}
-              onChange={(e) => {
-                setMethod(e.target.value);
-                setPage(1);
-              }}
-            >
-              {METHOD_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Recurso" htmlFor="audit-resource" hint="Por ejemplo /sales o /products/12">
+        </div>
+        <div className={styles.filterGrow}>
+          <Field label="Recurso" htmlFor="audit-resource">
             <Input
               id="audit-resource"
-              placeholder="Ruta del recurso"
+              className={styles.mono}
+              placeholder="/sales o /products/12"
               value={resource}
               onChange={(e) => {
                 setResource(e.target.value);
@@ -130,6 +92,8 @@ export const AuditsScreen = () => {
               }}
             />
           </Field>
+        </div>
+        <div className={styles.filterDate}>
           <Field label="Desde" htmlFor="audit-from">
             <Input
               id="audit-from"
@@ -142,6 +106,8 @@ export const AuditsScreen = () => {
               }}
             />
           </Field>
+        </div>
+        <div className={styles.filterDate}>
           <Field label="Hasta" htmlFor="audit-to">
             <Input
               id="audit-to"
@@ -154,44 +120,72 @@ export const AuditsScreen = () => {
               }}
             />
           </Field>
-          {hasFilters ? (
-            <div className={styles.filterActions}>
-              <Button variant="ghost" onClick={clear}>
-                Limpiar filtros
-              </Button>
-            </div>
-          ) : null}
         </div>
-      </Card>
+        {hasFilters ? (
+          <div className={styles.filterClear}>
+            <Button variant="ghost" onClick={clear}>
+              Limpiar filtros
+            </Button>
+          </div>
+        ) : null}
+      </div>
 
-      <Card title="Registro de actividad" subtitle={query.data ? `${int(query.data.count)} registros · escrituras, reportes generados e inicios de sesión` : "Se auditan las escrituras, cada reporte descargado y cada inicio de sesión"} className={styles.card}>
-        <QueryState
-          query={query}
-          isEmpty={(data) => data.items.length === 0}
-          empty={
-            <EmptyState
-              title="No hay registros con esos filtros"
-              text={hasFilters ? "Pruebe con otro usuario, recurso o rango de fechas." : "Las escrituras aparecerán aquí a medida que el equipo use el sistema."}
-              action={
-                hasFilters ? (
-                  <Button variant="secondary" size="sm" onClick={clear}>
-                    Limpiar filtros
-                  </Button>
-                ) : undefined
-              }
-            />
-          }
-        >
-          {(data) => (
-            <>
-              <DataTable columns={columns} rows={data.items} rowKey={(a) => a.id} />
-              <div className={styles.pager}>
-                <Pagination page={data} onPage={setPage} />
-              </div>
-            </>
-          )}
-        </QueryState>
-      </Card>
+      <section className={styles.log} aria-labelledby="audit-log-title">
+        <header className={styles.head}>
+          <div className={styles.headText}>
+            <h2 id="audit-log-title" className={styles.title}>
+              Escrituras
+            </h2>
+            <p className={styles.subtitle}>
+              {query.data ? `${int(query.data.count)} ${hasFilters ? "con estos filtros" : "registradas"}` : "…"} · solo se auditan POST, PUT y DELETE; las consultas no dejan rastro.
+            </p>
+          </div>
+          <div className={styles.headSide}>
+            <ul className={styles.legend} aria-label="Colores por método">
+              {METHOD_LEGEND.map((m) => (
+                <li key={m.kind} className={[styles.legendItem, KIND_CLASS[m.kind]].join(" ")}>
+                  <span className={styles.legendDot} aria-hidden="true" />
+                  <span className={styles.legendMethod}>{m.method}</span> {m.label}
+                </li>
+              ))}
+            </ul>
+            {query.data && query.data.pages > 1 ? (
+              <span className={styles.pageTag}>
+                Página {int(query.data.page)} de {int(query.data.pages)}
+              </span>
+            ) : null}
+          </div>
+        </header>
+
+        <div className={styles.screen}>
+          <QueryState
+            query={query}
+            isEmpty={(data) => data.items.length === 0}
+            empty={
+              <EmptyState
+                title="No hay escrituras registradas con esos filtros"
+                text={hasFilters ? "Pruebe con otro usuario, recurso o rango de fechas." : "Las escrituras aparecerán aquí a medida que el equipo use el sistema."}
+                action={
+                  hasFilters ? (
+                    <Button variant="secondary" size="sm" onClick={clear}>
+                      Limpiar filtros
+                    </Button>
+                  ) : undefined
+                }
+              />
+            }
+          >
+            {(data) => (
+              <>
+                <AuditTimeline key={data.page} items={data.items} />
+                <div className={styles.pager}>
+                  <Pagination page={data} onPage={setPage} />
+                </div>
+              </>
+            )}
+          </QueryState>
+        </div>
+      </section>
     </div>
   );
 };

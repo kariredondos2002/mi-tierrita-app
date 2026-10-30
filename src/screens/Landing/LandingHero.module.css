@@ -155,7 +155,7 @@
 .float strong {
   font-family: var(--font-heading);
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1.05;
   color: var(--ink);

@@ -1,68 +1,71 @@
+/* Control segmentado en píldora (como la navegación): la píldora blanca se desliza a la pestaña activa. */
 .tabs {
+  position: relative;
   display: inline-flex;
+  align-self: flex-start;
   gap: 2px;
   padding: 4px;
+  border-radius: 999px;
   background: var(--segment-bg);
-  border-radius: 11px;
-  box-shadow: var(--inset-well);
-  align-self: flex-start;
-  max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
+  max-width: 100%;
+}
+.pill {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--shadow-ink) 25%, transparent);
+  transition: transform var(--dur) var(--ease-out), width var(--dur) var(--ease-out);
 }
 .tab {
-  border: none;
+  position: relative;
+  z-index: 1;
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
   background: transparent;
-  padding: 7px 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 550;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
-  transition:
-    background var(--t-base) var(--ease),
-    color var(--t-base) var(--ease),
-    box-shadow var(--t-base) var(--ease);
+  cursor: pointer;
+  transition: color var(--dur) ease;
 }
 .tab:hover {
   color: var(--ink);
 }
 .active {
-  background: var(--surface);
-  color: var(--forest-fg);
-  font-weight: 650;
-  box-shadow: var(--tab-shadow);
+  color: var(--ink);
 }
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 .chip {
-  border: 1px solid var(--line-strong);
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
   background: var(--surface);
   color: var(--ink-2);
-  height: 34px;
-  padding: 0 15px;
-  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 12.5px;
-  font-weight: 550;
-  box-shadow: var(--elev-1);
-  transition:
-    background var(--t-base) var(--ease),
-    border-color var(--t-base) var(--ease),
-    box-shadow var(--t-base) var(--ease);
+  transition: background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease;
 }
 .chip:hover {
-  border-color: var(--leaf);
+  background: var(--hover);
   color: var(--ink);
 }
 .chipActive,
 .chipActive:hover {
-  background: var(--forest);
-  border-color: var(--forest);
-  color: var(--on-forest);
-  box-shadow: var(--inset-top), var(--elev-1);
+  background: var(--sprout);
+  border-color: var(--sprout);
+  color: var(--sprout-ink);
 }

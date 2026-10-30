@@ -1,226 +1,297 @@
 /*
- * Sistema de diseño «Verde pastel» (v4.6, 2026-10), el mismo de Figma y de la versión de Matos: tinta verdosa #1C2420,
- * verde oscuro #1D6B3E para acciones, verde #2F9E5B, suave #E6F4EA, rojo #D4554F, ámbar #B45309 y tipografía Urbanist.
- * Menú claro con píldora activa, tarjetas blancas muy redondeadas y fotografías solo en portadas. Fuente única de
- * colores, tipografía, radios y sombras; ningún componente usa un color suelto.
+ * Variables de diseño. Dirección visual inspirada en las referencias Clerio CRM y Pay Key (octubre de 2026): un solo
+ * tema claro, encabezado con degradado verde pastel, tarjetas blancas muy redondeadas sin borde con sombra suave,
+ * navegación superior en píldora, cifras grandes y livianas y Urbanist en todo. Ningún componente usa un color suelto.
+ *
+ * Los tokens --dark-*, --nav-* y --app-bg existían para superficies "siempre oscuras"; ahora apuntan a valores claros
+ * para que esas superficies hereden el tema blanco sin reescribir cada pantalla.
  */
 :root {
   /* marca */
   --forest: #1d6b3e;
-  --forest-2: #174f2e;
-  --leaf: #1d6b3e;
-  --sprout: #2f9e5b;
+  --leaf: #1d7240;
+  /* --sprout oscurecido un paso (oct. 2026) para que el texto blanco de los botones pase AA (4,5:1). */
+  --sprout: #23874d;
+  --sprout-ink: #ffffff;
   --sprout-soft: #e6f4ea;
-  --sprout-ink: #0f1512;
-  --forest-fg: #1d6b3e;
-  --lime: #9fd3b2;
-  --olive: #1d6b3e;
+  --forest-fg: #17532f;
   --on-forest: #ffffff;
-  --harvest: #f3c969;
-  --harvest-soft: #fef3c7;
-  --clay: #d4554f;
-  --sky: #3a7ca5;
-  --sky-soft: #e4eff6;
-
   /* fondos y bordes */
-  --app-bg: #0f1512;
-  --app-bg-2: #1b2420;
+  --app-bg: #f4f7f5;
   --ground: #f4f7f5;
   --surface: #ffffff;
   --surface-2: #f8faf9;
-  --surface-3: #eef3f0;
-  --segment-bg: #e3ebe6;
-  --line: #e1e9e4;
-  --line-soft: #eaf0ec;
-  --line-strong: #c9d6ce;
-  --hover: #eef5f0;
-
+  --surface-3: #f0f4f1;
+  --segment-bg: #eef3ef;
+  --line: #e8ede9;
+  --line-soft: #f0f3f1;
+  --line-strong: #d6ddd8;
+  --hover: #f2f6f3;
+  /* franja de color del encabezado (como el azul de Clerio, en verde): barra superior y título en blanco encima */
+  /* Franja más profunda arriba: los títulos blancos grandes quedan por encima de 3:1 (AA texto grande). */
+  --hero-from: #367d55;
+  --hero-to: #86c09c;
+  --band-height: 470px;
+  /* degradado pastel suave (página pública, inicio de sesión) */
+  --pastel-from: #dff1e5;
+  --pastel-to: #f4f7f5;
+  --on-band: #ffffff;
+  --on-band-muted: rgba(255, 255, 255, 0.9);
+  --band-glass: rgba(255, 255, 255, 0.2);
+  --band-glass-line: rgba(255, 255, 255, 0.5);
+  --overlay: rgba(17, 24, 20, 0.32);
+  --glass: rgba(255, 255, 255, 0.92);
+  --spot: transparent;
+  --spot-border: var(--line-strong);
+  --skeleton: #eef0ee;
+  --skeleton-shine: rgba(255, 255, 255, 0.7);
   /* texto */
   --ink: #1c2420;
   --ink-2: #4b5650;
-  --muted: #7a847e;
-  --muted-2: #a3ada7;
-  --link: #1d6b3e;
-
+  /* Grises de texto con contraste AA sobre blanco y sobre --ground (5,8:1 y 4,8:1). */
+  --muted: #5d6862;
+  --muted-2: #6b7570;
+  --link: #15803d;
   /* semánticos */
-  --good: #1d6b3e;
+  --good: #1d7f4b;
   --good-soft: #e6f4ea;
-  --good-line: #9fd3b2;
-  --good-tag-bg: #d7eedf;
-  --good-tag-fg: #175a33;
+  --good-line: #b7e4c7;
   --warn: #b45309;
-  --warn-soft: #fef3c7;
-  --warn-line: #ecd29b;
-  --warn-tag-bg: #fdeab0;
-  --warn-tag-fg: #8a4106;
-  --bad: #d4554f;
+  --warn-soft: #fffbeb;
+  --warn-line: #f5d38a;
+  --warn-tag-bg: #fef3c7;
+  --warn-tag-fg: #92400e;
+  --bad: #c2423c;
   --bad-soft: #fdeeed;
-  --bad-line: #efc0ba;
-  --bad-tag-bg: #fbe0de;
-  --bad-tag-fg: #a63a35;
-  --accent: #d4554f;
-
-  /* gráficos: categorías en orden fijo (validado para daltonismo) */
-  --chart-1: #2f9e5b;
-  --chart-2: #e3a33b;
-  --chart-3: #3a7ca5;
-  --chart-4: #d4554f;
-  --chart-5: #1d6b3e;
-  --chart-6: #9fd3b2;
-  --chart-grid: #e6eee9;
-  --chart-area: rgba(47, 158, 91, 0.16);
-
-  /* barra lateral */
-  --nav-ink: #3b4741;
-  --nav-muted: #7a847e;
-  --nav-exit: #4b5650;
-  --nav-line: rgba(28, 36, 32, 0.08);
-  --nav-hover: rgba(47, 158, 91, 0.08);
-  --nav-active: #e6f4ea;
-  --nav-active-rail: #cdebd8;
-  --nav-badge-bg: #fef3c7;
-  --nav-badge-fg: #8a4106;
-  --nav-badge-dot: #b45309;
-  --nav-bg: #ffffff;
-  --nav-on: #1d6b3e;
-  --nav-brand: #1c2420;
-
-  /* geometría, sombras y tipografía */
-  --radius: 14px;
-  --radius-sm: 8px;
-  --radius-panel: 20px;
-  --shadow: var(--elev-1);
-  --shadow-card: var(--ring), var(--elev-2);
-  --shadow-pop: var(--elev-3);
-  --shadow-panel: var(--elev-4);
-  --font-body: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
-  --font-heading: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
-  --font-script: "Urbanist Variable", "Urbanist", system-ui, sans-serif;
-  --nav-width: 252px;
-  --nav-rail: 76px;
-  --content-max: 1440px;
-
-  /* escala de espacio (4 px) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-
-  /* escala tipográfica */
-  --text-xs: 11.5px;
-  --text-sm: 12.5px;
-  --text-md: 13.5px;
-  --text-lg: 15px;
-  --text-xl: 18px;
-  --track-caps: 0.06em;
-
-  /* elevación en capas: borde fino + sombra de contacto + sombra ambiental */
-  --ring: 0 0 0 1px rgba(28, 36, 32, 0.04);
-  --elev-1: 0 1px 1px rgba(28, 36, 32, 0.04), 0 1px 2px rgba(28, 36, 32, 0.06);
-  --elev-2: 0 1px 2px rgba(28, 36, 32, 0.05), 0 4px 10px -4px rgba(28, 36, 32, 0.1), 0 10px 24px -14px rgba(28, 36, 32, 0.14);
-  --elev-3: 0 2px 4px rgba(28, 36, 32, 0.06), 0 12px 24px -8px rgba(28, 36, 32, 0.16), 0 24px 48px -24px rgba(28, 36, 32, 0.2);
-  --elev-4: 0 4px 8px rgba(28, 36, 32, 0.08), 0 24px 48px -12px rgba(28, 36, 32, 0.32);
-  --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  --inset-well: inset 0 1px 2px rgba(28, 36, 32, 0.06);
-  --scrim: rgba(15, 21, 18, 0.52);
-  --focus-ring: 0 0 0 3px var(--sprout-soft), 0 0 0 4px var(--leaf);
-  --tab-shadow: 0 1px 2px rgba(28, 36, 32, 0.1), 0 0 0 1px var(--line);
-  --on-harvest: #4a2a05;
-  --on-photo: #ffffff;
-  --on-photo-2: rgba(255, 255, 255, 0.86);
-  --on-photo-line: rgba(255, 255, 255, 0.5);
-  --photo-veil: rgba(15, 21, 18, 0.86);
-  --photo-veil-mid: rgba(15, 21, 18, 0.55);
-  --photo-veil-soft: rgba(15, 21, 18, 0.25);
-  --glass: rgba(255, 255, 255, 0.1);
-  --glass-hover: rgba(255, 255, 255, 0.2);
-
-  /* movimiento */
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --t-fast: 0.12s;
-  --t-base: 0.18s;
+  --bad-line: #fecaca;
+  --bad-tag-bg: #fde8e7;
+  --bad-tag-fg: #b8423c;
+  --accent: #c2410c;
+  /* barra lateral (clara) */
+  --nav-ink: #47514b;
+  --nav-muted: #6b746f;
+  --nav-exit: #6b746f;
+  --nav-line: #e4e7e4;
+  --nav-hover: #f1f3f1;
+  --nav-active: #ffffff;
+  --nav-active-rail: #2f9e5b;
+  --nav-badge-bg: #fee2e2;
+  --nav-badge-fg: #991b1b;
+  --nav-badge-dot: #dc2626;
+  --nav-brand: #111814;
+  /* antiguas superficies oscuras: ahora claras */
+  --dark-ink: #111814;
+  --dark-ink-2: #47514b;
+  --dark-muted: #6b746f;
+  --dark-line: #e4e7e4;
+  --dark-glass: rgba(255, 255, 255, 0.92);
+  --dark-surface: #ffffff;
+  --dark-bad: #b91c1c;
+  --dark-warn: #b45309;
+  /* papel (banda académica, fondo del logo de la universidad) */
+  --paper: #ffffff;
+  --paper-ink: #111814;
+  --paper-ink-2: #47514b;
+  --paper-muted: #6b746f;
+  --paper-line: #e4e7e4;
+  --logo-bg: #ffffff;
+  /* geometría y tipografía */
+  --radius: 28px;
+  --radius-sm: 12px;
+  --radius-panel: 34px;
+  --shadow: 0 1px 2px rgba(28, 52, 38, 0.03), 0 10px 30px -18px rgba(28, 52, 38, 0.14);
+  --shadow-lift: 0 14px 34px -16px rgba(28, 52, 38, 0.22);
+  --shadow-panel: 0 24px 60px -24px rgba(28, 52, 38, 0.28);
+  --font-body: "Urbanist", "Inter", system-ui, sans-serif;
+  --font-heading: "Urbanist", "Inter", system-ui, sans-serif;
+  /* La serif decorativa se retiró: los acentos de los titulares usan la misma letra. */
+  --font-serif: var(--font-heading);
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-dots: var(--font-heading);
+  --nav-width: 232px;
+  --nav-rail: 68px;
+  /* movimiento: solo transiciones cortas de estado */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 0.12s;
+  --dur: 0.15s;
+  --dur-slow: 0.2s;
+  --stagger: 0ms;
+  /* blanco fijo (no cambia con el tema): reflejos de vidrio, texto sobre la franja y píldoras sobre ella */
+  --white: #ffffff;
+  --shadow-ink: #10301e;
+  --band-pill: #ffffff;
+  --band-pill-ink: #1d6b3e;
+  --band-leaf: #eef7f1;
+  /* abanico de vidrio del Inicio y maqueta de la página pública */
+  --fan-1: #c8ecd5;
+  --fan-2: #5fbf86;
+  --fan-3: #2f9e5b;
+  --fan-4: #8fd6aa;
+  /* Tita, la mascota: tierra, ojos y mejillas */
+  --tita-soil: #c9a57f;
+  --tita-ink: #12301f;
+  --tita-cheek: #f2a7a0;
   color-scheme: light;
-  font-weight: 700;
 }
 
-/* Tema oscuro: mismas variables, activado con data-theme="dark" (selector en la barra superior). */
+/*
+ * Modo oscuro (brief de octubre de 2026, punto 36). El tema claro sigue siendo el predeterminado; la persona elige
+ * «Oscuro» o «Del dispositivo» en Mi perfil (`html[data-theme]`, ver `lib/theme.ts`). Solo cambian las variables: las
+ * pantallas no conocen el tema. El papel de los reportes (`--paper-*`) y el logo siguen claros, como en la impresión.
+ */
 :root[data-theme="dark"] {
-  --sprout-soft: #16301f;
-  --on-forest: #0f1512;
-  --forest-fg: #8fd9ae;
-  --forest: #9fd3b2;
-  --forest-2: #0f1512;
-  --leaf: #8fd9ae;
-  --harvest-soft: #3a2e14;
-  --sky-soft: #172b38;
-  --app-bg: #0a0f0c;
-  --app-bg-2: #121915;
+  --forest: #a6e3bf;
+  --leaf: #3fb26f;
+  --sprout: #4cc07e;
+  --sprout-ink: #0f1a13;
+  --sprout-soft: #1d3527;
+  --forest-fg: #a6e3bf;
+  --on-forest: #0f1a13;
+  --app-bg: #0f1512;
   --ground: #0f1512;
-  --surface: #1b2420;
-  --surface-2: #1f2a24;
-  --surface-3: #222d27;
-  --segment-bg: #222d27;
-  --line: #2a372f;
-  --line-soft: #222d27;
-  --line-strong: #3a4a40;
-  --hover: #222d27;
-  --ink: #e9f0eb;
-  --ink-2: #b7c3bb;
-  --muted: #8a978f;
-  --muted-2: #6b7871;
-  --link: #8fd9ae;
-  --good: #7fd9a3;
-  --good-soft: #15301f;
-  --good-line: #2f6a4c;
-  --good-tag-bg: #15301f;
-  --good-tag-fg: #7fd9a3;
-  --warn: #e9b764;
-  --warn-soft: #33290f;
-  --warn-line: #6e5a25;
-  --warn-tag-bg: #3a2e14;
-  --warn-tag-fg: #e9b764;
-  --bad: #f19a90;
-  --bad-soft: #36201d;
-  --bad-line: #6e3a34;
-  --bad-tag-bg: #3c211e;
-  --bad-tag-fg: #f19a90;
-  --accent: #f19a90;
-  --chart-1: #5cc47e;
-  --chart-2: #ebb85c;
-  --chart-3: #6aaed6;
-  --chart-4: #f19a90;
-  --chart-5: #8fd9ae;
-  --chart-6: #9fd3b2;
-  --chart-grid: #222d27;
-  --chart-area: rgba(92, 196, 126, 0.16);
-  --ring: 0 0 0 1px rgba(255, 255, 255, 0.03);
-  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --elev-2: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 20px -10px rgba(0, 0, 0, 0.6);
-  --elev-3: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 32px -12px rgba(0, 0, 0, 0.75);
-  --elev-4: 0 4px 8px rgba(0, 0, 0, 0.55), 0 28px 56px -16px rgba(0, 0, 0, 0.85);
-  --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --inset-well: inset 0 1px 2px rgba(0, 0, 0, 0.45);
-  --scrim: rgba(0, 0, 0, 0.64);
-  --tab-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--line-strong);
-  --shadow: var(--elev-1);
-  --shadow-card: var(--ring), var(--elev-2);
-  --shadow-pop: var(--elev-3);
-  --shadow-panel: var(--elev-4);
-  --nav-bg: #121915;
-  --nav-on: #8fd9ae;
-  --nav-ink: #b7c3bb;
-  --nav-muted: #8a978f;
-  --nav-exit: #9aa7a0;
-  --nav-line: rgba(255, 255, 255, 0.08);
-  --nav-hover: rgba(255, 255, 255, 0.06);
-  --nav-active: rgba(143, 217, 174, 0.14);
-  --nav-active-rail: rgba(143, 217, 174, 0.2);
-  --nav-brand: #ffffff;
-  --nav-badge-bg: rgba(227, 163, 59, 0.2);
-  --nav-badge-fg: #f2c477;
-  --nav-badge-dot: #e3a33b;
+  --surface: #1a221d;
+  --surface-2: #1f2923;
+  --surface-3: #243029;
+  --segment-bg: #202a24;
+  --line: #2a352e;
+  --line-soft: #232d27;
+  --line-strong: #36433b;
+  --hover: #25302a;
+  --hero-from: #1f4a33;
+  --hero-to: #15241b;
+  --pastel-from: #1a2c21;
+  --pastel-to: #0f1512;
+  --on-band: #ffffff;
+  --on-band-muted: rgba(255, 255, 255, 0.82);
+  --band-glass: rgba(255, 255, 255, 0.1);
+  --band-glass-line: rgba(255, 255, 255, 0.24);
+  --band-pill: #e7f3ec;
+  --band-pill-ink: #14462a;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --glass: rgba(26, 34, 29, 0.92);
+  --skeleton: #242e28;
+  --skeleton-shine: rgba(255, 255, 255, 0.06);
+  --ink: #e7ede9;
+  --ink-2: #c3ccc6;
+  --muted: #9fa9a3;
+  --muted-2: #85908a;
+  --link: #6fd39a;
+  --good: #5fcf8f;
+  --good-soft: #17301f;
+  --good-line: #2b5a3c;
+  --warn: #f0b45a;
+  --warn-soft: #2e2412;
+  --warn-line: #5c4720;
+  --warn-tag-bg: #3a2c12;
+  --warn-tag-fg: #f3c77d;
+  --bad: #f08a84;
+  --bad-soft: #33191a;
+  --bad-line: #5e2c2b;
+  --bad-tag-bg: #3d1d1c;
+  --bad-tag-fg: #f5a39e;
+  --accent: #f39a62;
+  --nav-ink: #c3ccc6;
+  --nav-muted: #8f9993;
+  --nav-exit: #9fa9a3;
+  --nav-line: #2a352e;
+  --nav-hover: #222c26;
+  --nav-active: #1a221d;
+  --nav-active-rail: #4cc07e;
+  --nav-badge-bg: #3d1d1c;
+  --nav-badge-fg: #f5a39e;
+  --nav-badge-dot: #f08a84;
+  --nav-brand: #e7ede9;
+  --dark-ink: #e7ede9;
+  --dark-ink-2: #c3ccc6;
+  --dark-muted: #9fa9a3;
+  --dark-line: #2a352e;
+  --dark-glass: rgba(26, 34, 29, 0.92);
+  --dark-surface: #1a221d;
+  --dark-bad: #f08a84;
+  --dark-warn: #f0b45a;
+  --shadow-ink: #000000;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -18px rgba(0, 0, 0, 0.7);
+  --shadow-lift: 0 14px 34px -16px rgba(0, 0, 0, 0.7);
+  --shadow-panel: 0 24px 60px -24px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    --forest: #a6e3bf;
+    --leaf: #3fb26f;
+    --sprout: #4cc07e;
+    --sprout-ink: #0f1a13;
+    --sprout-soft: #1d3527;
+    --forest-fg: #a6e3bf;
+    --on-forest: #0f1a13;
+    --app-bg: #0f1512;
+    --ground: #0f1512;
+    --surface: #1a221d;
+    --surface-2: #1f2923;
+    --surface-3: #243029;
+    --segment-bg: #202a24;
+    --line: #2a352e;
+    --line-soft: #232d27;
+    --line-strong: #36433b;
+    --hover: #25302a;
+    --hero-from: #1f4a33;
+    --hero-to: #15241b;
+    --pastel-from: #1a2c21;
+    --pastel-to: #0f1512;
+    --on-band: #ffffff;
+    --on-band-muted: rgba(255, 255, 255, 0.82);
+    --band-glass: rgba(255, 255, 255, 0.1);
+    --band-glass-line: rgba(255, 255, 255, 0.24);
+    --band-pill: #e7f3ec;
+    --band-pill-ink: #14462a;
+    --overlay: rgba(0, 0, 0, 0.55);
+    --glass: rgba(26, 34, 29, 0.92);
+    --skeleton: #242e28;
+    --skeleton-shine: rgba(255, 255, 255, 0.06);
+    --ink: #e7ede9;
+    --ink-2: #c3ccc6;
+    --muted: #9fa9a3;
+    --muted-2: #85908a;
+    --link: #6fd39a;
+    --good: #5fcf8f;
+    --good-soft: #17301f;
+    --good-line: #2b5a3c;
+    --warn: #f0b45a;
+    --warn-soft: #2e2412;
+    --warn-line: #5c4720;
+    --warn-tag-bg: #3a2c12;
+    --warn-tag-fg: #f3c77d;
+    --bad: #f08a84;
+    --bad-soft: #33191a;
+    --bad-line: #5e2c2b;
+    --bad-tag-bg: #3d1d1c;
+    --bad-tag-fg: #f5a39e;
+    --accent: #f39a62;
+    --nav-ink: #c3ccc6;
+    --nav-muted: #8f9993;
+    --nav-exit: #9fa9a3;
+    --nav-line: #2a352e;
+    --nav-hover: #222c26;
+    --nav-active: #1a221d;
+    --nav-active-rail: #4cc07e;
+    --nav-badge-bg: #3d1d1c;
+    --nav-badge-fg: #f5a39e;
+    --nav-badge-dot: #f08a84;
+    --nav-brand: #e7ede9;
+    --dark-ink: #e7ede9;
+    --dark-ink-2: #c3ccc6;
+    --dark-muted: #9fa9a3;
+    --dark-line: #2a352e;
+    --dark-glass: rgba(26, 34, 29, 0.92);
+    --dark-surface: #1a221d;
+    --dark-bad: #f08a84;
+    --dark-warn: #f0b45a;
+    --shadow-ink: #000000;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -18px rgba(0, 0, 0, 0.7);
+    --shadow-lift: 0 14px 34px -16px rgba(0, 0, 0, 0.7);
+    --shadow-panel: 0 24px 60px -24px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+  }
 }

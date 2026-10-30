@@ -1,0 +1,102 @@
+/* Bitácora de escrituras: filas agrupadas por día, hora alineada y método como etiqueta. */
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.entry + .entry .row {
+  border-top: 1px solid var(--line-soft);
+}
+.entry + .entry .day + .row {
+  border-top: none;
+}
+
+.day {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.entry:first-child .day {
+  border-top: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 76px 74px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  padding: 10px 12px;
+  transition: background-color var(--dur) ease;
+}
+.row:hover {
+  background: var(--surface-2);
+}
+.time {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.method {
+  display: flex;
+}
+.line {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.user {
+  font-weight: 600;
+  color: var(--ink);
+}
+.verb {
+  color: var(--muted);
+}
+
+.path {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.slash {
+  color: var(--muted-2);
+}
+.segId {
+  color: var(--link);
+  font-weight: 600;
+}
+.ai {
+  display: inline-flex;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.id {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 4px;
+  }
+  .line {
+    grid-column: 1 / -1;
+  }
+  .id {
+    display: none;
+  }
+}

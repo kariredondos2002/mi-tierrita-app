@@ -1,5 +1,5 @@
 import { Card, EmptyState, ErrorState, Loading } from "@/components/ui";
-import { HBarChart } from "@/components/charts";
+import { VBarChart } from "@/components/charts";
 import { useProducts } from "@/hooks/products";
 import { int } from "@/lib/format";
 import styles from "./InventoryScreen.module.css";
@@ -24,7 +24,7 @@ export const ProductsByLineCard = () => {
         <EmptyState title="Aún no hay productos" />
       ) : (
         <>
-          <HBarChart stacked data={rows.slice(0, 6).map(([label, value]) => ({ label, value }))} format={int} />
+          <VBarChart data={rows.slice(0, 6).map(([label, value]) => ({ label, value }))} format={int} />
           <p className={styles.note}>
             {top[0]} es la línea con más productos ({int(top[1])}).{partial ? ` Conteo entre los primeros ${int(data.items.length)} de ${int(data.count)}.` : ""}
           </p>

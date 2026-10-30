@@ -1,77 +1,90 @@
 /* Proveedores: lienzo Proveedores.dc.html (Administrador) y BodProveedores.dc.html (Bodega). */
 .page {
+  container: suppliers / inline-size;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-/* Aviso de consulta del lienzo de Bodega: fondo verde suave, borde verde claro, texto bosque. */
+/* Aviso de consulta para Bodega: fondo verde suave, borde verde claro, texto bosque. */
 .info {
   background: var(--good-soft);
   border: 1px solid var(--good-line);
-  border-radius: 9px;
+  border-radius: var(--radius);
   padding: 10px 14px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--forest-fg);
 }
 
-/* Directorio 1,5fr + panel lateral 1fr, como en el lienzo del Administrador. */
+/* Directorio a la izquierda, recepciones por vencer (fijo al hacer scroll) a la derecha. */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: 16px;
   align-items: start;
 }
-@media (max-width: 1000px) {
+@container suppliers (max-width: 900px) {
+  /* minmax(0, …): los nombres en una sola línea de «Recepciones por vencer» no deben ensanchar la columna. */
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.directory {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+}
+.headTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.headTitle h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.headCount {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 11px;
 }
 .search {
-  max-width: 260px;
-  height: 34px;
-  font-size: 12.5px;
+  position: relative;
+  width: 270px;
+  max-width: 100%;
+  color: var(--muted);
 }
-.pager {
-  padding-top: 8px;
+.search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
-
-.name {
-  font-weight: 600;
-  color: var(--ink);
+.search input {
+  padding-left: 32px;
 }
-.secondary {
-  color: var(--ink-2);
-}
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12.5px;
-  color: var(--ink-2);
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.cardLink {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--link);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.cardLink:hover {
-  text-decoration: underline;
+@media (max-width: 640px) {
+  .search {
+    width: 100%;
+  }
 }
 
 /* formularios de los modales */
@@ -90,7 +103,7 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
 }
 .summary {
@@ -105,7 +118,7 @@
   gap: 2px;
 }
 .summaryLabel {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 .summaryValue {

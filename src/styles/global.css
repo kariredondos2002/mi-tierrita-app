@@ -14,45 +14,51 @@ body,
 
 body {
   margin: 0;
-  background: var(--app-bg);
+  background: var(--ground);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: var(--text-md);
+  font-size: 14px;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "cv11", "ss03";
-  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--sprout-soft);
+  color: var(--ink);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-weight: 650;
+  font-family: var(--font-heading);
+  font-weight: 600;
   margin: 0;
   color: var(--ink);
   letter-spacing: -0.01em;
 }
 
 h1 {
-  font-family: var(--font-heading);
-  font-size: 42px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.015em;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  font-size: var(--text-lg);
-  line-height: 1.35;
-  letter-spacing: -0.012em;
+  font-size: 15px;
 }
 
 h3 {
-  font-size: var(--text-md);
-  letter-spacing: -0.006em;
+  font-size: 14px;
 }
 
 p {
@@ -67,6 +73,20 @@ a:hover {
   color: var(--forest-fg);
 }
 
+/* Sin serif decorativa: los acentos de los titulares (`*así*`) se leen igual que el resto. */
+em {
+  font: inherit;
+  font-style: normal;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+/* Sin especificidad: cualquier módulo puede sustituir el foco por el suyo. */
+:where(:focus-visible) {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+}
+
 button,
 input,
 select,
@@ -75,20 +95,9 @@ textarea {
   color: inherit;
 }
 
-:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
-}
-
 table {
   border-collapse: collapse;
   width: 100%;
-}
-
-::selection {
-  background: var(--sprout);
-  color: var(--forest-2);
 }
 
 .num {
@@ -117,11 +126,105 @@ table {
   white-space: nowrap;
 }
 
+/* Transición entre pantallas: un fundido corto. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(page) {
+  animation: none;
+}
+::view-transition-old(page),
+::view-transition-new(page) {
+  animation-duration: 0.12s;
+}
+
+/*
+ * Movimiento mínimo y funcional: ninguna animación de entrada, bucle ni efecto decorativo. Solo se conservan las
+ * transiciones cortas de estado (hover, foco, abrir y cerrar) y lo marcado con data-motion: indicadores de carga y
+ * la página pública, que conserva sus animaciones.
+ */
+*:not([data-motion]):not([data-motion] *),
+*:not([data-motion]):not([data-motion] *)::before,
+*:not([data-motion]):not([data-motion] *)::after {
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(page),
+  ::view-transition-new(page) {
+    animation: none;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Impresión de un documento (lib/print.ts): solo el contenedor #print-root, en papel blanco y sin animaciones. */
+#print-root {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 12mm 16mm;
+    /* «Página X de Y» en el margen inferior (cajas de margen de CSS Paged Media; Chrome 131+). */
+    @bottom-right {
+      content: "Página " counter(page) " de " counter(pages);
+      font-family: "Urbanist", system-ui, sans-serif;
+      font-size: 9pt;
+      color: var(--paper-muted);
+    }
+  }
+  html[data-printing] body > :not(#print-root) {
+    display: none !important;
+  }
+  html[data-printing] #print-root {
+    display: block;
+  }
+  html[data-printing],
+  html[data-printing] body {
+    background: var(--white) !important;
+  }
+  #print-root * {
+    animation: none !important;
+    transition: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  #print-root > * {
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+  /* Tablas largas: el encabezado se repite en cada página, las filas no se parten y los totales cierran la tabla. */
+  #print-root thead {
+    display: table-header-group;
+  }
+  #print-root tfoot {
+    display: table-footer-group;
+  }
+  #print-root tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  #print-root [data-print-block] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* La portada ocupa su propia página. */
+  #print-root [data-print-cover] {
+    break-after: page;
+    page-break-after: always;
   }
 }

@@ -3,14 +3,20 @@ import { ROLE_LABELS, useSessionStore } from "@/stores/session";
 import type { Role } from "@/types/api";
 import { Button } from "@/components/ui";
 import { findRoute } from "@/router/navigation";
-import lostArt from "@/assets/ill/farm-girl_cefo.svg";
 import styles from "./RestrictedScreen.module.css";
 
 const LockIcon = () => (
-  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="4.5" y="10.5" width="15" height="10.5" rx="2.4" stroke="currentColor" strokeWidth="1.8" />
     <path d="M8.2 10.5 V7.4 a3.8 3.8 0 0 1 7.6 0 V10.5" stroke="currentColor" strokeWidth="1.8" />
     <circle cx="12" cy="15.8" r="1.5" fill="currentColor" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M15.5 15.5 L20 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
 
@@ -35,7 +41,7 @@ export const RestrictedScreen = ({ roles }: { roles: Role[] }) => {
         </div>
         <h1>{module} no está disponible para su cuenta</h1>
         <p>
-          {module === "Evaluación financiera"
+          {module === "Finanzas y crédito"
             ? "Este módulo contiene la evaluación de inversiones y las proyecciones financieras del negocio."
             : "Este módulo no forma parte de las tareas de su rol."}{" "}
           Está reservado para {describe(roles)}.
@@ -54,24 +60,18 @@ export const RestrictedScreen = ({ roles }: { roles: Role[] }) => {
   );
 };
 
-/** 404 con ilustración: la ruta no existe dentro del sistema. */
 export const NotFoundScreen = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   return (
     <div className={styles.wrap}>
       <div className={styles.box}>
-        <img src={lostArt} alt="" width={220} className={styles.art} />
-        <div className={styles.code}>404</div>
-        <h1>Esta página no está sembrada</h1>
-        <p>
-          No existe <code>{location.pathname}</code> en Mi Tierrita. Puede que el enlace esté incompleto o que el módulo haya cambiado de lugar.
-        </p>
+        <div className={styles.circle}>
+          <SearchIcon />
+        </div>
+        <h1>Página no encontrada</h1>
+        <p>La dirección no corresponde a ninguna pantalla del sistema.</p>
         <div className={styles.actions}>
-          <Button onClick={() => navigate("/")}>Volver al tablero</Button>
-          <Button variant="secondary" onClick={() => navigate(-1)}>
-            Regresar
-          </Button>
+          <Button onClick={() => navigate("/")}>Volver al inicio</Button>
         </div>
       </div>
     </div>

@@ -1,78 +1,99 @@
-/* Usuarios y roles: lienzo Usuarios.dc.html (Cuentas, matriz por rol y registro de actividad). */
+/* Usuarios y roles: equipo en tarjetas blancas, matriz de permisos y actividad reciente. */
 .page {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-.card {
-  border-radius: 10px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  align-items: start;
-}
-@media (max-width: 1000px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-.name {
-  font-weight: 600;
-  color: var(--ink);
-}
-.you {
-  margin-left: 6px;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 400;
-}
-.username {
-  color: var(--ink-2);
-}
-.date {
-  white-space: nowrap;
-  color: var(--ink-2);
-}
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
-  color: var(--ink);
-  word-break: break-all;
-}
-.pager {
-  padding-top: 8px;
+  gap: 16px;
 }
 
-/* matriz de módulos por rol */
-.full {
-  color: var(--good);
-  font-weight: 600;
-}
-.consult {
-  color: var(--ink-2);
-}
-.none {
-  color: var(--muted);
-}
-.legend {
+/* Equipo */
+.teamHead {
   display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  font-size: 11.5px;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.count {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.addItem {
+  display: flex;
+}
+.add {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 150px;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  color: var(--ink-2);
+  text-align: center;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--dur) ease,
+    background-color var(--dur) ease;
+}
+.add:hover {
+  border-color: var(--sprout);
+  background: var(--surface);
+}
+.add:focus-visible {
+  outline: 2px solid var(--sprout);
+  outline-offset: 2px;
+}
+.addPlus {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--forest);
+  background: var(--sprout-soft);
+}
+.addText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.addHint {
+  font-size: 13px;
   color: var(--muted);
 }
-.cardLink {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--link);
-  text-decoration: none;
-  white-space: nowrap;
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
 }
-.cardLink:hover {
-  text-decoration: underline;
+@media (max-width: 1080px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* formularios de los modales */

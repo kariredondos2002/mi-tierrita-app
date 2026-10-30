@@ -53,3 +53,6 @@ export const points = (fraction: number): string => `${fraction < 0 ? "−" : ""
 /** Número con signo tipográfico para mostrar una fórmula: −1,2. */
 export const signed = (value: number, digits = 2): string =>
   `${value < 0 ? "−" : ""}${new Intl.NumberFormat("es-CO", { maximumFractionDigits: digits }).format(Math.abs(value))}`;
+
+/** Nombre con que se muestra el ejemplo de la ampliación (aún sin guardar como proyecto). */
+export const EXAMPLE_NAME = "Ampliación del local (ejemplo)";

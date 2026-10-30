@@ -17,10 +17,9 @@ import { RisksTab } from "./RisksTab";
 import { ProjectsTab } from "./ProjectsTab";
 import { SaveAsModal } from "./SaveAsModal";
 import { SimulatorReport } from "./SimulatorReport";
-import { SIM_TABS, isSimTab, type SimTab, type TabProps } from "./simShared";
+import { SIM_TABS, isSimTab, type SimTab, type TabProps, EXAMPLE_NAME } from "./simShared";
 import styles from "./FinanceScreen.module.css";
 
-const EXAMPLE_NAME = "Ampliación del local (ejemplo)";
 
 /** Espera a que se deje de escribir antes de pedir el recálculo a la API. */
 const useDebounced = <T,>(value: T, ms: number): T => {

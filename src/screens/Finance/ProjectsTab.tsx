@@ -4,7 +4,7 @@ import { useCompareProjects, useDeleteProject, useProject, useProjects } from "@
 import { dateTime, int, money, moneyCompact, pct, times, years } from "@/lib/format";
 import { useSessionStore } from "@/stores/session";
 import type { ProjectComparison, ProjectScope, ProjectSummary } from "@/types/api";
-import { SimulatorReport } from "./SimulatorReport";
+import { SimulatorReportView } from "./SimulatorReportView";
 import styles from "./FinanceScreen.module.css";
 
 const MAX_COMPARED = 4;
@@ -13,18 +13,9 @@ const MAX_COMPARED = 4;
 const ExportProjectModal = ({ projectId, onClose }: { projectId: number; onClose: () => void }) => {
   const project = useProject(projectId);
   return (
-    <Modal open title="Exportar proyecto" description="El informe usa el cálculo guardado del proyecto, igual al de la pantalla." onClose={onClose}>
+    <Modal open title="Informe del proyecto" description="El informe usa el cálculo guardado del proyecto, igual al de la pantalla." onClose={onClose} wide>
       <QueryState query={project} empty={null}>
-        {(p) => (
-          <div className={styles.stackSm}>
-            <p className={styles.formula}>
-              <strong>{p.name}</strong> · VPN {money(p.result.indicators.npv)} · TIR {pct(p.result.indicators.irr)}
-            </p>
-            <div className={styles.actionsRow}>
-              <SimulatorReport name={p.name} projectId={p.id} input={p.input} result={p.result} />
-            </div>
-          </div>
-        )}
+        {(p) => <SimulatorReportView name={p.name} projectId={p.id} input={p.input} result={p.result} />}
       </QueryState>
     </Modal>
   );

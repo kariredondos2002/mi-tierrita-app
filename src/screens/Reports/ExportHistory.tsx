@@ -5,7 +5,7 @@ import { dateOnly, dateTime, int } from "@/lib/format";
 import type { ExportData, ExportReportKind, ReportExport } from "@/types/api";
 import styles from "./ReportsScreen.module.css";
 
-const REPORT_LABEL: Record<ExportReportKind, string> = { sales: "Reporte de ventas", inventory: "Reporte de inventario", receivables: "Reporte de cartera", scenario: "Escenario financiero" };
+const REPORT_LABEL: Record<ExportReportKind, string> = { sales: "Reporte de ventas", inventory: "Reporte de inventario", receivables: "Reporte de cartera", scenario: "Informe del simulador" };
 
 /** Nombre legible de cada filtro guardado y cómo mostrar su valor. */
 const FILTER_LABEL: Record<string, { label: string; value?: (v: string | number | boolean | null) => string }> = {

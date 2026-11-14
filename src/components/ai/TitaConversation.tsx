@@ -88,7 +88,7 @@ const Attachments = ({ files }: { files: AiAttachment[] }) => (
 );
 
 /**
- * Conversación con Tita (Claude por debajo). Responde con los datos reales del rol y puede hacer todo lo que esa cuenta
+ * Conversación con Tita (modelo de IA de Anthropic por debajo). Responde con los datos reales del rol y puede hacer todo lo que esa cuenta
  * puede hacer en el sistema: cada escritura llega como tarjeta y solo se ejecuta si la persona la confirma, contra la
  * API real (mismos permisos, validaciones y auditoría). Acepta fotos y documentos, y conversación por voz.
  * La usan el panel rápido (`compact`) y la página /tita.

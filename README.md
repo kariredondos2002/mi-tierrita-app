@@ -21,7 +21,7 @@ por REST y recibe los avisos en tiempo real (chat, alarmas, vencimientos) por Se
 
 **Demostración:** [mi-tierrita-app-keoc.vercel.app](https://mi-tierrita-app-keoc.vercel.app) (Vercel, datos de ejemplo).
 
-**Enlaces:** [presentación (Figma Slides)](https://www.figma.com/deck/0bH9C8DbFsVHskGEeIQPIW/PRESENTACI%C3%93N-Mi-Tierrita-SIG?node-id=0-20) · [repositorio del servidor](https://github.com/kariredondos2002/mi-tierrita-api) · [manual de usuario](docs/manual-de-usuario.md) · [auditoría del sistema](docs/auditoria/README.md) · [registro de cambios](CHANGELOG.md)
+**Enlaces:** [presentación (Figma Slides)](https://www.figma.com/deck/0bH9C8DbFsVHskGEeIQPIW/PRESENTACI%C3%93N-Mi-Tierrita-SIG?node-id=0-20) · [repositorio del servidor](https://github.com/kariredondos2002/mi-tierrita-api) · [manuales por rol (Figma)](https://www.figma.com/design/O5PvdXx37jNt0NBOSPKhoT/DISE%C3%91O-Mi-Tierrita-SIG?node-id=3-5) · [todos los enlaces](docs/ENLACES.md) · [cuentas de prueba](docs/datos-de-prueba.md)
 
 ![Inicio del administrador](docs/capturas/03-inicio-administrador.jpg)
 
@@ -45,9 +45,14 @@ Cuentas para entrar: las de los datos de ejemplo del servidor (`pnpm db:seed`, u
 
 | Documento | Contenido |
 |---|---|
-| [docs/manual-de-usuario.md](docs/manual-de-usuario.md) | Manual de usuario por rol |
+| [docs/README.md](docs/README.md) | Índice de la documentación y orden de lectura según tu rol |
+| [docs/desarrollo.md](docs/desarrollo.md) | Entorno local, scripts, reglas del código, ramas y definición de «terminado» |
+| [docs/SISTEMA-DISENO.md](docs/SISTEMA-DISENO.md) | Tokens, paleta, tipografía, componentes y movimiento |
+| [docs/datos-de-prueba.md](docs/datos-de-prueba.md) | Cuentas demo por rol y qué probar con cada una |
+| [docs/manual-de-usuario.md](docs/manual-de-usuario.md) | Manual de usuario por rol en texto; los manuales con capturas están en [Figma](https://www.figma.com/design/O5PvdXx37jNt0NBOSPKhoT/DISE%C3%91O-Mi-Tierrita-SIG?node-id=3-5) |
 | [docs/auditoria/README.md](docs/auditoria/README.md) | Auditoría integral: informe, hallazgos, mapa, redundancias, pruebas, pendientes y evaluación final |
 | [docs/capturas/](docs/capturas) | Capturas de las pantallas (ver [Capturas](#capturas)) |
+| [docs/ENLACES.md](docs/ENLACES.md) | Repositorios, demostración, presentación, diseño, manuales por rol (Figma) y diagramas |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios |
 | `/ayuda/tita` (dentro de la app) | Manual de Tita, general y por rol |
 

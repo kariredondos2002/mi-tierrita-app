@@ -38,8 +38,9 @@ cp .env.example .env      # VITE_API_URL=http://localhost:4300/api/v1
 pnpm dev                  # http://localhost:5173
 ```
 
-Cuentas para entrar: las de los datos de ejemplo del servidor (`pnpm db:seed`, usuarios `demo.admin`, `demo.caja` y
-`demo.bodega`). Para Tita (la asistente) el servidor necesita `ANTHROPIC_API_KEY`.
+Cuentas para entrar: en la demostración publicada, `admin`, `ventas` y `almacen` (contraseñas en
+[docs/datos-de-prueba.md](docs/datos-de-prueba.md#cuentas-de-la-demostración-publicada)); en una instalación local, las
+de los datos de ejemplo del servidor (`pnpm db:seed`, usuarios `demo.admin`, `demo.caja` y `demo.bodega`). Para Tita (la asistente) el servidor necesita `ANTHROPIC_API_KEY`.
 
 ## Documentación
 
